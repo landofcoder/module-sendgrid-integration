@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+	<menu>
+		<add action="lof_sendgrid/singlesend/index" id="Lof_SendGrid::lof_sendgrid_singlesend" module="Lof_SendGrid" parent="Magento_Backend::marketing" resource="Magento_Backend::content" sortOrder="9999" title="SingleSend"/>
+		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_statistics" module="Lof_SendGrid" parent="Magento_Reports::report" resource="Magento_Backend::content" sortOrder="9999" title="Statistics"/>
+	</menu>
+</config>

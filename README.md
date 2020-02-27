@@ -1,0 +1,97 @@
+# Mage2 Module Lof SendGrid
+
+    ``lof/module-sendgrid``
+
+ - [Main Functionalities](#markdown-header-main-functionalities)
+ - [Installation](#markdown-header-installation)
+ - [Configuration](#markdown-header-configuration)
+ - [Specifications](#markdown-header-specifications)
+ - [Attributes](#markdown-header-attributes)
+
+
+## Main Functionalities
+
+
+## Installation
+\* = in production please use the `--keep-generated` option
+
+### Type 1: Zip file
+
+ - Unzip the zip file in `app/code/Lof`
+ - Enable the module by running `php bin/magento module:enable Lof_SendGrid`
+ - Apply database updates by running `php bin/magento setup:upgrade`\*
+ - Flush the cache by running `php bin/magento cache:flush`
+
+### Type 2: Composer
+
+ - Make the module available in a composer repository for example:
+    - private repository `repo.magento.com`
+    - public repository `packagist.org`
+    - public github repository as vcs
+ - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
+ - Install the module composer by running `composer require lof/module-sendgrid`
+ - enable the module by running `php bin/magento module:enable Lof_SendGrid`
+ - apply database updates by running `php bin/magento setup:upgrade`\*
+ - Flush the cache by running `php bin/magento cache:flush`
+
+
+## Configuration
+
+ - Enabled (sendgrid/general/enabled)
+
+ - API Key (sendgrid/general/api_key)
+
+ - Subscribe List (sendgrid/general/subscribe_list)
+
+ - Unsubscribe List	 (sendgrid/general/unsubscribe_list)
+
+ - Add customers without subscriptions status in SendGrid	 (sendgrid/general/add_customer)
+
+ - webhook_url (sendgrid/general/webhook_url)
+
+ - Webhook Url	 (sendgrid/general/list_for_new_customer)
+
+ - Cron Enabled (sendgrid/sync/cron_enable)
+
+ - Enabled SMTP (smtp/general/enabled)
+
+ - Local Client Hostname (smtp/smtp_settings/local_client_host_name)
+
+ - Host (smtp/general/host)
+
+ - Port (smtp/general/port)
+
+ - Connection Security	 (smtp/general/connection_security)
+
+ - Authentication Method (smtp/general/authentication_method)
+
+ - Username	 (smtp/general/username)
+
+ - Password (smtp/general/password)
+
+ - Send Test To E-mail	 (smtp/general/send_test_to_email)
+
+ - Add Plain Text Part in Email (smltp/email_settings/add_plain_text_part_in_email)
+
+ - Use Another Email Sender (smtp/email_settings/use_another_email_sender)
+
+ - CC Emails	 (smtp/email_settings/cc_emails)
+
+ - BCC Emails	 (smtp/email_settings/bcc_emails)
+
+ - Enable Log Outgoing Emails	 (smtp/log_settings/enable_log_outgoing_emails)
+
+ - Log Clean Every (days) (smtp/log_settings/log_clean_every)
+
+ - Disable Actual Email Delivery (Debug Mode)	 (smtp/debug/disable_actual_email_delivery)
+
+
+## Specifications
+
+
+
+
+## Attributes
+
+
+
