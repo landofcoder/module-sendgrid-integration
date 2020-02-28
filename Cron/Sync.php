@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
+namespace Lof\SendGrid\Cron;
 
 /**
  * Class Sync
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System/Config
+ * @package Lof\SendGrid\Cron
  */
 class Sync extends \Magento\Backend\App\Action
 {
@@ -82,9 +82,7 @@ class Sync extends \Magento\Backend\App\Action
         ));
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
         curl_close($curl);
-
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {

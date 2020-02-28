@@ -29,11 +29,11 @@ class ButtonSync extends Field
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $html = "";
-        $url = $this->_backendUrl->getUrl("lof_barcode/system_config/printpaper", []);
+        $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/sync", []);
         $html .= '
         <div class="pp-buttons-container"><button type="button" id="sync"><span><span><span>'.__("Sync").'</span></span></span></button></div>
         <style>
-        #btn_id{
+        #sync{
             width:558px;
             background-color: #eb5202;
             color: #fff;
@@ -45,7 +45,7 @@ class ButtonSync extends Field
                 'jquery'
             ],
             function($) {
-                $('#print').on('click', function(){
+                $('#sync').on('click', function(){
                     
                     window.open('$url.');
                 });
