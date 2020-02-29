@@ -5,9 +5,9 @@
 		<constraint referenceId="PRIMARY" xsi:type="primary">
 			<column name="singlesend_id"/>
 		</constraint>
-		<column name="id" nullable="true" xsi:type="text"/>
 		<column name="name" nullable="true" xsi:type="text"/>
 		<column name="create_date" nullable="true" xsi:type="text"/>
 		<column name="update_date" nullable="true" xsi:type="text"/>
+		<column name="singlesend" nullable="true" xsi:type="text"/>
 	</table>
 </schema>

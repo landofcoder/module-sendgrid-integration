@@ -1,17 +1,17 @@
 <?php
 /**
- * Copyright (c) 2020  Landofcoder
- * 
+ * Copyright (c) 2019  Landofcoder
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,10 +31,10 @@ namespace Lof\SendGrid\Api\Data;
 interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
 
-    const ID = 'id';
+    const SINGLESEND = 'singlesend';
     const SINGLESEND_ID = 'singlesend_id';
-    const CREATE_DATE = 'create_date';
     const UPDATE_DATE = 'update_date';
+    const CREATE_DATE = 'create_date';
     const NAME = 'name';
 
     /**
@@ -51,17 +51,17 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setSinglesendId($singlesendId);
 
     /**
-     * Get id
+     * Get name
      * @return string|null
      */
-    public function getId();
+    public function getName();
 
     /**
-     * Set id
-     * @param string $id
+     * Set name
+     * @param string $name
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setId($id);
+    public function setName($name);
 
     /**
      * Retrieve existing extension attributes object or create a new one.
@@ -77,19 +77,6 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setExtensionAttributes(
         \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
     );
-
-    /**
-     * Get name
-     * @return string|null
-     */
-    public function getName();
-
-    /**
-     * Set name
-     * @param string $name
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setName($name);
 
     /**
      * Get create_date
@@ -116,5 +103,17 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
     public function setUpdateDate($updateDate);
-}
 
+    /**
+     * Get singlesend
+     * @return string|null
+     */
+    public function getSinglesend();
+
+    /**
+     * Set singlesend
+     * @param string $singlesend
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSinglesend($singlesend);
+}

@@ -53,40 +53,43 @@ class Sync extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-
-        $curl = curl_init();
-        $api_key = $this->helper->getSendGridConfig('general', 'api_key');
-        $customer_collection = $this->helper->getCustomerCollection();
-        $contact = '';
-        foreach ($customer_collection as $key => $customer) {
-            $arr = '{"email":'."\"".$customer->getEmail()."\"".',"first_name":'."\"".$customer->getFirstname()."\"".',"last_name":'."\"".$customer->getLastname()."\"".'}';
-            if ($key == 1) {
-                $contact .= $arr;
+        $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
+        if ($cron_enable == 1) {
+            $curl = curl_init();
+            $api_key = $this->helper->getSendGridConfig('general', 'api_key');
+            $customer_collection = $this->helper->getCustomerCollection();
+            $contact = '';
+            foreach ($customer_collection as $key => $customer) {
+                $arr = '{"email":'."\"".$customer->getEmail()."\"".',"first_name":'."\"".$customer->getFirstname()."\"".',"last_name":'."\"".$customer->getLastname()."\"".'}';
+                if ($key == 1) {
+                    $contact .= $arr;
+                } else {
+                    $contact .= ','.$arr;
+                }
+            }
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "PUT",
+                CURLOPT_POSTFIELDS => "{\"contacts\":[".$contact."]}",
+                CURLOPT_HTTPHEADER => array(
+                    "authorization: Bearer $api_key",
+                    "content-type: application/json"
+                ),
+            ));
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+            if ($err) {
+                echo "cURL Error #:" . $err;
             } else {
-                $contact .= ','.$arr;
+                echo $response;
             }
         }
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => "{\"contacts\":[".$contact."]}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            echo $response;
-        }
+
     }
 }

@@ -18,25 +18,40 @@
 				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label" type="text">
 					<label>API Key</label>
 					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="subscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
 					<label>Subscribe List</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="unsubscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="select">
 					<label>Unsubscribe List	</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="add_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
 					<label>Add customers without subscriptions status in SendGrid	</label>
 					<comment>If this setting is enable than all customers without any subscription status (subscribe / unsubsricbe) also will be added in SendGrid contacts list like subscribers.</comment>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
 					<label>Webhook Url</label>
 					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="list_for_new_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
 					<label>List for New Customer</label>
@@ -53,10 +68,16 @@
 					<label>Cron Enabled</label>
 					<comment/>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<depends>
+						<field id="sendgrid/general/enabled">1</field>
+					</depends>
 				</field>
 				<field id="sync" type="button" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
 					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\ButtonSync</frontend_model>
 					<label>Sync All Contacts</label>
+					<depends>
+						<field id="sendgrid/general/enabled">1</field>
+					</depends>
 				</field>
 			</group>
 		</section>
@@ -74,36 +95,60 @@
 				<field id="host" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="text">
 					<label>Host</label>
 					<comment>Host name or IP address of SMTP Server</comment>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="port" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="text">
 					<label>Port</label>
 					<comment><![CDATA[Default ports: 25, 465, or 587. (<strong>SSL</strong> - 465, <strong>TLS</strong> - 587)]]></comment>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="connection_security" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="18" translate="label" type="select">
 					<label>Connection Security	</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\ConnectionSecurity</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="authentication_method" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
 					<label>Authentication Method</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\AuthenticationMethod</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="username" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="21" translate="label" type="text">
 					<label>Username	</label>
 					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="22" translate="label" type="password">
 					<label>Password</label>
 					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="send_test_to_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="23" translate="label" type="text">
 					<label>Send Test To E-mail	</label>
 					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 				<field id="Send" translate="label" type="button" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
 					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\ButtonSendTest</frontend_model>
 					<label>Send Test E-mail</label>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
 				</field>
 			</group>
 			<group id="smtp_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label">

@@ -21,16 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
-
-use Magento\Backend\Model\View\Result\Redirect;
+namespace Lof\SendGrid\Cron;
 
 /**
- * Class Sync
+ * Class SingleSend
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System/Config
+ * @package Lof\SendGrid\Cron
  */
-class Sync extends \Magento\Backend\App\Action
+class SingleSend extends \Magento\Backend\App\Action
 {
     protected $helper;
 
@@ -59,20 +57,49 @@ class Sync extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        /** @var Redirect $resultRedirect */
-        $resultRedirect = $this->resultRedirectFactory->create();
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable == 1) {
-            $out = array();
-            $cmd =  "../bin/magento cron:run --group sendgrid";
-            exec($cmd, $out, $status);
-            if (0 === $status) {
-                var_dump($out);
-            } else {
-                echo "Command failed with status: $status";
+            $token = $this->helper->getSendGridConfig('general', 'api_key');
+            $httpHeaders = new \Zend\Http\Headers();
+            $httpHeaders->addHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json'
+            ]);
+            $request = new \Zend\Http\Request();
+            $request->setHeaders($httpHeaders);
+            $request->setUri('https://api.sendgrid.com/v3/marketing/singlesends');
+            $request->setMethod(\Zend\Http\Request::METHOD_GET);
+
+            $params = new \Zend\Stdlib\Parameters();
+
+            $request->setQuery($params);
+            $client = new \Zend\Http\Client();
+            $options = [
+                'adapter'   => 'Zend\Http\Client\Adapter\Curl',
+                'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
+                'maxredirects' => 0,
+                'timeout' => 30
+            ];
+            $client->setOptions($options);
+
+            $response = $client->send($request);
+            $collection = ($response->getContent());
+            $object = json_decode($collection, false);
+            foreach ($object as $items) {
+                foreach ($items as $item) {
+                    $model = $this->singlesend->create();
+                    $existing = $model->getCollection()->addFieldToFilter("singlesend", $item->id)->getData();
+                    if (count($existing) == 0) {
+                        $model->setSinglesend($item->id);
+                        $model->setName($item->name);
+                        $model->setUpdateDate($item->updated_at);
+                        $model->setCreateDate($item->created_at);
+                        $model->save($model);
+                    }
+                }
+                die;
             }
-        } else {
-            echo 'bat cron len -_-';
         }
     }
 }

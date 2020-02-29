@@ -34,7 +34,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     /**
      * @var string
      */
-    protected $_idFieldName = 'singlesend_id';
+    protected $_idFieldName = 'singlesend';
 
     /**
      * Define resource model

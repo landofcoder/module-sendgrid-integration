@@ -1,17 +1,17 @@
 <?php
 /**
- * Copyright (c) 2020  Landofcoder
- * 
+ * Copyright (c) 2019  Landofcoder
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -117,15 +117,15 @@ class SingleSendRepository implements SingleSendRepositoryInterface
             $storeId = $this->storeManager->getStore()->getId();
             $singleSend->setStoreId($storeId);
         } */
-        
+
         $singleSendData = $this->extensibleDataObjectConverter->toNestedArray(
             $singleSend,
             [],
             \Lof\SendGrid\Api\Data\SingleSendInterface::class
         );
-        
+
         $singleSendModel = $this->singleSendFactory->create()->setData($singleSendData);
-        
+
         try {
             $this->resource->save($singleSendModel);
         } catch (\Exception $exception) {
@@ -157,22 +157,22 @@ class SingleSendRepository implements SingleSendRepositoryInterface
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
     ) {
         $collection = $this->singleSendCollectionFactory->create();
-        
+
         $this->extensionAttributesJoinProcessor->process(
             $collection,
             \Lof\SendGrid\Api\Data\SingleSendInterface::class
         );
-        
+
         $this->collectionProcessor->process($criteria, $collection);
-        
+
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
-        
+
         $items = [];
         foreach ($collection as $model) {
             $items[] = $model->getDataModel();
         }
-        
+
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
         return $searchResults;
@@ -205,4 +205,3 @@ class SingleSendRepository implements SingleSendRepositoryInterface
         return $this->delete($this->get($singleSendId));
     }
 }
-

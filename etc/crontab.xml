@@ -4,5 +4,8 @@
         <job instance="Lof\SendGrid\Cron\Sync" method="execute" name="lof_sendgrid_sync">
             <schedule>* * * * *</schedule>
         </job>
+        <job instance="Lof\SendGrid\Cron\SingleSend" method="execute" name="lof_sendgrid_singlesend">
+            <schedule>* * * * *</schedule>
+        </job>
     </group>
 </config>

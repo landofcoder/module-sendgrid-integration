@@ -1,17 +1,17 @@
 <?php
 /**
- * Copyright (c) 2020  Landofcoder
- * 
+ * Copyright (c) 2019  Landofcoder
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,22 +53,22 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
     }
 
     /**
-     * Get id
+     * Get name
      * @return string|null
      */
-    public function getId()
+    public function getName()
     {
-        return $this->_get(self::ID);
+        return $this->_get(self::NAME);
     }
 
     /**
-     * Set id
-     * @param string $id
+     * Set name
+     * @param string $name
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setId($id)
+    public function setName($name)
     {
-        return $this->setData(self::ID, $id);
+        return $this->setData(self::NAME, $name);
     }
 
     /**
@@ -89,25 +89,6 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
         \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
-    }
-
-    /**
-     * Get name
-     * @return string|null
-     */
-    public function getName()
-    {
-        return $this->_get(self::NAME);
-    }
-
-    /**
-     * Set name
-     * @param string $name
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setName($name)
-    {
-        return $this->setData(self::NAME, $name);
     }
 
     /**
@@ -147,5 +128,23 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
     {
         return $this->setData(self::UPDATE_DATE, $updateDate);
     }
-}
 
+    /**
+     * Get singlesend
+     * @return string|null
+     */
+    public function getSinglesend()
+    {
+        return $this->_get(self::SINGLESEND);
+    }
+
+    /**
+     * Set singlesend
+     * @param string $singlesend
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSinglesend($singlesend)
+    {
+        return $this->setData(self::SINGLESEND, $singlesend);
+    }
+}
