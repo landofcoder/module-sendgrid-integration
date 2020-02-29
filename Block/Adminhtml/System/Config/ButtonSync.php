@@ -46,8 +46,7 @@ class ButtonSync extends Field
             ],
             function($) {
                 $('#sync').on('click', function(){
-                    
-                    window.open('$url.');
+                    window.location = '".$url."';
                 });
         });</script>";
         return $html;

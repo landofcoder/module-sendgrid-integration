@@ -44,9 +44,11 @@ class Sync extends \Magento\Backend\App\Action
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Lof\SendGrid\Helper\Data $helper,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
         \Lof\SendGrid\Model\SingleSendFactory $singlesend
     ) {
         $this->singlesend = $singlesend;
+        $this->_messageManager = $messageManager;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -67,12 +69,13 @@ class Sync extends \Magento\Backend\App\Action
             $cmd =  "../bin/magento cron:run --group sendgrid";
             exec($cmd, $out, $status);
             if (0 === $status) {
-                var_dump($out);
+                $this->_messageManager->addSuccessMessage(__("All contacts are synced"));
             } else {
-                echo "Command failed with status: $status";
+                $this->_messageManager->addErrorMessage(__("Command failed with status: $status"));
             }
         } else {
-            echo 'bat cron len -_-';
+            $this->_messageManager->addErrorMessage(__("Cron is disabled, please enable cron to sync contacts"));
         }
+        return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
     }
 }
