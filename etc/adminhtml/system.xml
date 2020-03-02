@@ -139,12 +139,24 @@
 					<comment><![CDATA[Add Plain part in email recommended for <strong>increase Spam Score of email</strong>]]></comment>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
-				<field id="use_another_email_sender" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="select">
+				<field id="use_another_email_sender" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
 					<label>Use Another Email Sender</label>
 					<comment><![CDATA[<strong>Please notice</strong>, the <strong>Sender domain</strong> must be the same as the domain where you send email. Other combinations can lead to a ban because of spam]]></comment>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
-				<field id="cc_emails" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="textarea">
+				<field id="user_name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="text">
+					<label>User Name</label>
+					<depends>
+						<field id = "use_another_email_sender">1</field>
+					</depends>
+				</field>
+				<field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="password">
+					<label>Password</label>
+					<depends>
+						<field id = "use_another_email_sender">1</field>
+					</depends>
+				</field>
+				<field id="cc_emails" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="textarea">
 					<label>CC Emails	</label>
 					<comment><![CDATA[Comma-separated. Leave empty for disable <strong>CC emails</strong>.]]></comment>
 				</field>
