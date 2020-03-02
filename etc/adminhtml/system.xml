@@ -15,7 +15,7 @@
 					<comment/>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
-				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label" type="text">
+				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label" type="password">
 					<label>API Key</label>
 					<comment/>
 					<depends>
@@ -92,64 +92,7 @@
 					<comment>When the option is disabled, the module will not impact on email sendings</comment>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
 				</field>
-				<field id="host" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="text">
-					<label>Host</label>
-					<comment>Host name or IP address of SMTP Server</comment>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="port" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="text">
-					<label>Port</label>
-					<comment><![CDATA[Default ports: 25, 465, or 587. (<strong>SSL</strong> - 465, <strong>TLS</strong> - 587)]]></comment>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="connection_security" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="18" translate="label" type="select">
-					<label>Connection Security	</label>
-					<comment/>
-					<source_model>Lof\SendGrid\Model\Config\Source\ConnectionSecurity</source_model>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="authentication_method" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
-					<label>Authentication Method</label>
-					<comment/>
-					<source_model>Lof\SendGrid\Model\Config\Source\AuthenticationMethod</source_model>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="username" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="21" translate="label" type="text">
-					<label>Username	</label>
-					<comment/>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="22" translate="label" type="password">
-					<label>Password</label>
-					<comment/>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="send_test_to_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="23" translate="label" type="text">
-					<label>Send Test To E-mail	</label>
-					<comment/>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
-				<field id="Send" translate="label" type="button" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
-					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\ButtonSendTest</frontend_model>
-					<label>Send Test E-mail</label>
-					<depends>
-						<field id="enabled">1</field>
-					</depends>
-				</field>
+
 			</group>
 			<group id="smtp_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label">
 				<label>SMTP Settings</label>
@@ -157,8 +100,39 @@
 					<label>Local Client Hostname</label>
 					<comment><![CDATA[Local client hostname or IP. Default: <strong>localhost</strong>]]></comment>
 				</field>
+				<field id="host" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="text">
+					<label>Host</label>
+					<comment>Host name or IP address of SMTP Server</comment>
+				</field>
+				<field id="port" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="text">
+					<label>Port</label>
+					<comment><![CDATA[Default ports: 25, 465, or 587. (<strong>SSL</strong> - 465, <strong>TLS</strong> - 587)]]></comment>
+				</field>
+				<field id="connection_security" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="18" translate="label" type="select">
+					<label>Connection Security	</label>
+					<comment/>
+					<source_model>Lof\SendGrid\Model\Config\Source\ConnectionSecurity</source_model>
+				</field>
+				<field id="authentication_method" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
+					<label>Authentication Method</label>
+					<comment/>
+					<source_model>Lof\SendGrid\Model\Config\Source\AuthenticationMethod</source_model>
+				</field>
+				<field id="username" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="21" translate="label" type="text">
+					<label>Username	</label>
+				</field>
+				<field id="password" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="22" translate="label" type="password">
+					<label>Password</label>
+				</field>
+				<field id="send_test_to_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="23" translate="label" type="text">
+					<label>Send Test To E-mail	</label>
+				</field>
+				<field id="Send" translate="label" type="button" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\ButtonSendTest</frontend_model>
+					<label>Send Test E-mail</label>
+				</field>
 			</group>
-			<group id="email_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+			<group id="email_settings" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
 				<label>Email Settings</label>
 				<field id="add_plain_text_part_in_email	" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="12" translate="label" type="select">
 					<label>Add Plain Text Part in Email	</label>

@@ -90,6 +90,5 @@ class Sync extends \Magento\Backend\App\Action
                 echo $response;
             }
         }
-
     }
 }

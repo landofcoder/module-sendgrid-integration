@@ -96,9 +96,17 @@ class SingleSend extends \Magento\Backend\App\Action
                         $model->setUpdateDate($item->updated_at);
                         $model->setCreateDate($item->created_at);
                         $model->save($model);
+                    } else {
+                        $entity_id = $existing[0]['singlesend_id'];
+                        $model->load($entity_id);
+                        $model->setSinglesend($item->id);
+                        $model->setName($item->name);
+                        $model->setUpdateDate($item->updated_at);
+                        $model->setCreateDate($item->created_at);
+                        $model->save($model);
                     }
                 }
-                die;
+                break;
             }
         }
     }
