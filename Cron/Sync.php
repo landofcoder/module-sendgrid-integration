@@ -23,6 +23,8 @@
 
 namespace Lof\SendGrid\Cron;
 
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+
 /**
  * Class Sync
  *
@@ -31,18 +33,28 @@ namespace Lof\SendGrid\Cron;
 class Sync extends \Magento\Backend\App\Action
 {
     protected $helper;
+    /**
+     * @var CollectionFactory
+     */
+    protected $_orderCollectionFactory;
 
     /**
      * Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lof\SendGrid\Helper\Data $helper
+     * @param CollectionFactory $orderCollectionFactory
+     * @param \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Lof\SendGrid\Helper\Data $helper
+        \Lof\SendGrid\Helper\Data $helper,
+        CollectionFactory $orderCollectionFactory,
+        \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
     ) {
         $this->helper = $helper;
+        $this->_orderCollectionFactory = $orderCollectionFactory;
+        $this->_subcriberCollectionFactory = $subcriberCollectionFactory;
         parent::__construct($context);
     }
 
@@ -53,6 +65,7 @@ class Sync extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable == 1) {
             $curl = curl_init();
@@ -62,6 +75,24 @@ class Sync extends \Magento\Backend\App\Action
             foreach ($customer_collection as $key => $customer) {
                 $arr = '{"email":'."\"".$customer->getEmail()."\"".',"first_name":'."\"".$customer->getFirstname()."\"".',"last_name":'."\"".$customer->getLastname()."\"".'}';
                 if ($key == 1) {
+                    $contact .= $arr;
+                } else {
+                    $contact .= ','.$arr;
+                }
+            }
+            $order_collection = $this->_orderCollectionFactory->create()->addFieldToSelect('customer_email')->addFieldToSelect('customer_firstname')->addFieldToSelect('customer_lastname');
+            foreach ($order_collection as $key => $order) {
+                $arr = '{"email":'."\"".$order->getCustomerEmail()."\"".',"first_name":'."\"".$order->getCustomerFirstname()."\"".',"last_name":'."\"".$order->getCustomerLastname()."\"".'}';
+                if ($contact == '') {
+                    $contact .= $arr;
+                } else {
+                    $contact .= ','.$arr;
+                }
+            }
+            $sub = $this->_subcriberCollectionFactory->create();
+            foreach ($sub as $item) {
+                $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
+                if ($contact == '') {
                     $contact .= $arr;
                 } else {
                     $contact .= ','.$arr;

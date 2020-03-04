@@ -34,9 +34,9 @@ class ButtonSync extends Field
         <div class="pp-buttons-container"><button type="button" id="sync"><span><span><span>'.__("Sync").'</span></span></span></button></div>
         <style>
         #sync{
-            width:558px;
-            background-color: #eb5202;
-            color: #fff;
+            width:31px;
+            background-color: #e3e3e3;
+            border-color: #adadad;
         }
         </style>';
         $html .= "
@@ -46,7 +46,8 @@ class ButtonSync extends Field
             ],
             function($) {
                 $('#sync').on('click', function(){
-                    window.location = '".$url."';
+                    window.open('".$url."');
+//                    window.location = '".$url."';
                 });
         });</script>";
         return $html;
