@@ -1,6 +1,7 @@
 <?php
 namespace Lof\SendGrid\Block\Adminhtml\System\Config;
 
+use Magento\Backend\Model\UrlInterface;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
@@ -8,13 +9,13 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 class ButtonSync extends Field
 {
     /**
-     * @param \Magento\Backend\Model\UrlInterface $backendUrl
-     * @param \Magento\Backend\Block\Template\Context $context
+     * @param UrlInterface $backendUrl
+     * @param Context $context
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Model\UrlInterface $backendUrl,
-        \Magento\Backend\Block\Template\Context $context,
+        UrlInterface $backendUrl,
+        Context $context,
         array $data = []
     ) {
         $this->_backendUrl = $backendUrl;
@@ -46,8 +47,7 @@ class ButtonSync extends Field
             ],
             function($) {
                 $('#sync').on('click', function(){
-                    window.open('".$url."');
-//                    window.location = '".$url."';
+                    window.location = '".$url."';
                 });
         });</script>";
         return $html;
