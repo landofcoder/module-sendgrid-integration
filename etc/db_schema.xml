@@ -20,12 +20,12 @@
 		<column name="lastname" nullable="true" xsi:type="text"/>
 		<column name="is_subscribed" nullable="false" xsi:type="smallint"/>
 		<column name="source_from" nullable="true" xsi:type="text"/>
-		<column name="created_at" nullable="true" xsi:type="date"/>
+		<column name="created_at" nullable="true" xsi:type="datetime"/>
 		<column name="customer_id" nullable="true" xsi:type="int"/>
 		<column name="order_id" nullable="true" xsi:type="int"/>
-		<column name="is_synced" nullable="fale" xsi:type="boolean"/>
+		<column name="is_synced" nullable="false" xsi:type="boolean"/>
 		<column name="sync_log" nullable="true" xsi:type="varchar" length="255"/>
-		<column name="group_id" nullable="fale" xsi:type="varchar" length="100"/>
+		<column name="group_id" nullable="false" xsi:type="varchar" length="100"/>
 		<column name="tags" nullable="true" xsi:type="varchar" length="255"/>
 	</table>
 </schema>

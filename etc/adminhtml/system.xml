@@ -17,14 +17,14 @@
 				</field>
 				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label" type="password">
 					<label>API Key</label>
-					<comment/>
+					<validate>required-entry</validate>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
 				</field>
 				<field id="subscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
 					<label>Subscribe List</label>
-					<comment/>
+					<validate>required-entry</validate>
 					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
 					<depends>
 						<field id="enabled">1</field>
@@ -34,11 +34,21 @@
 					<label>Unsubscribe List	</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
+					<validate>required-entry</validate>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
 				</field>
-				<field id="add_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
+				<field id="other_group" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
+					<label>Other List</label>
+					<comment/>
+					<source_model>Lof\SendGrid\Model\Config\Source\OtherList</source_model>
+					<validate>required-entry</validate>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="add_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
 					<label>Add customers without subscriptions status in SendGrid	</label>
 					<comment>If this setting is enable than all customers without any subscription status (subscribe / unsubsricbe) also will be added in SendGrid contacts list like subscribers.</comment>
 					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -55,11 +65,11 @@
 				</field>
 				<field id="list_for_new_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
 					<label>List for New Customer</label>
-					<comment/>
+					<validate>required-entry</validate>
 					<depends>
 						<field id="add_customer">1</field>
 					</depends>
-					<source_model>Lof\SendGrid\Model\Config\Source\ListForNewCustomer</source_model>
+					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
 				</field>
 			</group>
 			<group id="sync" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label">

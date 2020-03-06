@@ -3,7 +3,7 @@ namespace Lof\SendGrid\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\Context;
 
-class AddressBook
+class AddressBook extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
     public function __construct(
         Context $context

@@ -22,12 +22,13 @@ namespace Lof\SendGrid\Model;
 
 class AddressBook extends \Magento\Framework\Model\AbstractModel implements \Magento\Framework\DataObject\IdentityInterface
 {
+    const TABLE = 'lof_sendgrid_addressbook';
     protected function _construct()
     {
         $this->_init('Lof\SendGrid\Model\ResourceModel\AddressBook');
     }
     public function getIdentities()
     {
-        return [self::lof_sendgrid_addressbook . '_' . $this->getId()];
+        return [self:: TABLE. '_' . $this->getId()];
     }
 }
