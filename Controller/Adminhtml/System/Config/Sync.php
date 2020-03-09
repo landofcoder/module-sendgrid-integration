@@ -24,7 +24,6 @@
 namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
 
 use Lof\SendGrid\Helper\Data;
-use Lof\SendGrid\Model\ResourceModel\AddressBook\Collection;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
@@ -54,6 +53,10 @@ class Sync extends \Magento\Backend\App\Action
      * @var ManagerInterface
      */
     private $_messageManager;
+    /**
+     * @var \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory
+     */
+    private $addressBookCollection;
 
     /**
      * Constructor
@@ -79,7 +82,7 @@ class Sync extends \Magento\Backend\App\Action
         $this->addressBookCollection = $addressBookCollection;
         $this->subscriberFactory= $subscriberFactory;
         $this->_messageManager = $messageManager;
-
+        $this->addressBookCollection = $addressBookCollection;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_subcriberCollectionFactory = $subcriberCollectionFactory;
         parent::__construct($context);
@@ -94,11 +97,14 @@ class Sync extends \Magento\Backend\App\Action
     {
         $curl = curl_init();
         $api_key = $this->helper->getSendGridConfig('general', 'api_key');
-        $subscriber_list = $this->helper->getSendGridConfig('general', 'subscribe_list');
+        if ($this->helper->getSendGridConfig('general', 'add_customer') == 1) {
+            $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
+        } else {
+            $subscriber_list = $this->helper->getSendGridConfig('general', 'subscribe_list');
+        }
         $unsubscriber_list = $this->helper->getSendGridConfig('general', 'unsubscribe_list');
         $other_list = $this->helper->getSendGridConfig('general', 'other_group');
         $list_subscriber_id = '';
-        $list_customer_id = '';
         $list = $this->helper->getAllList($curl, $api_key);
         foreach ($list as $items) {
             foreach ($items as $item) {
@@ -106,16 +112,33 @@ class Sync extends \Magento\Backend\App\Action
                     if ($item->name == $subscriber_list) {
                         $list_subscriber_id = $item->id;
                     }
-                    if ($item->name == $unsubscriber_list) {
-                        $list_customer_id = $item->id;
-                    }
                 }
             }
             break;
         }
-        $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id);
+        $list_unsubscriber = $this->helper->getUnsubscriberGroup($curl, $api_key);
+        $unsubscriber_id = '';
+        $other_list_id = '';
+        foreach ($list_unsubscriber as $item) {
+            if ($item->name == $unsubscriber_list) {
+                $unsubscriber_id = $item->id;
+            }
+            if ($item->name == $other_list) {
+                $other_list_id = $item->id;
+            }
+        }
+        $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0');
+        $list_other_email = '';
+        foreach ($addressBookCollection as $addressBook) {
+            if ($list_other_email == '') {
+                $list_other_email .= "\"".$addressBook->getEmailAddress()."\"";
+            } else {
+                $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
+            }
+        }
+        $this->helper->syncUnsubscriber($curl, $api_key, $other_list_id, $list_other_email);
+        $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_id);
         $this->helper->syncSubscriberToM2($curl, $api_key, $list_subscriber_id);
-
         curl_close($curl);
     }
 }

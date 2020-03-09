@@ -32,7 +32,7 @@ class UnsubscribeList implements \Magento\Framework\Option\ArrayInterface
 {
     public function toOptionArray()
     {
-        return [['value' => 'Global List', 'label' => __('Global List')],['value' => 'All Customer', 'label' => __('All Customer')],['value' => 'Additional Unsubscribers', 'label' => __('Additional Unsubscribers')]];
+        return [['value' => 'Global List', 'label' => __('Global List')],['value' => 'All Customers', 'label' => __('All Customers')],['value' => 'Additional Unsubscribers', 'label' => __('Additional Unsubscribers')]];
     }
     public function toArray()
     {

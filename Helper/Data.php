@@ -5,16 +5,24 @@ use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Newsletter\Model\SubscriberFactory;
+use Magento\Framework\Message\ManagerInterface;
 
 class Data extends AbstractHelper
 {
     const XML_PATH_SENDGRID = 'sendgrid/';
+    private $_subcriberFactory;
+
     public function __construct(
         CollectionFactory $customerFactory,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        SubscriberFactory $subscriberFactory,
+        ManagerInterface $manager
     ) {
         $this->_customerFactory = $customerFactory;
         $this->scopeConfig=$scopeConfig;
+        $this->_subscriberFactory = $subscriberFactory;
+        $this->_messageManager = $manager;
     }
 
     public function getConfigValue($field, $storeId = null)
@@ -110,7 +118,7 @@ class Data extends AbstractHelper
     }
     public function getAllList()
     {
-        $api_key = $this->getSendGridConfig('general','api_key');
+        $api_key = $this->getSendGridConfig('general', 'api_key');
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/lists?page_size=100",
@@ -203,11 +211,13 @@ class Data extends AbstractHelper
             $this->sync($curl, $contact_order, $list_customer_id, $api_key);
         }
     }
-    public function syncSubscriber($curl, $api_key, $list_subscriber_id)
+    public function syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_list_id)
     {
-        $sub = $this->_subcriberCollectionFactory->create();
-        if ($this->helper->getSendGridConfig('general', 'add_customer') == 1) {
+        $sub = $this->_subscriberFactory->create()->getCollection();
+        $unsub = $this->_subscriberFactory->create()->getCollection();
+        if ($this->getSendGridConfig('general', 'add_customer') == 0) {
             $sub->addFieldToFilter('subscriber_status', '1');
+            $unsub->addFieldToFilter('subscriber_status', '3');
         }
         $subscriber = '';
         if (count($sub)) {
@@ -221,5 +231,61 @@ class Data extends AbstractHelper
             }
             $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
         }
+        if (count($unsub)) {
+            $arr2 = '';
+            foreach ($unsub as $item) {
+                if ($arr2 == '') {
+                    $arr2 .= "\"".$item->getSubscriberEmail()."\"";
+                } else {
+                    $arr2 .= ",\"".$item->getSubscriberEmail()."\"";
+                }
+            }
+            $this->syncUnsubscriber($curl, $api_key, $unsubscriber_list_id, $arr2);
+        }
+    }
+    public function getUnsubscriberGroup($curl, $api_key)
+    {
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_POSTFIELDS => "{}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        return json_decode($response, false);
+    }
+    public function syncUnsubscriber($curl, $api_key, $list_unsubscriber_id, $list_email)
+    {
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups/$list_unsubscriber_id/suppressions",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "{\"recipient_emails\":[$list_email]}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            echo $response;
+        }
+        return json_decode($response);
     }
 }
