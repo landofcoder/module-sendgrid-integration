@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="controller_action_postdispatch_contacts_index_post">
+    <event name="controller_action_predispatch_contact_index_post">
         <observer name="lof_contact_form_submit" instance="Lof\SendGrid\Observer\GetContact" />
     </event>
 </config>

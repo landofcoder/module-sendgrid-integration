@@ -137,6 +137,8 @@ class Sync extends \Magento\Backend\App\Action
             } else {
                 $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
             }
+            $addressBook->setIsSynced('1');
+            $addressBook->save();
         }
         $this->helper->syncUnsubscriber($curl, $api_key, $other_list_id, $list_other_email);
         $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_id);
