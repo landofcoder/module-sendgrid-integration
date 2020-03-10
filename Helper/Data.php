@@ -143,6 +143,34 @@ class Data extends AbstractHelper
         $response = curl_exec($curl);
         return json_decode($response, false);
     }
+    public function getUnsubscriberGroup()
+    {
+        $api_key = $this->getSendGridConfig('general', 'api_key');
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_POSTFIELDS => "{}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key"
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        if ($err) {
+            return '';
+        } else {
+            return json_decode($response, false);
+        }
+    }
     public function syncSubscriberToM2($curl, $api_key, $list_subscriber_id)
     {
         $contacts = $this->getContacts($curl, $api_key);
@@ -207,26 +235,6 @@ class Data extends AbstractHelper
                 $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
             }
         }
-    }
-    public function getUnsubscriberGroup($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        return json_decode($response, false);
     }
     public function syncUnsubscriber($curl, $api_key, $list_unsubscriber_id, $list_email)
     {

@@ -23,6 +23,9 @@
 
 namespace Lof\SendGrid\Model\Config\Source;
 
+use Lof\SendGrid\Helper\Data;
+use Magento\Framework\App\Action\Context;
+
 /**
  * Class SubscribeList
  *
@@ -30,15 +33,36 @@ namespace Lof\SendGrid\Model\Config\Source;
  */
 class SubscribeList implements \Magento\Framework\Option\ArrayInterface
 {
+    /**
+     * @var Data
+     */
+    private $helper;
+    /**
+     * @var Context
+     */
+    private $context;
 
+    public function __construct(
+        Context $context,
+        Data $helper
+    ) {
+        $this->context = $context;
+        $this->helper = $helper;
+    }
     public function toOptionArray()
     {
-        return [['value' => 'Global List', 'label' => __('Global List')],['value' => 'All Customers', 'label' => __('All Customers')],['value' => 'Additional Subscribers', 'label' => __('Additional Subscribers')]];
-    }
-
-    public function toArray()
-    {
-        return ['Global List' => __('Global List'),'All Customers' => __('All Customers'),'Additional Subscribers' => __('Additional Subscribers')];
+        $options = [];
+        $list = $this->helper->getAllList();
+        foreach ($list as $items) {
+            foreach ($items as $item) {
+                $options[] = [
+                    'label' => $item->name,
+                    'value' => __($item->name),
+                ];
+            }
+            break;
+        }
+        return $options;
     }
 }
 
