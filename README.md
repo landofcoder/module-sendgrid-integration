@@ -34,8 +34,16 @@
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
 
-
 ## Configuration
+1. Create SendGrid account
+
+2. Get sendgrid api
+
+3. Create subscribe contacts list on sendgrid
+
+4. Create unsubscript contacts list on sendgrid
+
+5. Config on module
 
  - Enabled (sendgrid/general/enabled)
 
@@ -44,6 +52,8 @@
  - Subscribe List (sendgrid/general/subscribe_list)
 
  - Unsubscribe List	 (sendgrid/general/unsubscribe_list)
+ 
+ - Other List	 (sendgrid/general/other_list)
 
  - Add customers without subscriptions status in SendGrid	 (sendgrid/general/add_customer)
 
@@ -52,39 +62,6 @@
  - Webhook Url	 (sendgrid/general/list_for_new_customer)
 
  - Cron Enabled (sendgrid/sync/cron_enable)
-
- - Enabled SMTP (smtp/general/enabled)
-
- - Local Client Hostname (smtp/smtp_settings/local_client_host_name)
-
- - Host (smtp/general/host)
-
- - Port (smtp/general/port)
-
- - Connection Security	 (smtp/general/connection_security)
-
- - Authentication Method (smtp/general/authentication_method)
-
- - Username	 (smtp/general/username)
-
- - Password (smtp/general/password)
-
- - Send Test To E-mail	 (smtp/general/send_test_to_email)
-
- - Add Plain Text Part in Email (smltp/email_settings/add_plain_text_part_in_email)
-
- - Use Another Email Sender (smtp/email_settings/use_another_email_sender)
-
- - CC Emails	 (smtp/email_settings/cc_emails)
-
- - BCC Emails	 (smtp/email_settings/bcc_emails)
-
- - Enable Log Outgoing Emails	 (smtp/log_settings/enable_log_outgoing_emails)
-
- - Log Clean Every (days) (smtp/log_settings/log_clean_every)
-
- - Disable Actual Email Delivery (Debug Mode)	 (smtp/debug/disable_actual_email_delivery)
-
 
 ## Specifications
 
