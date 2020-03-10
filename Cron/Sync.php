@@ -24,8 +24,7 @@
 namespace Lof\SendGrid\Cron;
 
 use Lof\SendGrid\Helper\Data;
-use Magento\Backend\App\Action\Context;
-use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
@@ -50,29 +49,39 @@ class Sync extends \Magento\Backend\App\Action
      */
     private $subscriberFactory;
     /**
-     * @var \Magento\Framework\Message\ManagerInterface
+     * @var ManagerInterface
      */
     private $_messageManager;
+    /**
+     * @var \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory
+     */
+    private $addressBookCollection;
 
     /**
      * Constructor
      *
-     * @param Context $context
+     * @param \Magento\Backend\App\Action\Context $context
      * @param Data $helper
      * @param CollectionFactory $orderCollectionFactory
+     * @param ManagerInterface $messageManager
      * @param SubscriberFactory $subscriberFactory
+     * @param \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory $addressBookCollection
      * @param \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
      */
     public function __construct(
-        Context $context,
+        \Magento\Backend\App\Action\Context $context,
         Data $helper,
         CollectionFactory $orderCollectionFactory,
+        ManagerInterface $messageManager,
         SubscriberFactory $subscriberFactory,
+        \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory $addressBookCollection,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
     ) {
         $this->helper = $helper;
+        $this->addressBookCollection = $addressBookCollection;
         $this->subscriberFactory= $subscriberFactory;
-
+        $this->_messageManager = $messageManager;
+        $this->addressBookCollection = $addressBookCollection;
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_subcriberCollectionFactory = $subcriberCollectionFactory;
         parent::__construct($context);
@@ -81,211 +90,54 @@ class Sync extends \Magento\Backend\App\Action
     /**
      * Execute view action
      *
-     * @return ResultInterface
+     * @return \Magento\Framework\Controller\ResultInterface
      */
     public function execute()
     {
-        $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         $curl = curl_init();
-        if ($cron_enable == 1) {
-            $api_key = $this->helper->getSendGridConfig('general', 'api_key');
-
-            $list = $this->getAllList($curl, $api_key);
-            $exist_subscriber = 0;
-            $exist_customer = 0;
-            $list_subscriber_id = '';
-            $list_customer_id = '';
-            foreach ($list as $items) {
-                foreach ($items as $item) {
-                    if (isset($item->name)) {
-                        if ($item->name == 'Subscribers') {
-                            $exist_subscriber = 1;
-                            $list_subscriber_id = $item->id;
-                        }
-                        if ($item->name == 'All Customers') {
-                            $exist_customer = 1;
-                            $list_customer_id = $item->id;
-                        }
-                    }
-                }
-                break;
-            }
-            if ($exist_subscriber == 0) {
-                $this->create_contact_list($curl, 'Subscribers', $api_key);
-            }
-            if ($exist_customer == 0) {
-                $this->create_contact_list($curl, 'All Customers', $api_key);
-            }
-            $list2 = $this->getAllList($curl, $api_key);
-            if ($list2) {
-                foreach ($list2 as $items) {
-                    foreach ($items as $item) {
-                        if (isset($item->name)) {
-                            if ($item->name == 'Subscribers') {
-                                $list_subscriber_id = $item->id;
-                            }
-                            if ($item->name == 'All Customers') {
-                                $list_customer_id = $item->id;
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-            $this->syncCustomers($curl, $api_key, $list_customer_id);
-            $this->syncOrders($curl, $api_key, $list_customer_id);
-            $this->syncSubscriber($curl, $api_key, $list_subscriber_id);
-            $this->syncSubscriberToM2($curl, $api_key, $list_subscriber_id);
-        }
-        curl_close($curl);
-    }
-    public function sync($curl, $contact, $list_id, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => "{\"list_ids\": [\" $list_id  \"],\"contacts\":[".$contact."]}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-    }
-    public function create_contact_list($curl, $name, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/lists",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"name\":\"$name\"}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-    }
-    public function getAllList($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/lists?page_size=100",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        if ($err) {
-            return '';
+        $api_key = $this->helper->getSendGridConfig('general', 'api_key');
+        if ($this->helper->getSendGridConfig('general', 'add_customer') == 1) {
+            $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
         } else {
-            return json_decode($response, false);
+            $subscriber_list = $this->helper->getSendGridConfig('general', 'subscribe_list');
         }
-    }
-    public function getContacts($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        return json_decode($response, false);
-    }
-    public function syncSubscriberToM2($curl, $api_key, $list_subscriber_id)
-    {
-        $contacts = $this->getContacts($curl, $api_key);
-        foreach ($contacts as $contact) {
-            foreach ($contact as $item) {
-                if (isset($item->list_ids)) {
-                    if (in_array($list_subscriber_id, $item->list_ids)) {
-                        $subscriber = $this->subscriberFactory->create();
-                        $existing = $subscriber->getCollection()->addFieldToFilter("subscriber_email", $item->email)->getData();
-                        if (count($existing) == 0) {
-                            $subscriber->setSubscriberEmail($item->email)->setCustomerFirstname($item->first_name)->setCustomerLastname($item->last_name)->setStatus('1');
-                            $subscriber->save();
-                        }
+        $unsubscriber_list = $this->helper->getSendGridConfig('general', 'unsubscribe_list');
+        $other_list = $this->helper->getSendGridConfig('general', 'other_group');
+        $list_subscriber_id = '';
+        $list = $this->helper->getAllList($curl, $api_key);
+        foreach ($list as $items) {
+            foreach ($items as $item) {
+                if (isset($item->name)) {
+                    if ($item->name == $subscriber_list) {
+                        $list_subscriber_id = $item->id;
                     }
                 }
             }
             break;
         }
-    }
-    public function syncCustomers($curl, $api_key, $list_customer_id)
-    {
-        $customer_collection = $this->helper->getCustomerCollection();
-        $contact = '';
-        if (count($customer_collection) > 0) {
-            foreach ($customer_collection as $key => $customer) {
-                $arr = '{"email":'."\"".$customer->getEmail()."\"".',"first_name":'."\"".$customer->getFirstname()."\"".',"last_name":'."\"".$customer->getLastname()."\"".'}';
-                if ($key == 1) {
-                    $contact .= $arr;
-                } else {
-                    $contact .= ','.$arr;
-                }
+        $list_unsubscriber = $this->helper->getUnsubscriberGroup($curl, $api_key);
+        $unsubscriber_id = '';
+        $other_list_id = '';
+        foreach ($list_unsubscriber as $item) {
+            if ($item->name == $unsubscriber_list) {
+                $unsubscriber_id = $item->id;
             }
-            $this->sync($curl, $contact, $list_customer_id, $api_key);
-        }
-    }
-    public function syncOrders($curl, $api_key, $list_customer_id)
-    {
-        $contact_order = '';
-        $order_collection = $this->_orderCollectionFactory->create()->addFieldToSelect('customer_email')->addFieldToSelect('customer_firstname')->addFieldToSelect('customer_lastname');
-        if (count($order_collection) > 0) {
-            foreach ($order_collection as $key => $order) {
-                $arr = '{"email":'."\"".$order->getCustomerEmail()."\"".',"first_name":'."\"".$order->getCustomerFirstname()."\"".',"last_name":'."\"".$order->getCustomerLastname()."\"".'}';
-                if ($contact_order == '') {
-                    $contact_order .= $arr;
-                } else {
-                    $contact_order .= ','.$arr;
-                }
+            if ($item->name == $other_list) {
+                $other_list_id = $item->id;
             }
-            $this->sync($curl, $contact_order, $list_customer_id, $api_key);
         }
-    }
-    public function syncSubscriber($curl, $api_key, $list_subscriber_id)
-    {
-        $sub = $this->_subcriberCollectionFactory->create();
-        if ($this->helper->getSendGridConfig('general', 'add_customer') == 1) {
-            $sub->addFieldToFilter('subscriber_status', '1');
-        }
-        $subscriber = '';
-        if (count($sub)) {
-            foreach ($sub as $item) {
-                $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
-                if ($subscriber == '') {
-                    $subscriber .= $arr;
-                } else {
-                    $subscriber .= ','.$arr;
-                }
+        $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0');
+        $list_other_email = '';
+        foreach ($addressBookCollection as $addressBook) {
+            if ($list_other_email == '') {
+                $list_other_email .= "\"".$addressBook->getEmailAddress()."\"";
+            } else {
+                $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
             }
-            $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
         }
+        $this->helper->syncUnsubscriber($curl, $api_key, $other_list_id, $list_other_email);
+        $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_id);
+        $this->helper->syncSubscriberToM2($curl, $api_key, $list_subscriber_id);
+        curl_close($curl);
     }
 }

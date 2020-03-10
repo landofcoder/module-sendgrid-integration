@@ -120,11 +120,13 @@ class Sync extends \Magento\Backend\App\Action
         $unsubscriber_id = '';
         $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
-            if ($item->name == $unsubscriber_list) {
-                $unsubscriber_id = $item->id;
-            }
-            if ($item->name == $other_list) {
-                $other_list_id = $item->id;
+            if(isset($item->name)) {
+                if ($item->name == $unsubscriber_list) {
+                    $unsubscriber_id = $item->id;
+                }
+                if ($item->name == $other_list) {
+                    $other_list_id = $item->id;
+                }
             }
         }
         $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0');
@@ -139,6 +141,8 @@ class Sync extends \Magento\Backend\App\Action
         $this->helper->syncUnsubscriber($curl, $api_key, $other_list_id, $list_other_email);
         $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_id);
         $this->helper->syncSubscriberToM2($curl, $api_key, $list_subscriber_id);
+        $resultRedirect = $this->resultRedirectFactory->create();
+        return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         curl_close($curl);
     }
 }
