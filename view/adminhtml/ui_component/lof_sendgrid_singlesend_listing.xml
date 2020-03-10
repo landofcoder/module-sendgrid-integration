@@ -45,10 +45,17 @@
 				<label translate="true">ID</label>
 			</settings>
 		</column>
+<<<<<<< HEAD
 		<column name="singlesend">
 			<settings>
 				<filter>text</filter>
 				<label translate="true">Single Send Id</label>
+=======
+		<column name="id">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">id</label>
+>>>>>>> create module settings, menu, model, database
 			</settings>
 		</column>
 		<column name="name">

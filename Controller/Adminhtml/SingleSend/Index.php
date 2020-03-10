@@ -1,17 +1,28 @@
 <?php
 /**
  * Copyright (c) 2020  Landofcoder
+<<<<<<< HEAD
  *
+=======
+ * 
+>>>>>>> create module settings, menu, model, database
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
+<<<<<<< HEAD
  *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
+=======
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+>>>>>>> create module settings, menu, model, database
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +41,10 @@ namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
  */
 class Index extends \Magento\Backend\App\Action
 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> create module settings, menu, model, database
     protected $resultPageFactory;
 
     /**
@@ -54,7 +69,15 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
         $resultPage = $this->resultPageFactory->create();
+<<<<<<< HEAD
         $resultPage->getConfig()->getTitle()->prepend(__("SingleSend"));
         return $resultPage;
     }
 }
+=======
+            $resultPage->getConfig()->getTitle()->prepend(__("SingleSend"));
+            return $resultPage;
+    }
+}
+
+>>>>>>> create module settings, menu, model, database

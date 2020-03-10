@@ -23,9 +23,12 @@
 
 namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
 
+<<<<<<< HEAD
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Backend\Model\View\Result\Redirect;
 
+=======
+>>>>>>> create module settings, menu, model, database
 /**
  * Class Sync
  *
@@ -33,6 +36,7 @@ use Magento\Backend\Model\View\Result\Redirect;
  */
 class Sync extends \Magento\Backend\App\Action
 {
+<<<<<<< HEAD
     protected $helper;
     /**
      * @var CollectionFactory
@@ -50,10 +54,15 @@ class Sync extends \Magento\Backend\App\Action
      * @var \Magento\Framework\Message\ManagerInterface
      */
     private $_messageManager;
+=======
+
+    protected $resultPageFactory;
+>>>>>>> create module settings, menu, model, database
 
     /**
      * Constructor
      *
+<<<<<<< HEAD
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lof\SendGrid\Helper\Data $helper
      * @param CollectionFactory $orderCollectionFactory
@@ -75,6 +84,16 @@ class Sync extends \Magento\Backend\App\Action
 
         $this->_orderCollectionFactory = $orderCollectionFactory;
         $this->_subcriberCollectionFactory = $subcriberCollectionFactory;
+=======
+     * @param \Magento\Backend\App\Action\Context  $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     */
+    public function __construct(
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+    ) {
+        $this->resultPageFactory = $resultPageFactory;
+>>>>>>> create module settings, menu, model, database
         parent::__construct($context);
     }
 
@@ -85,6 +104,7 @@ class Sync extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+<<<<<<< HEAD
         $curl = curl_init();
         $api_key = $this->helper->getSendGridConfig('general', 'api_key');
         $list = $this->getAllList($curl, $api_key);
@@ -295,5 +315,8 @@ class Sync extends \Magento\Backend\App\Action
             }
             $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
         }
+=======
+        return $this->resultPageFactory->create();
+>>>>>>> create module settings, menu, model, database
     }
 }

@@ -30,13 +30,24 @@ namespace Lof\SendGrid\Model\Config\Source;
  */
 class UnsubscribeList implements \Magento\Framework\Option\ArrayInterface
 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> create module settings, menu, model, database
     public function toOptionArray()
     {
         return [['value' => 'Global List', 'label' => __('Global List')],['value' => 'All Customer', 'label' => __('All Customer')],['value' => 'Additional Unsubscribers', 'label' => __('Additional Unsubscribers')]];
     }
+<<<<<<< HEAD
     public function toArray()
     {
         return ['Global List' => __('Global List'),'All Unsupscribed Customer' => __('All Unsupscribed Customer'),'Additional Unsubscribers' => __('Additional Unsubscribers')];
+=======
+
+    public function toArray()
+    {
+        return ['Global List' => __('Global List'),'All Customer' => __('All Customer'),'Additional Unsubscribers' => __('Additional Unsubscribers')];
+>>>>>>> create module settings, menu, model, database
     }
 }
 
