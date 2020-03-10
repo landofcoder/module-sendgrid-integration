@@ -31,7 +31,6 @@ class GetContact implements \Magento\Framework\Event\ObserverInterface
             $addressBook->setFirstname($info['name'])->setEmailAddress($info['email'])->setIsSubscribed('0')->setSourceFrom('Contact')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
             $addressBook->save();
         }
-
         return $this;
     }
 }
