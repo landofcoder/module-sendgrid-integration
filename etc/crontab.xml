@@ -7,5 +7,8 @@
         <job instance="Lof\SendGrid\Cron\SingleSend" method="execute" name="lof_sendgrid_singlesend">
             <schedule>* * * * *</schedule>
         </job>
+        <job instance="Lof\SendGrid\Cron\SyncToNewDb" method="execute" name="lof_sendgrid_synctonewdb">
+            <schedule>* * * * *</schedule>
+        </job>
     </group>
 </config>

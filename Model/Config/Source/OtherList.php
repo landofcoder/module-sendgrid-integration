@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2019  Landofcoder
+ * Copyright (c) 2020  Landofcoder
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,43 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
+namespace Lof\SendGrid\Model\Config\Source;
+
+use Lof\SendGrid\Helper\Data;
 
 /**
- * Class Sync
+ * Class SubscribeList
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System\Config
+ * @package Lof\SendGrid\Model\Config\Source
  */
-class SendTest extends \Magento\Backend\App\Action
+class OtherList implements \Magento\Framework\Option\ArrayInterface
 {
-
-    protected $resultPageFactory;
-
     /**
-     * Constructor
-     *
-     * @param \Magento\Backend\App\Action\Context  $context
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @var Data
      */
-    public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+    private $data;
+
+    public function contruct(
+        Data $data
     ) {
-        $this->resultPageFactory = $resultPageFactory;
-        parent::__construct($context);
+        $this->helper = $helper;
+        $this->data = $data;
     }
-
-    /**
-     * Execute view action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
-     */
-    public function execute()
+    public function toOptionArray()
     {
-        return $this->resultPageFactory->create();
+//        $group = $this->data->getAllList();
+        $arr = '';
+//        foreach ($group as $items) {
+//            foreach ($items as $key => $item) {
+//                if ($key == '0') {
+//                    $arr .= "['value' => $item->name, 'label' => __($item->name)]";
+//                } else {
+//                    $arr .= "['value' => $item->name, 'label' => __($item->name)]";
+//                }
+//            }
+//            break;
+//        }
+        return [['value' => 'Other Unsubscriber List', 'label' => __('Other Unsubscriber List')]];
+//        curl_close($curl);
     }
 }
