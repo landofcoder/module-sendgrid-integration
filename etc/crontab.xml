@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="sendgrid">
+        <job instance="Lof\SendGrid\Cron\Sync" method="execute" name="lof_sendgrid_sync">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job instance="Lof\SendGrid\Cron\SingleSend" method="execute" name="lof_sendgrid_singlesend">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+</config>

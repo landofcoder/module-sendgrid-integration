@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="landofcoder" sortOrder="1" translate="label">
+			<label>landofcoder</label>
+		</tab>
+		<section id="sendgrid" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="19" translate="label">
+			<label>SendGrid Intergration</label>
+			<tab>landofcoder</tab>
+			<resource>Lof_SendGrid::config_lof_sendgrid</resource>
+			<group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+				<label>General</label>
+				<field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Enabled</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label" type="password">
+					<label>API Key</label>
+					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="subscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
+					<label>Subscribe List</label>
+					<comment/>
+					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="unsubscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="14" translate="label" type="select">
+					<label>Unsubscribe List	</label>
+					<comment/>
+					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="add_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
+					<label>Add customers without subscriptions status in SendGrid	</label>
+					<comment>If this setting is enable than all customers without any subscription status (subscribe / unsubsricbe) also will be added in SendGrid contacts list like subscribers.</comment>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+					<label>Webhook Url</label>
+					<comment/>
+					<depends>
+						<field id="enabled">1</field>
+					</depends>
+				</field>
+				<field id="list_for_new_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
+					<label>List for New Customer</label>
+					<comment/>
+					<depends>
+						<field id="add_customer">1</field>
+					</depends>
+					<source_model>Lof\SendGrid\Model\Config\Source\ListForNewCustomer</source_model>
+				</field>
+			</group>
+			<group id="sync" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label">
+				<label>Sync all contacts	</label>
+				<field id="cron_enable" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+					<label>Cron Enabled</label>
+					<comment/>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<depends>
+						<field id="sendgrid/general/enabled">1</field>
+					</depends>
+				</field>
+				<field id="sync" type="button" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="1">
+					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\ButtonSync</frontend_model>
+					<label>Sync Contacts</label>
+					<depends>
+						<field id="sendgrid/general/enabled">1</field>
+					</depends>
+				</field>
+			</group>
+		</section>
+	</system>
+</config>
