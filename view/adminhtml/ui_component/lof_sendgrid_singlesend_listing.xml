@@ -2,24 +2,24 @@
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
 	<argument name="data" xsi:type="array">
 		<item name="js_config" xsi:type="array">
-			<item name="provider" xsi:type="string">lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_listing_data_source</item>
+			<item name="provider" xsi:type="string">lof_sendgrid_campaigns_listing.lof_sendgrid_campaigns_listing_data_source</item>
 		</item>
 	</argument>
 	<settings>
-		<spinner>lof_sendgrid_singlesend_columns</spinner>
+		<spinner>lof_sendgrid_campaigns_columns</spinner>
 		<deps>
-			<dep>lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_listing_data_source</dep>
+			<dep>lof_sendgrid_campaigns_listing.lof_sendgrid_campaigns_listing_data_source</dep>
 		</deps>
 	</settings>
-	<dataSource component="Magento_Ui/js/grid/provider" name="lof_sendgrid_singlesend_listing_data_source">
+	<dataSource component="Magento_Ui/js/grid/provider" name="lof_sendgrid_campaigns_listing_data_source">
 		<settings>
 			<updateUrl path="mui/index/render"/>
 		</settings>
-		<aclResource>Lof_SendGrid::SingleSend</aclResource>
-		<dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="lof_sendgrid_singlesend_listing_data_source">
+		<aclResource>Lof_SendGrid::Campaigns</aclResource>
+		<dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="lof_sendgrid_campaigns_listing_data_source">
 			<settings>
 				<requestFieldName>id</requestFieldName>
-				<primaryFieldName>singlesend_id</primaryFieldName>
+				<primaryFieldName>campaigns_id</primaryFieldName>
 			</settings>
 		</dataProvider>
 	</dataSource>
@@ -32,20 +32,20 @@
 		<filters name="listing_filters"/>
 		<paging name="listing_paging"/>
 	</listingToolbar>
-	<columns name="lof_sendgrid_singlesend_columns">
+	<columns name="lof_sendgrid_campaigns_columns">
 		<selectionsColumn name="ids">
 			<settings>
-				<indexField>entity_id</indexField>
+				<indexField>campaigns_id</indexField>
 			</settings>
 		</selectionsColumn>
-		<column name="entity_id">
+		<column name="campaigns_id">
 			<settings>
 				<filter>text</filter>
 				<sorting>asc</sorting>
 				<label translate="true">ID</label>
 			</settings>
 		</column>
-		<column name="singlesend_id">
+		<column name="campaigns">
 			<settings>
 				<filter>text</filter>
 				<label translate="true">Single Send Id</label>
@@ -57,12 +57,6 @@
 				<label translate="true">name</label>
 			</settings>
 		</column>
-        <column name="status">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Status</label>
-            </settings>
-        </column>
 		<column name="create_date">
 			<settings>
 				<filter>text</filter>

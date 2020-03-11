@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Cron;
+namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
 
 /**
- * Class SingleSend
+ * Class Campaigns
  *
  * @package Lof\SendGrid\Cron
  */
-class SingleSend extends \Magento\Backend\App\Action
+class Campaigns extends \Magento\Backend\App\Action
 {
     protected $helper;
 
@@ -37,14 +37,14 @@ class SingleSend extends \Magento\Backend\App\Action
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lof\SendGrid\Helper\Data $helper
-     * @param \Lof\SendGrid\Model\SingleSendFactory $singlesend
+     * @param \Lof\SendGrid\Model\CampaignsFactory $campaigns
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Lof\SendGrid\Helper\Data $helper,
-        \Lof\SendGrid\Model\SingleSendFactory $singlesend
+        \Lof\SendGrid\Model\CampaignsFactory $campaigns
     ) {
-        $this->singlesend = $singlesend;
+        $this->campaigns = $campaigns;
         $this->helper = $helper;
         parent::__construct($context);
     }
@@ -88,18 +88,18 @@ class SingleSend extends \Magento\Backend\App\Action
             $object = json_decode($collection, false);
             foreach ($object as $items) {
                 foreach ($items as $item) {
-                    $model = $this->singlesend->create();
-                    $existing = $model->getCollection()->addFieldToFilter("singlesend", $item->id)->getData();
+                    $model = $this->campaigns->create();
+                    $existing = $model->getCollection()->addFieldToFilter("campaigns", $item->id)->getData();
                     if (count($existing) == 0) {
-                        $model->setSinglesend($item->id);
+                        $model->setCampaigns($item->id);
                         $model->setName($item->name);
                         $model->setUpdateDate($item->updated_at);
                         $model->setCreateDate($item->created_at);
                         $model->save($model);
                     } else {
-                        $entity_id = $existing[0]['singlesend_id'];
+                        $entity_id = $existing[0]['campaigns_id'];
                         $model->load($entity_id);
-                        $model->setSinglesend($item->id);
+                        $model->setCampaigns($item->id);
                         $model->setName($item->name);
                         $model->setUpdateDate($item->updated_at);
                         $model->setCreateDate($item->created_at);

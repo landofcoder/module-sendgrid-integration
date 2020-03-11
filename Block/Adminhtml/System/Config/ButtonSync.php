@@ -30,7 +30,7 @@ class ButtonSync extends Field
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $html = "";
-        $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/sync", []);
+        $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/campaigns", []);
         $html .= '
         <div class="pp-buttons-container"><button type="button" id="sync"><span><span><span>'.__("Sync").'</span></span></span></button></div>
         <style>

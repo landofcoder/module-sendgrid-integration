@@ -1,14 +1,15 @@
 {
-    "name": "lof/module-sendgrid",
-    "description": "",
+    "name": "landofcoder/module-sendgrid",
+    "description": "Sendgrid Sync Magento 2 with Sendgrid",
     "type": "magento2-module",
     "license": "MIT",
     "authors": [
         {
-            "name": "Mage2Gen",
-            "email": "info@mage2gen.com"
+            "name": "Landofcoder",
+            "email": "info@landofcoder.com"
         }
     ],
+    "version": "1.0.0",
     "minimum-stability": "dev",
     "require": {},
     "autoload": {

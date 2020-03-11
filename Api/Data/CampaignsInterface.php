@@ -24,31 +24,31 @@
 namespace Lof\SendGrid\Api\Data;
 
 /**
- * Interface SingleSendInterface
+ * Interface CampaignsInterface
  *
  * @package Lof\SendGrid\Api\Data
  */
-interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInterface
+interface CampaignsInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
 
-    const SINGLESEND = 'singlesend';
-    const SINGLESEND_ID = 'singlesend_id';
+    const CAMPAIGNS = 'campaigns';
+    const CAMPAIGNS_ID = 'campaigns_id';
     const UPDATE_DATE = 'update_date';
     const CREATE_DATE = 'create_date';
     const NAME = 'name';
 
     /**
-     * Get singlesend_id
+     * Get campaigns_id
      * @return string|null
      */
-    public function getSinglesendId();
+    public function getCampaignsId();
 
     /**
-     * Set singlesend_id
-     * @param string $singlesendId
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * Set campaigns_id
+     * @param string $campaignsId
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      */
-    public function setSinglesendId($singlesendId);
+    public function setCampaignsId($campaignsId);
 
     /**
      * Get name
@@ -59,23 +59,23 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     /**
      * Set name
      * @param string $name
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      */
     public function setName($name);
 
     /**
      * Retrieve existing extension attributes object or create a new one.
-     * @return \Lof\SendGrid\Api\Data\SingleSendExtensionInterface|null
+     * @return \Lof\SendGrid\Api\Data\CampaignsExtensionInterface|null
      */
     public function getExtensionAttributes();
 
     /**
      * Set an extension attributes object.
-     * @param \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
+     * @param \Lof\SendGrid\Api\Data\CampaignsExtensionInterface $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
+        \Lof\SendGrid\Api\Data\CampaignsExtensionInterface $extensionAttributes
     );
 
     /**
@@ -87,7 +87,7 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     /**
      * Set create_date
      * @param string $createDate
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      */
     public function setCreateDate($createDate);
 
@@ -100,20 +100,20 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     /**
      * Set update_date
      * @param string $updateDate
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      */
     public function setUpdateDate($updateDate);
 
     /**
-     * Get singlesend
+     * Get campaigns
      * @return string|null
      */
-    public function getSinglesend();
+    public function getCampaigns();
 
     /**
-     * Set singlesend
-     * @param string $singlesend
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * Set campaigns
+     * @param string $campaigns
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      */
-    public function setSinglesend($singlesend);
+    public function setCampaigns($campaigns);
 }

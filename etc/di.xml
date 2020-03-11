@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-	<preference for="Lof\SendGrid\Api\SingleSendRepositoryInterface" type="Lof\SendGrid\Model\SingleSendRepository"/>
-	<preference for="Lof\SendGrid\Api\Data\SingleSendInterface" type="Lof\SendGrid\Model\Data\SingleSend"/>
-	<preference for="Lof\SendGrid\Api\Data\SingleSendSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
-	<virtualType name="Lof\SendGrid\Model\ResourceModel\SingleSend\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+	<preference for="Lof\SendGrid\Api\CampaignsRepositoryInterface" type="Lof\SendGrid\Model\CampaignsRepository"/>
+	<preference for="Lof\SendGrid\Api\Data\CampaignsInterface" type="Lof\SendGrid\Model\Data\Campaigns"/>
+	<preference for="Lof\SendGrid\Api\Data\CampaignsSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+	<virtualType name="Lof\SendGrid\Model\ResourceModel\Campaigns\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
 		<arguments>
-			<argument name="mainTable" xsi:type="string">lof_sendgrid_singlesend</argument>
-			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\SingleSend\Collection</argument>
+			<argument name="mainTable" xsi:type="string">lof_sendgrid_campaigns</argument>
+			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Campaigns\Collection</argument>
 		</arguments>
 	</virtualType>
 	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
 		<arguments>
 			<argument name="collections" xsi:type="array">
-				<item name="lof_sendgrid_singlesend_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\SingleSend\Grid\Collection</item>
+				<item name="lof_sendgrid_campaigns_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Campaigns\Grid\Collection</item>
 			</argument>
 		</arguments>
 	</type>

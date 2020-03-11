@@ -23,62 +23,62 @@
 
 namespace Lof\SendGrid\Model;
 
-use Lof\SendGrid\Api\Data\SingleSendInterface;
-use Lof\SendGrid\Api\Data\SingleSendInterfaceFactory;
+use Lof\SendGrid\Api\Data\CampaignsInterface;
+use Lof\SendGrid\Api\Data\CampaignsInterfaceFactory;
 use Magento\Framework\Api\DataObjectHelper;
 
 /**
- * Class SingleSend
+ * Class Campaigns
  *
  * @package Lof\SendGrid\Model
  */
-class SingleSend extends \Magento\Framework\Model\AbstractModel
+class Campaigns extends \Magento\Framework\Model\AbstractModel
 {
 
-    protected $_eventPrefix = 'lof_sendgrid_singlesend';
+    protected $_eventPrefix = 'lof_sendgrid_campaigns';
     protected $dataObjectHelper;
 
-    protected $singlesendDataFactory;
+    protected $campaignsDataFactory;
 
 
     /**
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param SingleSendInterfaceFactory $singlesendDataFactory
+     * @param CampaignsInterfaceFactory $campaignsDataFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param \Lof\SendGrid\Model\ResourceModel\SingleSend $resource
-     * @param \Lof\SendGrid\Model\ResourceModel\SingleSend\Collection $resourceCollection
+     * @param \Lof\SendGrid\Model\ResourceModel\Campaigns $resource
+     * @param \Lof\SendGrid\Model\ResourceModel\Campaigns\Collection $resourceCollection
      * @param array $data
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        SingleSendInterfaceFactory $singlesendDataFactory,
+        CampaignsInterfaceFactory $campaignsDataFactory,
         DataObjectHelper $dataObjectHelper,
-        \Lof\SendGrid\Model\ResourceModel\SingleSend $resource,
-        \Lof\SendGrid\Model\ResourceModel\SingleSend\Collection $resourceCollection,
+        \Lof\SendGrid\Model\ResourceModel\Campaigns $resource,
+        \Lof\SendGrid\Model\ResourceModel\Campaigns\Collection $resourceCollection,
         array $data = []
     ) {
-        $this->singlesendDataFactory = $singlesendDataFactory;
+        $this->campaignsDataFactory = $campaignsDataFactory;
         $this->dataObjectHelper = $dataObjectHelper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
     /**
-     * Retrieve singlesend model with singlesend data
-     * @return SingleSendInterface
+     * Retrieve campaigns model with campaigns data
+     * @return CampaignsInterface
      */
     public function getDataModel()
     {
-        $singlesendData = $this->getData();
+        $campaignsData = $this->getData();
 
-        $singlesendDataObject = $this->singlesendDataFactory->create();
+        $campaignsDataObject = $this->campaignsDataFactory->create();
         $this->dataObjectHelper->populateWithArray(
-            $singlesendDataObject,
-            $singlesendData,
-            SingleSendInterface::class
+            $campaignsDataObject,
+            $campaignsData,
+            CampaignsInterface::class
         );
 
-        return $singlesendDataObject;
+        return $campaignsDataObject;
     }
 }

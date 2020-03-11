@@ -4,7 +4,7 @@
         <job instance="Lof\SendGrid\Cron\Sync" method="execute" name="lof_sendgrid_sync">
             <schedule>* * * * *</schedule>
         </job>
-        <job instance="Lof\SendGrid\Cron\SingleSend" method="execute" name="lof_sendgrid_singlesend">
+        <job instance="Lof\SendGrid\Cron\Campaigns" method="execute" name="lof_sendgrid_campaigns">
             <schedule>* * * * *</schedule>
         </job>
         <job instance="Lof\SendGrid\Cron\SyncToNewDb" method="execute" name="lof_sendgrid_synctonewdb">

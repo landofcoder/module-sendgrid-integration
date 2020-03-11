@@ -26,35 +26,35 @@ namespace Lof\SendGrid\Api;
 use Magento\Framework\Api\SearchCriteriaInterface;
 
 /**
- * Interface SingleSendRepositoryInterface
+ * Interface CampaignsRepositoryInterface
  *
  * @package Lof\SendGrid\Api
  */
-interface SingleSendRepositoryInterface
+interface CampaignsRepositoryInterface
 {
 
     /**
-     * Save SingleSend
-     * @param \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * Save Campaigns
+     * @param \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function save(
-        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
+        \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
     );
 
     /**
-     * Retrieve SingleSend
-     * @param string $singlesendId
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * Retrieve Campaigns
+     * @param string $campaignsId
+     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function get($singlesendId);
+    public function get($campaignsId);
 
     /**
-     * Retrieve SingleSend matching the specified criteria.
+     * Retrieve Campaigns matching the specified criteria.
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Lof\SendGrid\Api\Data\SingleSendSearchResultsInterface
+     * @return \Lof\SendGrid\Api\Data\CampaignsSearchResultsInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getList(
@@ -62,21 +62,21 @@ interface SingleSendRepositoryInterface
     );
 
     /**
-     * Delete SingleSend
-     * @param \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
+     * Delete Campaigns
+     * @param \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
      * @return bool true on success
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function delete(
-        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
+        \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
     );
 
     /**
-     * Delete SingleSend by ID
-     * @param string $singlesendId
+     * Delete Campaigns by ID
+     * @param string $campaignsId
      * @return bool true on success
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function deleteById($singlesendId);
+    public function deleteById($campaignsId);
 }
