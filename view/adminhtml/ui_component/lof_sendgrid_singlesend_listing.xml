@@ -35,17 +35,17 @@
 	<columns name="lof_sendgrid_singlesend_columns">
 		<selectionsColumn name="ids">
 			<settings>
-				<indexField>singlesend_id</indexField>
+				<indexField>entity_id</indexField>
 			</settings>
 		</selectionsColumn>
-		<column name="singlesend_id">
+		<column name="entity_id">
 			<settings>
 				<filter>text</filter>
 				<sorting>asc</sorting>
 				<label translate="true">ID</label>
 			</settings>
 		</column>
-		<column name="singlesend">
+		<column name="singlesend_id">
 			<settings>
 				<filter>text</filter>
 				<label translate="true">Single Send Id</label>
@@ -57,6 +57,12 @@
 				<label translate="true">name</label>
 			</settings>
 		</column>
+        <column name="status">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
 		<column name="create_date">
 			<settings>
 				<filter>text</filter>
