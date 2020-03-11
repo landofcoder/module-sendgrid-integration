@@ -24,6 +24,7 @@
 namespace Lof\SendGrid\Model\Config\Source;
 
 use Lof\SendGrid\Helper\Data;
+use Magento\Framework\App\Action\Context;
 
 /**
  * Class SubscribeList
@@ -36,28 +37,32 @@ class OtherList implements \Magento\Framework\Option\ArrayInterface
      * @var Data
      */
     private $data;
+    /**
+     * @var Context
+     */
+    private $context;
+    /**
+     * @var Data
+     */
+    private $helper;
 
-    public function contruct(
-        Data $data
+    public function __construct(
+        Context $context,
+        Data $helper
     ) {
+        $this->context = $context;
         $this->helper = $helper;
-        $this->data = $data;
     }
     public function toOptionArray()
     {
-//        $group = $this->data->getAllList();
-        $arr = '';
-//        foreach ($group as $items) {
-//            foreach ($items as $key => $item) {
-//                if ($key == '0') {
-//                    $arr .= "['value' => $item->name, 'label' => __($item->name)]";
-//                } else {
-//                    $arr .= "['value' => $item->name, 'label' => __($item->name)]";
-//                }
-//            }
-//            break;
-//        }
-        return [['value' => 'Other Unsubscriber List', 'label' => __('Other Unsubscriber List')]];
-//        curl_close($curl);
+        $options = [];
+        $list = $this->helper->getUnsubscriberGroup();
+        foreach ($list as $item) {
+            $options[] = [
+                'label' => $item->name,
+                'value' => __($item->name),
+            ];
+        }
+        return $options;
     }
 }
