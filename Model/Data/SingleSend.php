@@ -23,33 +23,33 @@
 
 namespace Lof\SendGrid\Model\Data;
 
-use Lof\SendGrid\Api\Data\CampaignsInterface;
+use Lof\SendGrid\Api\Data\SingleSendInterface;
 
 /**
- * Class Campaigns
+ * Class SingleSend
  *
  * @package Lof\SendGrid\Model\Data
  */
-class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implements CampaignsInterface
+class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject implements SingleSendInterface
 {
 
     /**
-     * Get campaigns_id
+     * Get singlesend_id
      * @return string|null
      */
-    public function getCampaignsId()
+    public function getSinglesendId()
     {
-        return $this->_get(self::CAMPAIGNS_ID);
+        return $this->_get(self::SINGLESEND_ID);
     }
 
     /**
-     * Set campaigns_id
-     * @param string $campaignsId
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
+     * Set singlesend_id
+     * @param string $singlesendId
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setCampaignsId($campaignsId)
+    public function setSinglesendId($singlesendId)
     {
-        return $this->setData(self::CAMPAIGNS_ID, $campaignsId);
+        return $this->setData(self::SINGLESEND_ID, $singlesendId);
     }
 
     /**
@@ -64,7 +64,7 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
     /**
      * Set name
      * @param string $name
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
     public function setName($name)
     {
@@ -73,7 +73,7 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
 
     /**
      * Retrieve existing extension attributes object or create a new one.
-     * @return \Lof\SendGrid\Api\Data\CampaignsExtensionInterface|null
+     * @return \Lof\SendGrid\Api\Data\SingleSendExtensionInterface|null
      */
     public function getExtensionAttributes()
     {
@@ -82,11 +82,11 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
 
     /**
      * Set an extension attributes object.
-     * @param \Lof\SendGrid\Api\Data\CampaignsExtensionInterface $extensionAttributes
+     * @param \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        \Lof\SendGrid\Api\Data\CampaignsExtensionInterface $extensionAttributes
+        \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }
@@ -103,7 +103,7 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
     /**
      * Set create_date
      * @param string $createDate
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
     public function setCreateDate($createDate)
     {
@@ -122,7 +122,7 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
     /**
      * Set update_date
      * @param string $updateDate
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
     public function setUpdateDate($updateDate)
     {
@@ -130,21 +130,21 @@ class Campaigns extends \Magento\Framework\Api\AbstractExtensibleObject implemen
     }
 
     /**
-     * Get campaigns
+     * Get singlesend
      * @return string|null
      */
-    public function getCampaigns()
+    public function getSinglesend()
     {
-        return $this->_get(self::CAMPAIGNS);
+        return $this->_get(self::SINGLESEND);
     }
 
     /**
-     * Set campaigns
-     * @param string $campaigns
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface
+     * Set singlesend
+     * @param string $singlesend
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setCampaigns($campaigns)
+    public function setSinglesend($singlesend)
     {
-        return $this->setData(self::CAMPAIGNS, $campaigns);
+        return $this->setData(self::SINGLESEND, $singlesend);
     }
 }

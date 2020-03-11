@@ -3,7 +3,7 @@
 	<update handle="styles"/>
 	<body>
 		<referenceContainer name="content">
-			<uiComponent name="lof_sendgrid_campaigns_listing"/>
+			<uiComponent name="lof_sendgrid_singlesend_listing"/>
 		</referenceContainer>
 	</body>
 </page>

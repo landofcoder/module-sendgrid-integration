@@ -21,26 +21,23 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Api\Data;
+namespace Lof\SendGrid\Model\ResourceModel;
 
 /**
- * Interface CampaignsSearchResultsInterface
+ * Class SingleSend
  *
- * @package Lof\SendGrid\Api\Data
+ * @package Lof\SendGrid\Model\ResourceModel
  */
-interface CampaignsSearchResultsInterface extends \Magento\Framework\Api\SearchResultsInterface
+class SingleSend extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
 
     /**
-     * Get Campaigns list.
-     * @return \Lof\SendGrid\Api\Data\CampaignsInterface[]
+     * Define resource model
+     *
+     * @return void
      */
-    public function getItems();
-
-    /**
-     * Set name list.
-     * @param \Lof\SendGrid\Api\Data\CampaignsInterface[] $items
-     * @return $this
-     */
-    public function setItems(array $items);
+    protected function _construct()
+    {
+        $this->_init('lof_sendgrid_singlesend', 'singlesend_id');
+    }
 }

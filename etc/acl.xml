@@ -10,9 +10,9 @@
 						</resource>
 					</resource>
 				</resource>
-				<resource id="Lof_SendGrid::Campaigns" sortOrder="10" title="Campaigns">
-					<resource id="Lof_SendGrid::Campaigns_delete" sortOrder="20" title="Delete Campaigns"/>
-					<resource id="Lof_SendGrid::Campaigns_view" sortOrder="40" title="View Campaigns"/>
+				<resource id="Lof_SendGrid::SingleSend" sortOrder="10" title="SingleSend">
+					<resource id="Lof_SendGrid::SingleSend_delete" sortOrder="20" title="Delete SingleSend"/>
+					<resource id="Lof_SendGrid::SingleSend_view" sortOrder="40" title="View SingleSend"/>
 				</resource>
 				<resource id="Lof_SendGrid::Statistics" sortOrder="15" title="Statistics"></resource>
 			</resource>

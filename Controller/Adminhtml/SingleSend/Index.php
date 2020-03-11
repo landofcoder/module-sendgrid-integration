@@ -21,12 +21,12 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\Campaigns;
+namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
 /**
  * Class Index
  *
- * @package Lof\SendGrid\Controller\Adminhtml\Campaigns
+ * @package Lof\SendGrid\Controller\Adminhtml\SingleSend
  */
 class Index extends \Magento\Backend\App\Action
 {
@@ -54,7 +54,7 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->prepend(__("Campaigns"));
+        $resultPage->getConfig()->getTitle()->prepend(__("SingleSend"));
         return $resultPage;
     }
 }

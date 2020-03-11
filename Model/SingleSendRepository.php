@@ -27,23 +27,23 @@ use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Exception\CouldNotSaveException;
-use Lof\SendGrid\Model\ResourceModel\Campaigns\CollectionFactory as CampaignsCollectionFactory;
+use Lof\SendGrid\Model\ResourceModel\SingleSend\CollectionFactory as SingleSendCollectionFactory;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Store\Model\StoreManagerInterface;
-use Lof\SendGrid\Model\ResourceModel\Campaigns as ResourceCampaigns;
+use Lof\SendGrid\Model\ResourceModel\SingleSend as ResourceSingleSend;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Reflection\DataObjectProcessor;
-use Lof\SendGrid\Api\Data\CampaignsInterfaceFactory;
+use Lof\SendGrid\Api\Data\SingleSendInterfaceFactory;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Lof\SendGrid\Api\Data\CampaignsSearchResultsInterfaceFactory;
-use Lof\SendGrid\Api\CampaignsRepositoryInterface;
+use Lof\SendGrid\Api\Data\SingleSendSearchResultsInterfaceFactory;
+use Lof\SendGrid\Api\SingleSendRepositoryInterface;
 
 /**
- * Class CampaignsRepository
+ * Class SingleSendRepository
  *
  * @package Lof\SendGrid\Model
  */
-class CampaignsRepository implements CampaignsRepositoryInterface
+class SingleSendRepository implements SingleSendRepositoryInterface
 {
 
     protected $searchResultsFactory;
@@ -52,9 +52,9 @@ class CampaignsRepository implements CampaignsRepositoryInterface
 
     protected $dataObjectProcessor;
 
-    protected $dataCampaignsFactory;
+    protected $dataSingleSendFactory;
 
-    protected $campaignsFactory;
+    protected $singleSendFactory;
 
     protected $extensionAttributesJoinProcessor;
 
@@ -65,15 +65,15 @@ class CampaignsRepository implements CampaignsRepositoryInterface
     private $storeManager;
 
     protected $extensibleDataObjectConverter;
-    protected $campaignsCollectionFactory;
+    protected $singleSendCollectionFactory;
 
 
     /**
-     * @param ResourceCampaigns $resource
-     * @param CampaignsFactory $campaignsFactory
-     * @param CampaignsInterfaceFactory $dataCampaignsFactory
-     * @param CampaignsCollectionFactory $campaignsCollectionFactory
-     * @param CampaignsSearchResultsInterfaceFactory $searchResultsFactory
+     * @param ResourceSingleSend $resource
+     * @param SingleSendFactory $singleSendFactory
+     * @param SingleSendInterfaceFactory $dataSingleSendFactory
+     * @param SingleSendCollectionFactory $singleSendCollectionFactory
+     * @param SingleSendSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
@@ -82,11 +82,11 @@ class CampaignsRepository implements CampaignsRepositoryInterface
      * @param ExtensibleDataObjectConverter $extensibleDataObjectConverter
      */
     public function __construct(
-        ResourceCampaigns $resource,
-        CampaignsFactory $campaignsFactory,
-        CampaignsInterfaceFactory $dataCampaignsFactory,
-        CampaignsCollectionFactory $campaignsCollectionFactory,
-        CampaignsSearchResultsInterfaceFactory $searchResultsFactory,
+        ResourceSingleSend $resource,
+        SingleSendFactory $singleSendFactory,
+        SingleSendInterfaceFactory $dataSingleSendFactory,
+        SingleSendCollectionFactory $singleSendCollectionFactory,
+        SingleSendSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
@@ -95,11 +95,11 @@ class CampaignsRepository implements CampaignsRepositoryInterface
         ExtensibleDataObjectConverter $extensibleDataObjectConverter
     ) {
         $this->resource = $resource;
-        $this->campaignsFactory = $campaignsFactory;
-        $this->campaignsCollectionFactory = $campaignsCollectionFactory;
+        $this->singleSendFactory = $singleSendFactory;
+        $this->singleSendCollectionFactory = $singleSendCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataCampaignsFactory = $dataCampaignsFactory;
+        $this->dataSingleSendFactory = $dataSingleSendFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
         $this->collectionProcessor = $collectionProcessor;
@@ -111,43 +111,43 @@ class CampaignsRepository implements CampaignsRepositoryInterface
      * {@inheritdoc}
      */
     public function save(
-        \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
+        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
     ) {
-        /* if (empty($campaigns->getStoreId())) {
+        /* if (empty($singleSend->getStoreId())) {
             $storeId = $this->storeManager->getStore()->getId();
-            $campaigns->setStoreId($storeId);
+            $singleSend->setStoreId($storeId);
         } */
 
-        $campaignsData = $this->extensibleDataObjectConverter->toNestedArray(
-            $campaigns,
+        $singleSendData = $this->extensibleDataObjectConverter->toNestedArray(
+            $singleSend,
             [],
-            \Lof\SendGrid\Api\Data\CampaignsInterface::class
+            \Lof\SendGrid\Api\Data\SingleSendInterface::class
         );
 
-        $campaignsModel = $this->campaignsFactory->create()->setData($campaignsData);
+        $singleSendModel = $this->singleSendFactory->create()->setData($singleSendData);
 
         try {
-            $this->resource->save($campaignsModel);
+            $this->resource->save($singleSendModel);
         } catch (\Exception $exception) {
             throw new CouldNotSaveException(__(
-                'Could not save the campaigns: %1',
+                'Could not save the singleSend: %1',
                 $exception->getMessage()
             ));
         }
-        return $campaignsModel->getDataModel();
+        return $singleSendModel->getDataModel();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($campaignsId)
+    public function get($singleSendId)
     {
-        $campaigns = $this->campaignsFactory->create();
-        $this->resource->load($campaigns, $campaignsId);
-        if (!$campaigns->getId()) {
-            throw new NoSuchEntityException(__('Campaigns with id "%1" does not exist.', $campaignsId));
+        $singleSend = $this->singleSendFactory->create();
+        $this->resource->load($singleSend, $singleSendId);
+        if (!$singleSend->getId()) {
+            throw new NoSuchEntityException(__('SingleSend with id "%1" does not exist.', $singleSendId));
         }
-        return $campaigns->getDataModel();
+        return $singleSend->getDataModel();
     }
 
     /**
@@ -156,11 +156,11 @@ class CampaignsRepository implements CampaignsRepositoryInterface
     public function getList(
         \Magento\Framework\Api\SearchCriteriaInterface $criteria
     ) {
-        $collection = $this->campaignsCollectionFactory->create();
+        $collection = $this->singleSendCollectionFactory->create();
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            \Lof\SendGrid\Api\Data\CampaignsInterface::class
+            \Lof\SendGrid\Api\Data\SingleSendInterface::class
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -182,15 +182,15 @@ class CampaignsRepository implements CampaignsRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        \Lof\SendGrid\Api\Data\CampaignsInterface $campaigns
+        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
     ) {
         try {
-            $campaignsModel = $this->campaignsFactory->create();
-            $this->resource->load($campaignsModel, $campaigns->getCampaignsId());
-            $this->resource->delete($campaignsModel);
+            $singleSendModel = $this->singleSendFactory->create();
+            $this->resource->load($singleSendModel, $singleSend->getSinglesendId());
+            $this->resource->delete($singleSendModel);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__(
-                'Could not delete the Campaigns: %1',
+                'Could not delete the SingleSend: %1',
                 $exception->getMessage()
             ));
         }
@@ -200,8 +200,8 @@ class CampaignsRepository implements CampaignsRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteById($campaignsId)
+    public function deleteById($singleSendId)
     {
-        return $this->delete($this->get($campaignsId));
+        return $this->delete($this->get($singleSendId));
     }
 }
