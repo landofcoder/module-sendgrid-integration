@@ -1,25 +1,5 @@
 <?php
-/**
- * Copyright (c) 2019  Landofcoder
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+
 
 namespace Lof\SendGrid\Api\Data;
 
@@ -31,11 +11,13 @@ namespace Lof\SendGrid\Api\Data;
 interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
 
-    const SINGLESEND = 'singlesend';
-    const SINGLESEND_ID = 'singlesend_id';
-    const UPDATE_DATE = 'update_date';
+    const ENTITY_ID = 'entity_id';
     const CREATE_DATE = 'create_date';
     const NAME = 'name';
+    const STATUS = 'status';
+    const SINGLESEND_ID = 'singlesend_id';
+    const UPDATE_DATE = 'update_date';
+    const EMAIL_HTML = 'email_html';
 
     /**
      * Get singlesend_id
@@ -51,17 +33,17 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setSinglesendId($singlesendId);
 
     /**
-     * Get name
+     * Get entity_id
      * @return string|null
      */
-    public function getName();
+    public function getEntityId();
 
     /**
-     * Set name
-     * @param string $name
+     * Set entity_id
+     * @param string $entityId
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setName($name);
+    public function setEntityId($entityId);
 
     /**
      * Retrieve existing extension attributes object or create a new one.
@@ -77,6 +59,19 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setExtensionAttributes(
         \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
     );
+
+    /**
+     * Get name
+     * @return string|null
+     */
+    public function getName();
+
+    /**
+     * Set name
+     * @param string $name
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setName($name);
 
     /**
      * Get create_date
@@ -105,15 +100,28 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setUpdateDate($updateDate);
 
     /**
-     * Get singlesend
+     * Get status
      * @return string|null
      */
-    public function getSinglesend();
+    public function getStatus();
 
     /**
-     * Set singlesend
-     * @param string $singlesend
+     * Set status
+     * @param string $status
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
-    public function setSinglesend($singlesend);
+    public function setStatus($status);
+
+    /**
+     * Get email_html
+     * @return string|null
+     */
+    public function getEmailHtml();
+
+    /**
+     * Set email_html
+     * @param string $emailHtml
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setEmailHtml($emailHtml);
 }

@@ -82,33 +82,30 @@ class SingleSend extends \Magento\Backend\App\Action
                 'timeout' => 30
             ];
             $client->setOptions($options);
-
             $response = $client->send($request);
             $collection = ($response->getContent());
             $object = json_decode($collection, false);
-            foreach ($object as $items) {
-                foreach ($items as $item) {
-                    $model = $this->singlesend->create();
-                    $existing = $model->getCollection()->addFieldToFilter("singlesend", $item->id)->getData();
-                    if (count($existing) == 0) {
-                        $model->setSingleSendId($item->id);
-                        $model->setName($item->name);
-                        $model->setUpdateDate($item->updated_at);
-                        $model->setCreateDate($item->created_at);
-                        $model->setStatus($item->status);
-                        $model->save($model);
-                    } else {
-                        $entity_id = $existing[0]['singlesend_id'];
-                        $model->load($entity_id);
-                        $model->setSinglesendId($item->id);
-                        $model->setName($item->name);
-                        $model->setUpdateDate($item->updated_at);
-                        $model->setCreateDate($item->created_at);
-                        $model->setStatus($item->status);
-                        $model->save($model);
-                    }
+            $items = get_object_vars($object)['result'];
+            foreach ($items as $item) {
+                $model = $this->singlesend->create();
+                $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
+                if (count($existing) == 0) {
+                    $model->setSinglesendId($item->id);
+                    $model->setName($item->name);
+                    $model->setUpdateDate($item->updated_at);
+                    $model->setCreateDate($item->created_at);
+                    $model->setStatus($item->status);
+                    $model->save();
+                } else {
+                    $entity_id = $existing[0]['entity_id'];
+                    $model->load($entity_id);
+                    $model->setSinglesendId($item->id);
+                    $model->setName($item->name);
+                    $model->setUpdateDate($item->updated_at);
+                    $model->setCreateDate($item->created_at);
+                    $model->setStatus($item->status);
+                    $model->save($model);
                 }
-                break;
             }
         }
     }

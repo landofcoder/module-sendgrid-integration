@@ -53,16 +53,13 @@ class SubscribeList implements \Magento\Framework\Option\ArrayInterface
     {
         $options = [];
         $list = $this->helper->getAllList();
-        foreach ($list as $items) {
-            foreach ($items as $item) {
-                $options[] = [
-                    'label' => $item->name,
-                    'value' => __($item->name),
-                ];
-            }
-            break;
+        $items = get_object_vars($list)['result'];
+        foreach ($items as $item) {
+            $options[] = [
+                'label' => $item->name,
+                'value' => __($item->name),
+            ];
         }
         return $options;
     }
 }
-

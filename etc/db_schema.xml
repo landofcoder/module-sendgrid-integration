@@ -10,7 +10,7 @@
 		<column name="update_date" nullable="true" xsi:type="text"/>
 		<column name="status" nullable="true" xsi:type="varchar" length="50"/>
 		<column name="email_html" nullable="true" xsi:type="text"/>
-		<column name="singlesend_id" nullable="false" xsi:type="varchar" length="50"/>
+		<column name="singlesend_id" nullable="true" xsi:type="varchar" length="100"/>
 	</table>
 	<table comment="lof_sendgrid_addressbook Table" engine="innodb" name="lof_sendgrid_addressbook" resource="default">
 		<column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>

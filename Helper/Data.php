@@ -174,20 +174,18 @@ class Data extends AbstractHelper
     public function syncSubscriberToM2($curl, $api_key, $list_subscriber_id)
     {
         $contacts = $this->getContacts($curl, $api_key);
-        foreach ($contacts as $contact) {
-            foreach ($contact as $item) {
-                if (isset($item->list_ids)) {
-                    if (in_array($list_subscriber_id, $item->list_ids)) {
-                        $subscriber = $this->_subscriberFactory->create();
-                        $existing = $subscriber->getCollection()->addFieldToFilter("subscriber_email", $item->email)->getData();
-                        if (count($existing) == 0) {
-                            $subscriber->setSubscriberEmail($item->email)->setCustomerFirstname($item->first_name)->setCustomerLastname($item->last_name)->setStatus('1');
-                            $subscriber->save();
-                        }
+        $items = get_object_vars($contacts)['result'];
+        foreach ($items as $item) {
+            if (isset($item->list_ids)) {
+                if (in_array($list_subscriber_id, $item->list_ids)) {
+                    $subscriber = $this->_subscriberFactory->create();
+                    $existing = $subscriber->getCollection()->addFieldToFilter("subscriber_email", $item->email)->getData();
+                    if (count($existing) == 0) {
+                        $subscriber->setSubscriberEmail($item->email)->setCustomerFirstname($item->first_name)->setCustomerLastname($item->last_name)->setStatus('1');
+                        $subscriber->save();
                     }
                 }
             }
-            break;
         }
     }
     public function syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_list_id)

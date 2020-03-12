@@ -100,15 +100,13 @@ class Sync extends \Magento\Backend\App\Action
         $other_list = $this->helper->getSendGridConfig('general', 'other_group');
         $list_subscriber_id = '';
         $list = $this->helper->getAllList($curl, $api_key);
-        foreach ($list as $items) {
-            foreach ($items as $item) {
-                if (isset($item->name)) {
-                    if ($item->name == $subscriber_list) {
-                        $list_subscriber_id = $item->id;
-                    }
+        $items = get_object_vars($list)['result'];
+        foreach ($items as $item) {
+            if (isset($item->name)) {
+                if ($item->name == $subscriber_list) {
+                    $list_subscriber_id = $item->id;
                 }
             }
-            break;
         }
         $list_unsubscriber = $this->helper->getUnsubscriberGroup($curl, $api_key);
         $unsubscriber_id = '';
