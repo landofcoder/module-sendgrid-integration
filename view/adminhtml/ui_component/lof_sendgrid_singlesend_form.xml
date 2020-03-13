@@ -73,6 +73,10 @@
                                 <item name="value" xsi:type="string">triggered</item>
                                 <item name="label" xsi:type="string">Triggered</item>
                             </option>
+                            <option name="3" xsi:type="array">
+                                <item name="value" xsi:type="string">scheduled</item>
+                                <item name="label" xsi:type="string">Scheduled</item>
+                            </option>
                         </options>
                         <caption translate="true">-- Please Select --</caption>
                     </settings>

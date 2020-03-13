@@ -11,6 +11,8 @@
 		<column name="status" nullable="true" xsi:type="varchar" length="50"/>
 		<column name="email_html" nullable="true" xsi:type="text"/>
 		<column name="singlesend_id" nullable="true" xsi:type="varchar" length="100"/>
+		<column name="template_id" nullable="true" xsi:type="varchar" length="50"/>
+
 	</table>
 	<table comment="lof_sendgrid_addressbook Table" engine="innodb" name="lof_sendgrid_addressbook" resource="default">
 		<column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
@@ -30,4 +32,19 @@
 		<column name="group_id" nullable="false" xsi:type="varchar" length="100"/>
 		<column name="tags" nullable="true" xsi:type="varchar" length="255"/>
 	</table>
+    <table comment="lof_sendgrid_template_version Table" engine="innodb" name="lof_sendgrid_template_version" resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="template_id" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="update_at" nullable="true" xsi:type="datetime"/>
+        <column name="active" nullable="true" xsi:type="boolean"/>
+        <column name="name" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="html_content" nullable="true" xsi:type="text"/>
+        <column name="plain_content" nullable="true" xsi:type="text"/>
+        <column name="generate_plain_content" nullable="true" xsi:type="text"/>
+        <column name="subject" nullable="true" xsi:type="varchar" length="100"/>
+        <column name="editor" nullable="true" xsi:type="varchar" length="100"/>
+    </table>
 </schema>
