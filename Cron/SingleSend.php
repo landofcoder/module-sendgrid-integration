@@ -84,14 +84,14 @@ class SingleSend extends \Magento\Backend\App\Action
             $client->setOptions($options);
 
             $response = $client->send($request);
-            $collection = ($response->getContent());
+            $collection = ($response->getBody());
             $object = json_decode($collection, false);
             $items = get_object_vars($object)['result'];
             foreach ($items as $item) {
                 $model = $this->singlesend->create();
-                $existing = $model->getCollection()->addFieldToFilter("singlesend", $item->id)->getData();
+                $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
                 if (count($existing) == 0) {
-                    $model->setSingleSendId($item->id);
+                    $model->setSinglesendId($item->id);
                     $model->setName($item->name);
                     $model->setUpdateDate($item->updated_at);
                     $model->setCreateDate($item->created_at);
