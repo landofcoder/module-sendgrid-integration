@@ -259,4 +259,7 @@ class Data extends AbstractHelper
         }
         return json_decode($response);
     }
+    public function hello(){
+        echo 'hello';
+    }
 }

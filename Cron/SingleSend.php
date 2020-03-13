@@ -98,7 +98,7 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setStatus($item->status);
                     $model->save($model);
                 } else {
-                    $entity_id = $existing[0]['singlesend_id'];
+                    $entity_id = $existing[0]['entity_id'];
                     $model->load($entity_id);
                     $model->setSinglesendId($item->id);
                     $model->setName($item->name);

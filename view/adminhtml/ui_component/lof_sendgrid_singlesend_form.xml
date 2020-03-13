@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">lof_sendgrid_singlesend_form.singlesend_form_data_source</item>
+        </item>
+        <item name="label" translate="true" xsi:type="string">General Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button class="Lof\SendGrid\Block\Adminhtml\SingleSend\Edit\BackButton" name="back"/>
+            <button class="Lof\SendGrid\Block\Adminhtml\SingleSend\Edit\DeleteButton" name="delete"/>
+            <button class="Lof\SendGrid\Block\Adminhtml\SingleSend\Edit\SaveButton" name="save"/>
+            <button class="Lof\SendGrid\Block\Adminhtml\SingleSend\Edit\SaveAndContinueButton" name="save_and_continue"/>
+        </buttons>
+        <namespace>lof_sendgrid_singlesend_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>lof_sendgrid_singlesend_form.singlesend_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="singlesend_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/save"/>
+        </settings>
+        <dataProvider class="Lof\SendGrid\Model\SingleSend\DataProvider" name="singlesend_form_data_source">
+            <settings>
+                <requestFieldName>entity_id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label>General</label>
+        </settings>
+        <field formElement="input" name="name" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field formElement="select" name="status" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">draft</item>
+                                <item name="label" xsi:type="string">Draft</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">triggered</item>
+                                <item name="label" xsi:type="string">Triggered</item>
+                            </option>
+                        </options>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field formElement="input" name="singlesend_id" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">singlesend_id</label>
+                <dataScope>singlesend_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+</form>
