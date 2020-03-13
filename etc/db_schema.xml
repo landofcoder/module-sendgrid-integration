@@ -9,9 +9,11 @@
 		<column name="create_date" nullable="true" xsi:type="text"/>
 		<column name="update_date" nullable="true" xsi:type="text"/>
 		<column name="status" nullable="true" xsi:type="varchar" length="50"/>
-		<column name="email_html" nullable="true" xsi:type="text"/>
+		<column name="template_version" nullable="true" xsi:type="text"/>
 		<column name="singlesend_id" nullable="true" xsi:type="varchar" length="100"/>
 		<column name="template_id" nullable="true" xsi:type="varchar" length="50"/>
+		<column name="versions" nullable="true" xsi:type="varchar"/>
+		<column name="send_at" nullable="true" xsi:type="datetime"/>
 
 	</table>
 	<table comment="lof_sendgrid_addressbook Table" engine="innodb" name="lof_sendgrid_addressbook" resource="default">
@@ -47,4 +49,38 @@
         <column name="subject" nullable="true" xsi:type="varchar" length="100"/>
         <column name="editor" nullable="true" xsi:type="varchar" length="100"/>
     </table>
+    <table comment="lof_sendgrid_subscribes_group  Table" engine="innodb" name="lof_sendgrid_subscribes_group " resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="subscribes_group_id" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="subscribes_group_name" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="subscribes_count" nullable="true" xsi:type="int"/>
+    </table>
+    <table comment="lof_sendgrid_unsubscribes_group  Table" engine="innodb" name="lof_sendgrid_unsubscribes_group " resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="unsubscribes_group_id" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="unsubscribes_group_name" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="unsubscribes_count" nullable="true" xsi:type="int"/>
+    </table>
+    <table comment="lof_sendgrid_senders  Table" engine="innodb" name="lof_sendgrid_senders" resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="sender_id" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="nick_name" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="from" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="reply_to" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="address" nullable="false" xsi:type="varchar" length="250"/>
+        <column name="city" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="country" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="create_at" nullable="true" xsi:type="datetime"/>
+        <column name="update_at" nullable="true" xsi:type="datetime"/>
+    </table>
+
 </schema>

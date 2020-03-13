@@ -85,6 +85,7 @@ class SingleSend extends \Magento\Backend\App\Action
             $response = $client->send($request);
             $collection = ($response->getContent());
             $object = json_decode($collection, false);
+            var_dump($object);die;
             $items = get_object_vars($object)['result'];
             foreach ($items as $item) {
                 $model = $this->singlesend->create();
