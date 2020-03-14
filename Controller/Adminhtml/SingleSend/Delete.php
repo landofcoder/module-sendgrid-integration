@@ -38,7 +38,6 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $model = $this->_objectManager->create(\Lof\SendGrid\Model\SingleSend::class);
                 $model->load($id);
                 $model->delete();
-                $this->_helperdata->hello();
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $singlesend_id = $model->getSinglesendId();
                 $curl = curl_init();
