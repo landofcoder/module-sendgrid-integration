@@ -129,6 +129,8 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setUpdateDate($item->updated_at);
                     $model->setCreateDate($item->created_at);
                     $model->setStatus($item->status);
+                    $model->setTemplateId($template_id);
+                    $model->setTemplateVersion($data_version['0']->id);
                     $model->save();
                 } else {
                     $entity_id = $existing[0]['entity_id'];
@@ -138,6 +140,8 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setUpdateDate($item->updated_at);
                     $model->setCreateDate($item->created_at);
                     $model->setStatus($item->status);
+                    $model->setTemplateId($template_id);
+                    $model->setTemplateVersion($data_version['0']->id);
                     $model->save($model);
                 }
             }

@@ -60,6 +60,7 @@
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
                 </item>
+                <label translate="true">Status</label>
             </argument>
             <formElements>
                 <select>
@@ -93,6 +94,36 @@
                 <dataType>text</dataType>
                 <label translate="true">singlesend_id</label>
                 <dataScope>singlesend_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field formElement="input" name="template_id" sortOrder="80">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Template Id</label>
+                <dataScope>template_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field formElement="input" name="template_version" sortOrder="90">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Template Version Id</label>
+                <dataScope>template_version</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>

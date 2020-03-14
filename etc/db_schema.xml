@@ -12,7 +12,6 @@
 		<column name="template_version" nullable="true" xsi:type="text"/>
 		<column name="singlesend_id" nullable="true" xsi:type="varchar" length="100"/>
 		<column name="template_id" nullable="true" xsi:type="varchar" length="50"/>
-		<column name="versions" nullable="true" xsi:type="varchar"/>
 		<column name="send_at" nullable="true" xsi:type="datetime"/>
 
 	</table>

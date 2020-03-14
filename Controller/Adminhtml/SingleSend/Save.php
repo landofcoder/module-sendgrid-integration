@@ -59,6 +59,7 @@ class Save extends \Magento\Backend\App\Action
             $singlesendId = $model->getSinglesendId();
             $name = $model->getName();
             $status = $model->getStatus();
+            $template_id = $model->getTemplateId();
             if($id) {
                 $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                 $curl = curl_init();
@@ -70,7 +71,7 @@ class Save extends \Magento\Backend\App\Action
                     CURLOPT_TIMEOUT => 30,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => "PATCH",
-                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\"}",
+                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\",\"template_id\":\"$template_id\"}",
                     CURLOPT_HTTPHEADER => array(
                         "authorization: Bearer $api_key"
                     ),
@@ -90,7 +91,7 @@ class Save extends \Magento\Backend\App\Action
                     CURLOPT_TIMEOUT => 30,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\"}",
+                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\",\"template_id\":\"$template_id\"}",
                     CURLOPT_HTTPHEADER => array(
                         "authorization: Bearer $api_key"
                     ),
