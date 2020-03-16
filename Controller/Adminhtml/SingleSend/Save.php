@@ -3,6 +3,7 @@
 
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
+use Exception;
 use Lof\SendGrid\Helper\Data;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
@@ -50,6 +51,7 @@ class Save extends \Magento\Backend\App\Action
      * Save action
      *
      * @return \Magento\Framework\Controller\ResultInterface
+     * @throws Exception
      */
     public function execute()
     {
@@ -65,8 +67,10 @@ class Save extends \Magento\Backend\App\Action
                 $this->messageManager->addErrorMessage(__('This Singlesend no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
             }
+            if($data['status'] == '') {
+                $data['status'] = 'draft';
+            }
             $model->setData($data);
-
             if ($data['template_generation'] == '') {
                 $data['template_generation'] = 'legacy';
             }
@@ -105,8 +109,23 @@ class Save extends \Magento\Backend\App\Action
             } else {
                 $template_id =  $this->_helperdata->createTemplate($api_key, $data['template_name'], $data['template_generation'])->id;
                 $version_id = $this->_helperdata->createVersion($api_key, $data['version_name'], $template_id, $data['html_content'])->id;
+                $version = $this->version->create();
+                $version->setVersionId($version_id);
+                $version->setVersionName($data['version_name']);
+                $version->setTemplateId($template_id);
+                $version->setTemplateName($data['template_name']);
+                $version->setTemplateGeneration($data['template_generation']);
+                $version->setHtmlContent($data['html_content']);
+                $version->setActive('1');
+                $version->setGeneratePlaneContent('1');
+                $version->setSubject('Subject');
+                $version->setEditor('design');
+                $version->setUpdateAt($this->_dateFactory->create()->gmtDate());
+                $version->save();
                 $model->setCreateDate($this->_dateFactory->create()->gmtDate());
                 $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
+                $model->setTemplateId($template_id);
+                $model->setTemplateVersion($version_id);
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
@@ -125,7 +144,6 @@ class Save extends \Magento\Backend\App\Action
                 $err = curl_error($curl);
                 curl_close($curl);
             }
-
             $model->setSinglesendId(json_decode($response)->id);
             try {
                 $model->save();
@@ -138,7 +156,7 @@ class Save extends \Magento\Backend\App\Action
                 return $resultRedirect->setPath('*/*/');
             } catch (LocalizedException $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the Singlesend.'));
             }
 
