@@ -129,5 +129,21 @@
                 </validation>
             </settings>
         </field>
+        <field formElement="textarea" name="html_content" sortOrder="100">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                    <item name="rows" xsi:type="number">9</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">HTML Content</label>
+                <dataScope>html_content</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+        </field>
     </fieldset>
 </form>

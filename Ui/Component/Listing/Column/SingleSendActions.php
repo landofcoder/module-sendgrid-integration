@@ -50,7 +50,8 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_EDIT,
                                 [
-                                    'entity_id' => $item['entity_id']
+                                    'entity_id' => $item['entity_id'],
+                                    'template_version' =>$item['template_version']
                                 ]
                             ),
                             'label' => __('Edit')

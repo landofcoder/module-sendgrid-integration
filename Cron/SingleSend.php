@@ -95,7 +95,7 @@ class SingleSend extends \Magento\Backend\App\Action
                 $data_version = $this->helper->getVersion($template_id, $token);
                 $version = $this->_version->create();
                 $existing_version = $version->getCollection()->addFieldToFilter("version_id", $data_version['0']->id)->getData();
-                if(count($existing_version) == 0) {
+                if (count($existing_version) == 0) {
                     $version->setVersionId($data_version['0']->id);
                     $version->setTemplateId($data_version['0']->template_id);
                     $version->setActive($data_version['0']->active);
@@ -107,8 +107,7 @@ class SingleSend extends \Magento\Backend\App\Action
                     $version->setEditor($data_version['0']->editor);
                     $version->setSubject($data_version['0']->subject);
                     $version->save();
-                } else
-                {
+                } else {
                     $id = $existing_version[0]['id'];
                     $version->load($id);
                     $version->setVersionId($data_version['0']->id);
@@ -129,6 +128,8 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setUpdateDate($item->updated_at);
                     $model->setCreateDate($item->created_at);
                     $model->setStatus($item->status);
+                    $model->setTemplateId($template_id);
+                    $model->setTemplateVersion($data_version['0']->id);
                     $model->save();
                 } else {
                     $entity_id = $existing[0]['entity_id'];
@@ -138,6 +139,8 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setUpdateDate($item->updated_at);
                     $model->setCreateDate($item->created_at);
                     $model->setStatus($item->status);
+                    $model->setTemplateId($template_id);
+                    $model->setTemplateVersion($data_version['0']->id);
                     $model->save($model);
                 }
             }

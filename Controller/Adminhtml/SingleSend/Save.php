@@ -14,7 +14,6 @@ use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
  */
 class Save extends \Magento\Backend\App\Action
 {
-
     protected $dataPersistor;
     /**
      * @var DateTimeFactory
@@ -47,7 +46,7 @@ class Save extends \Magento\Backend\App\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
-        $api_key = $this->_helperdata->getSendGridConfig('general','api_key');
+        $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
         if ($data) {
             $id = $this->getRequest()->getParam('entity_id');
             $model = $this->_objectManager->create(\Lof\SendGrid\Model\SingleSend::class)->load($id);
@@ -60,7 +59,7 @@ class Save extends \Magento\Backend\App\Action
             $name = $model->getName();
             $status = $model->getStatus();
             $template_id = $model->getTemplateId();
-            if($id) {
+            if ($id) {
                 $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
@@ -91,7 +90,7 @@ class Save extends \Magento\Backend\App\Action
                     CURLOPT_TIMEOUT => 30,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\",\"template_id\":\"$template_id\"}",
+                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"template_id\":\"$template_id\"}",
                     CURLOPT_HTTPHEADER => array(
                         "authorization: Bearer $api_key"
                     ),

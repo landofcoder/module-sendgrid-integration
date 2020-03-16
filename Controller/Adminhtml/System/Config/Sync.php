@@ -118,7 +118,7 @@ class Sync extends \Magento\Backend\App\Action
         $unsubscriber_id = '';
         $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
-            if(isset($item->name)) {
+            if (isset($item->name)) {
                 if ($item->name == $unsubscriber_list) {
                     $unsubscriber_id = $item->id;
                 }
@@ -127,7 +127,7 @@ class Sync extends \Magento\Backend\App\Action
                 }
             }
         }
-        $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0')->addFieldToFilter('is_synced','0');
+        $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0')->addFieldToFilter('is_synced', '0');
         $list_other_email = '';
         foreach ($addressBookCollection as $addressBook) {
             if ($list_other_email == '') {
@@ -136,9 +136,9 @@ class Sync extends \Magento\Backend\App\Action
                 $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
             }
         }
-        if($list_other_email != '') {
+        if ($list_other_email != '') {
             $response = $this->helper->syncUnsubscriber($curl, $api_key, $other_list_id, $list_other_email);
-            if(count($response->recipient_emails) > 0) {
+            if (count($response->recipient_emails) > 0) {
                 foreach ($addressBookCollection as $addressBook) {
                     $addressBook->setIsSynced('1');
                     $addressBook->save();

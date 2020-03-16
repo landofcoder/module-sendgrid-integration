@@ -32,19 +32,24 @@ class Preview extends \Magento\Framework\View\Element\Template
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        \Lof\SendGrid\Model\VersionsFactory $versionsFactory
+        \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
+        \Lof\SendGrid\Model\SingleSendFactory $singleSendFactory
     ) {
         parent::__construct($context);
+        $this->_singlesend = $singleSendFactory;
         $this->_version = $versionsFactory;
     }
     public function execute()
     {
     }
-    public function getVersion(){
+    public function getVersion()
+    {
         $version = $this->_version->create();
+        $singlesend = $this->_singlesend->create();
         $id = $this->getRequest()->getParam('entity_id');
-        $version->load($id);
+        $singlesend->load($id);
+        $versions = $version->getCollection()->addFieldToFilter('version_id', $singlesend->getTemplateVersion())->getData();
+        $version->load($versions['0']['id']);
         return $version;
-
     }
 }
