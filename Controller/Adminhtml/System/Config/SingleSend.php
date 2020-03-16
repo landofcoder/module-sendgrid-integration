@@ -95,7 +95,7 @@ class SingleSend extends \Magento\Backend\App\Action
                 $data_version = $this->helper->getVersion($template_id, $token);
                 $version = $this->_version->create();
                 $existing_version = $version->getCollection()->addFieldToFilter("version_id", $data_version['0']->id)->getData();
-                if(count($existing_version) == 0) {
+                if (count($existing_version) == 0) {
                     $version->setVersionId($data_version['0']->id);
                     $version->setTemplateId($data_version['0']->template_id);
                     $version->setActive($data_version['0']->active);
@@ -107,8 +107,7 @@ class SingleSend extends \Magento\Backend\App\Action
                     $version->setEditor($data_version['0']->editor);
                     $version->setSubject($data_version['0']->subject);
                     $version->save();
-                } else
-                {
+                } else {
                     $id = $existing_version[0]['id'];
                     $version->load($id);
                     $version->setVersionId($data_version['0']->id);

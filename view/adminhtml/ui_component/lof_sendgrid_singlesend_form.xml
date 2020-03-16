@@ -48,7 +48,7 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">name</label>
+                <label translate="true">Single Send Name</label>
                 <dataScope>name</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
@@ -60,8 +60,12 @@
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
                 </item>
-                <label translate="true">Status</label>
             </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+                <dataScope>status</dataScope>
+            </settings>
             <formElements>
                 <select>
                     <settings>
@@ -84,7 +88,7 @@
                 </select>
             </formElements>
         </field>
-        <field formElement="input" name="singlesend_id" sortOrder="70">
+        <field formElement="input" name="template_name" sortOrder="60">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
@@ -92,14 +96,14 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">singlesend_id</label>
-                <dataScope>singlesend_id</dataScope>
+                <label translate="true">Template Name</label>
+                <dataScope>template_name</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
             </settings>
         </field>
-        <field formElement="input" name="template_id" sortOrder="80">
+        <field formElement="select" name="template_generation" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
@@ -107,14 +111,28 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Template Id</label>
-                <dataScope>template_id</dataScope>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
+                <label translate="true">Template Generation</label>
+                <dataScope>template_generation</dataScope>
             </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">legacy</item>
+                                <item name="label" xsi:type="string">Legacy</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">dynamic</item>
+                                <item name="label" xsi:type="string">Dynamic</item>
+                            </option>
+                        </options>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
         </field>
-        <field formElement="input" name="template_version" sortOrder="90">
+        <field formElement="input" name="version_name" sortOrder="90">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
@@ -122,8 +140,8 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Template Version Id</label>
-                <dataScope>template_version</dataScope>
+                <label translate="true">Version Name</label>
+                <dataScope>version_name</dataScope>
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>

@@ -19,6 +19,14 @@ class Save extends \Magento\Backend\App\Action
      * @var DateTimeFactory
      */
     private $_dateFactory;
+    /**
+     * @var \Lof\SendGrid\Model\VersionsFactory
+     */
+    private $version;
+    /**
+     * @var Data
+     */
+    private $_helperdata;
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
@@ -27,11 +35,13 @@ class Save extends \Magento\Backend\App\Action
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Lof\SendGrid\Helper\Data $helper,
+        \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
         DateTimeFactory $dateFactory,
         \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
     ) {
         $this->_helperdata = $helper;
         $this->dataPersistor = $dataPersistor;
+        $this->version = $versionsFactory;
         $this->_dateFactory = $dateFactory;
         parent::__construct($context);
     }
@@ -50,16 +60,29 @@ class Save extends \Magento\Backend\App\Action
         if ($data) {
             $id = $this->getRequest()->getParam('entity_id');
             $model = $this->_objectManager->create(\Lof\SendGrid\Model\SingleSend::class)->load($id);
+
             if (!$model->getId() && $id) {
                 $this->messageManager->addErrorMessage(__('This Singlesend no longer exists.'));
                 return $resultRedirect->setPath('*/*/');
             }
             $model->setData($data);
-            $singlesendId = $model->getSinglesendId();
-            $name = $model->getName();
-            $status = $model->getStatus();
-            $template_id = $model->getTemplateId();
+
+            if ($data['template_generation'] == '') {
+                $data['template_generation'] = 'legacy';
+            }
+            $name = $data['name'];
+            $status = $data['status'];
             if ($id) {
+                $version = $this->version->create();
+                $version_id = $version->getCollection()->addFieldToFilter('version_id',$model->getTemplateVersion())->getData()['0']['id'];
+                $version->load($version_id);
+                $version->setHtmlContent($data['html_content']);
+                $version->setTemplateName($data['template_name']);
+                $version->setTemplateGeneration($data['template_generation']);
+                $version->setVersionName($data['version_name']);
+                $version->save();
+                $singlesendId = $model->getSinglesendId();
+                $template_id = $model->getTemplateId();
                 $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
@@ -70,7 +93,7 @@ class Save extends \Magento\Backend\App\Action
                     CURLOPT_TIMEOUT => 30,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => "PATCH",
-                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"id\":\"$singlesendId\",\"template_id\":\"$template_id\"}",
+                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"template_id\":\"$template_id\"}",
                     CURLOPT_HTTPHEADER => array(
                         "authorization: Bearer $api_key"
                     ),
@@ -78,7 +101,10 @@ class Save extends \Magento\Backend\App\Action
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
+                $this->_helperdata->editVersion($api_key, $data['version_name'], $data['html_content'], $template_id, $model->getTemplateVersion());
             } else {
+                $template_id =  $this->_helperdata->createTemplate($api_key, $data['template_name'], $data['template_generation'])->id;
+                $version_id = $this->_helperdata->createVersion($api_key, $data['version_name'], $template_id, $data['html_content'])->id;
                 $model->setCreateDate($this->_dateFactory->create()->gmtDate());
                 $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                 $curl = curl_init();
@@ -99,6 +125,8 @@ class Save extends \Magento\Backend\App\Action
                 $err = curl_error($curl);
                 curl_close($curl);
             }
+
+            $model->setSinglesendId(json_decode($response)->id);
             try {
                 $model->save();
                 $this->messageManager->addSuccessMessage(__('You saved the Singlesend.'));

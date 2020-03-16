@@ -40,9 +40,11 @@
         </constraint>
         <column name="version_id" nullable="false" xsi:type="varchar" length="50"/>
         <column name="template_id" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="template_name" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="template_generation" nullable="true" xsi:type="varchar" length="50"/>
         <column name="update_at" nullable="true" xsi:type="datetime"/>
         <column name="active" nullable="true" xsi:type="int"/>
-        <column name="name" nullable="false" xsi:type="varchar" length="100"/>
+        <column name="version_name" nullable="false" xsi:type="varchar" length="100"/>
         <column name="html_content" nullable="true" xsi:type="text"/>
         <column name="plain_content" nullable="true" xsi:type="text"/>
         <column name="generate_plain_content" nullable="true" xsi:type="text"/>

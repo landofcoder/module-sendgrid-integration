@@ -218,8 +218,7 @@ class Data extends AbstractHelper
                 }
                 $this->syncUnsubscriber($curl, $api_key, $unsubscriber_list_id, $arr2);
             }
-        }
-        else {
+        } else {
             $subscriber = '';
             if (count($sub)) {
                 foreach ($sub as $item) {
@@ -259,9 +258,9 @@ class Data extends AbstractHelper
         }
         return json_decode($response);
     }
-    public function getTemplateId($id , $token){
+    public function getTemplateId($id, $token)
+    {
         $curl = curl_init();
-
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$id",
             CURLOPT_RETURNTRANSFER => true,
@@ -274,14 +273,13 @@ class Data extends AbstractHelper
                 "authorization: Bearer $token"
             ),
         ));
-
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
         curl_close($curl);
         return json_decode($response, false)->template_id;
     }
-    public function getVersion($template_id , $token) {
+    public function getVersion($template_id, $token)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$template_id",
@@ -299,6 +297,76 @@ class Data extends AbstractHelper
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-        return json_decode($response, false)->versions;
+        if ($response) {
+            return json_decode($response)->versions;
+        }
+    }
+    public function createTemplate($api_key, $name, $generation)
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/templates",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"generation\":\"$generation\"}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        return json_decode($response);
+    }
+    public function createVersion($api_key, $name, $templateId, $html)
+    {
+        $curl = curl_init();
+        $html = str_replace('"', '\"', $html);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$templateId/versions",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "{\"active\":1,\"name\":\"$name\",\"html_content\":\"$html\"}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        return json_decode($response);
+    }
+    public function editVersion($api_key, $name, $html, $templateId, $versionId)
+    {
+        $curl = curl_init();
+        $html = str_replace('"', '\"', $html);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$templateId/versions/$versionId",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "PATCH",
+            CURLOPT_POSTFIELDS => "{\"active\":1,\"name\":\"$name\",\"html_content\":\"$html\"}",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
     }
 }
