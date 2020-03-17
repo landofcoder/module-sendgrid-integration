@@ -63,4 +63,3 @@ class SubscribeList implements \Magento\Framework\Option\ArrayInterface
         return $options;
     }
 }
-
