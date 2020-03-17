@@ -12,6 +12,7 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
 {
 
     const URL_PATH_DELETE = 'lof_sendgrid/singlesend/delete';
+    const URL_PATH_DUPLICATE = 'lof_sendgrid/singlesend/duplicate';
     const URL_PATH_EDIT = 'lof_sendgrid/singlesend/edit';
     protected $urlBuilder;
     const URL_PATH_PREVIEW = 'lof_sendgrid/singlesend/preview';
@@ -67,6 +68,19 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             'confirm' => [
                                 'title' => __('Delete "${ $.$data.title }"'),
                                 'message' => __('Are you sure you wan\'t to delete a "${ $.$data.title }" record?')
+                            ]
+                        ],
+                        'duplicate' => [
+                            'href' => $this->urlBuilder->getUrl(
+                                static::URL_PATH_DUPLICATE,
+                                [
+                                    'entity_id' => $item['entity_id']
+                                ]
+                            ),
+                            'label' => __('Duplicate'),
+                            'confirm' => [
+                                'title' => __('Duplicate "${ $.$data.title }"'),
+                                'message' => __('Are you sure you wan\'t to duplicate a "${ $.$data.title }" record?')
                             ]
                         ],
                         'preview' => [

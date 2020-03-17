@@ -40,27 +40,7 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $model->delete();
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $singlesend_id = $model->getSinglesendId();
-                $curl = curl_init();
-
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$singlesend_id",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "DELETE",
-                    CURLOPT_POSTFIELDS => "{}",
-                    CURLOPT_HTTPHEADER => array(
-                        "authorization: Bearer $api_key"
-                    ),
-                ));
-
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
-
-                curl_close($curl);
-
+                $this->_helperdata->deleteSingleSend($api_key, $singlesend_id);
                 // display success message
                 $this->messageManager->addSuccessMessage(__('You deleted the Singlesend.'));
                 // go to grid
