@@ -13,7 +13,6 @@
 		<column name="singlesend_id" nullable="true" xsi:type="varchar" length="100"/>
 		<column name="template_id" nullable="true" xsi:type="varchar" length="50"/>
 		<column name="send_at" nullable="true" xsi:type="datetime"/>
-
 	</table>
 	<table comment="lof_sendgrid_addressbook Table" engine="innodb" name="lof_sendgrid_addressbook" resource="default">
 		<column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
