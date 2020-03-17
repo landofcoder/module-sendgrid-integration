@@ -1,14 +1,14 @@
 <?php
 
 
-namespace Lof\SendGrid\Block\Adminhtml\SingleSend\Edit;
+namespace Lof\SendGrid\Block\Adminhtml\Sender\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
 
 /**
  * Class SaveButton
  *
- * @package Lof\SendGrid\Block\Adminhtml\SingleSend\Edit
+ * @package Lof\SendGrid\Block\Adminhtml\Sender\Edit
  */
 class SaveButton extends GenericButton implements ButtonProviderInterface
 {
@@ -19,7 +19,7 @@ class SaveButton extends GenericButton implements ButtonProviderInterface
     public function getButtonData()
     {
         return [
-            'label' => __('Save SingleSend'),
+            'label' => __('Save Sender'),
             'class' => 'save primary',
             'data_attribute' => [
                 'mage-init' => ['button' => ['event' => 'save']],

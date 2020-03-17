@@ -16,4 +16,17 @@
 			</argument>
 		</arguments>
 	</type>
+	<virtualType name="Lof\SendGrid\Model\ResourceModel\Sender\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">lof_sendgrid_senders</argument>
+			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Sender\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="lof_sendgrid_sender_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Sender\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
 </config>

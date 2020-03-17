@@ -35,7 +35,7 @@ use Lof\SendGrid\Model\AddressBookFactory;
 /**
  * Class SyncToNewDb
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System/Config
+ * @package Lof\SendGrid\Cron
  */
 class SyncToNewDb extends \Magento\Backend\App\Action
 {

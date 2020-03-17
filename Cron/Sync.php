@@ -31,7 +31,7 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 /**
  * Class Sync
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System/Config
+ * @package Lof\SendGrid\Cron
  */
 class Sync extends \Magento\Backend\App\Action
 {

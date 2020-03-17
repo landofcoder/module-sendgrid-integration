@@ -54,7 +54,6 @@ class Data extends AbstractHelper
                 "authorization: Bearer $api_key"
             ),
         ));
-
         $response = curl_exec($curl);
         $err = curl_error($curl);
 
@@ -388,5 +387,29 @@ class Data extends AbstractHelper
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
+    }
+    public function getAllSenders($api_key) {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/senders",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            return json_decode($response);
+        }
     }
 }

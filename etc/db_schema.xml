@@ -83,6 +83,7 @@
         <column name="country" nullable="false" xsi:type="varchar" length="50"/>
         <column name="create_at" nullable="true" xsi:type="datetime"/>
         <column name="update_at" nullable="true" xsi:type="datetime"/>
+        <column name="verified" nullable="true" xsi:type="boolean"/>
     </table>
 
 </schema>
