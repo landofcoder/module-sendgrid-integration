@@ -42,21 +42,21 @@ class SubscribeList implements \Magento\Framework\Option\ArrayInterface
      */
     private $context;
     /**
-     * @var \Lof\SendGrid\Model\SubscriberFactory
+     * @var \Lof\SendGrid\Model\ResourceModel\Subscriber\CollectionFactory
      */
-    private $_subscribers;
+    private $_collection;
 
     public function __construct(
         Context $context,
-        \Lof\SendGrid\Model\SubscriberFactory $subscriberFactory
+        \Lof\SendGrid\Model\ResourceModel\Subscriber\CollectionFactory $collection
     ) {
         $this->context = $context;
-        $this->_subscribers = $subscriberFactory;
+        $this->_collection = $collection;
     }
     public function toOptionArray()
     {
         $options = [];
-        $list = $this->_subscribers->getCollection()->create();
+        $list = $this->_collection->create();
         foreach ($list as $item) {
             $options[] = [
                 'label' => __($item->getSubscriberGroupName()),

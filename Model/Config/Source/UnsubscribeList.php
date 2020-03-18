@@ -34,25 +34,25 @@ use Magento\Framework\App\Action\Context;
 class UnsubscribeList implements \Magento\Framework\Option\ArrayInterface
 {
     /**
-     * @var \Lof\SendGrid\Model\UnSubscriberFactory
-     */
-    private $_unsubscribers;
-    /**
      * @var Context
      */
     private $context;
+    /**
+     * @var \Lof\SendGrid\Model\ResourceModel\UnSubscriber\Collection
+     */
+    private $_collection;
 
     public function __construct(
         Context $context,
-        \Lof\SendGrid\Model\UnSubscriberFactory $unsubscriberFactory
+        \Lof\SendGrid\Model\ResourceModel\UnSubscriber\CollectionFactory $collectionFactory
     ) {
         $this->context = $context;
-        $this->_unsubscribers = $unsubscriberFactory;
+        $this->_collection = $collectionFactory;
     }
     public function toOptionArray()
     {
         $options = [];
-        $list = $this->_unsubscribers->getCollection()->create();
+        $list = $this->_collection->create();
         foreach ($list as $item) {
             $options[] = [
                 'label' => __($item->getUnsubscriberGroupName()),
