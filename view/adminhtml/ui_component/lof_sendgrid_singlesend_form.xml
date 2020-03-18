@@ -164,7 +164,7 @@
         </field>
         <field name="suppression_group_id">
             <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\UnsubscribeList</item>
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\UnsubscribeListId</item>
                 <item name="config" xsi:type="array">
                     <item name="label" xsi:type="string">Unsubscribe Group</item>
                     <item name="visible" xsi:type="boolean">true</item>
