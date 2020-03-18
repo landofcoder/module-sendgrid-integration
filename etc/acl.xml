@@ -17,7 +17,9 @@
 					<resource id="Lof_SendGrid::SingleSend_save" sortOrder="40" title="Save SingleSend"/>
 				</resource>
 				<resource id="Lof_SendGrid::Statistics" sortOrder="15" title="Statistics"></resource>
-				<resource id="Lof_SendGrid::Sender" sortOrder="15" title="Sender">
+				<resource id="Lof_SendGrid::Subscriber" sortOrder="20" title="Subscriber"></resource>
+				<resource id="Lof_SendGrid::UnSubscriber" sortOrder="25" title="UnSubscriber"></resource>
+				<resource id="Lof_SendGrid::Sender" sortOrder="30" title="Sender">
 					<resource id="Lof_SendGrid::Sender_view" sortOrder="40" title="View Sender"/>
 					<resource id="Lof_SendGrid::Sender_save" sortOrder="40" title="Save Sender"/>
 				</resource>

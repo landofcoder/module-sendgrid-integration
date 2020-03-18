@@ -33,21 +33,30 @@ use Magento\Framework\App\Action\Context;
  */
 class UnsubscribeList implements \Magento\Framework\Option\ArrayInterface
 {
+    /**
+     * @var \Lof\SendGrid\Model\UnSubscriberFactory
+     */
+    private $_unsubscribers;
+    /**
+     * @var Context
+     */
+    private $context;
+
     public function __construct(
         Context $context,
-        Data $helper
+        \Lof\SendGrid\Model\UnSubscriberFactory $unsubscriberFactory
     ) {
         $this->context = $context;
-        $this->helper = $helper;
+        $this->_unsubscribers = $unsubscriberFactory;
     }
     public function toOptionArray()
     {
         $options = [];
-        $list = $this->helper->getUnsubscriberGroup();
+        $list = $this->_unsubscribers->getCollection()->create();
         foreach ($list as $item) {
             $options[] = [
-                'label' => $item->name,
-                'value' => __($item->name),
+                'label' => __($item->getUnsubscriberGroupName()),
+                'value' => $item->getUnsubscriberGroupName(),
             ];
         }
         return $options;

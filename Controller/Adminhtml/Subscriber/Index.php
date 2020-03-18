@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
+namespace Lof\SendGrid\Controller\Adminhtml\Subscriber;
 
 /**
  * Class Index
  *
- * @package Lof\SendGrid\Controller\Adminhtml\SingleSend
+ * @package Lof\SendGrid\Controller\Adminhtml\Subscriber
  */
-class Preview extends \Magento\Backend\App\Action
+class Index extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
 
@@ -40,14 +40,10 @@ class Preview extends \Magento\Backend\App\Action
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
-        \Lof\SendGrid\Model\SingleSendFactory $singleSendFactory
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
-        $this->_singlesend = $singleSendFactory;
-        $this->_version = $versionsFactory;
     }
 
     /**
@@ -57,18 +53,8 @@ class Preview extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $version = $this->getVersion();
-        echo $version->getHtmlContent();
-        return;
-    }
-    public function getVersion()
-    {
-        $version = $this->_version->create();
-        $singlesend = $this->_singlesend->create();
-        $id = $this->getRequest()->getParam('entity_id');
-        $singlesend->load($id);
-        $versions = $version->getCollection()->addFieldToFilter('version_id', $singlesend->getTemplateVersion())->getData();
-        $version->load($versions['0']['id']);
-        return $version;
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->prepend(__("Subscriber Management"));
+        return $resultPage;
     }
 }

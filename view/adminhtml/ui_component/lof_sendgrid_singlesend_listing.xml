@@ -121,7 +121,7 @@
         <column name="name">
             <settings>
                 <filter>text</filter>
-                <label translate="true">name</label>
+                <label translate="true">Name</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>
@@ -133,7 +133,7 @@
         <column name="create_date">
             <settings>
                 <filter>text</filter>
-                <label translate="true">create_date</label>
+                <label translate="true">Created At</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>
@@ -145,7 +145,7 @@
         <column name="update_date">
             <settings>
                 <filter>text</filter>
-                <label translate="true">update_date</label>
+                <label translate="true">Updated At</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>
@@ -157,7 +157,7 @@
         <column name="status">
             <settings>
                 <filter>text</filter>
-                <label translate="true">status</label>
+                <label translate="true">Status</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>

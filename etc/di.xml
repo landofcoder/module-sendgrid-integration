@@ -29,4 +29,30 @@
 			</argument>
 		</arguments>
 	</type>
+	<virtualType name="Lof\SendGrid\Model\ResourceModel\Subscriber\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">lof_sendgrid_subscribers_group</argument>
+			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Subscriber\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="lof_sendgrid_subscriber_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Subscriber\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
+	<virtualType name="Lof\SendGrid\Model\ResourceModel\UnSubscriber\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">lof_sendgrid_unsubscribers_group</argument>
+			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\UnSubscriber\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="lof_sendgrid_unsubscriber_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\UnSubscriber\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
 </config>
