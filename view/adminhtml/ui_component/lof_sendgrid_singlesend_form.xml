@@ -55,6 +55,21 @@
                 </validation>
             </settings>
         </field>
+        <field formElement="input" name="subject" sortOrder="25">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">SingleSend</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Subject</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
         <field formElement="select" name="status" sortOrder="50">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -147,15 +162,57 @@
                 </validation>
             </settings>
         </field>
+        <field name="suppression_group_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\UnsubscribeList</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Unsubscribe Group</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="sender_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\Sender</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Sender</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="list_ids">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\ListIds</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Recipients</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">multiselect</item>
+                    <item name="formElement" xsi:type="string">multiselect</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
         <field name="html_content" sortOrder="150" formElement="wysiwyg">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="wysiwygConfigData" xsi:type="array">
-                        <item name="height" xsi:type="string">100px</item>
-                        <item name="add_variables" xsi:type="boolean">true</item>
-                        <item name="add_widgets" xsi:type="boolean">true</item>
+                        <item name="height" xsi:type="string">150px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
                         <item name="add_images" xsi:type="boolean">true</item>
-                        <item name="add_directives" xsi:type="boolean">true</item>
+                        <item name="add_directives" xsi:type="boolean">false</item>
                     </item>
                 </item>
             </argument>
