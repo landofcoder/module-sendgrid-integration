@@ -1,7 +1,9 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
 	<menu>
-		<add action="lof_sendgrid/singlesend/index" id="Lof_SendGrid::lof_sendgrid_singlesend" module="Lof_SendGrid" parent="Magento_Backend::marketing" resource="Magento_Backend::content" sortOrder="9999" title="SingleSend"/>
-		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_statistics" module="Lof_SendGrid" parent="Magento_Reports::report" resource="Magento_Backend::content" sortOrder="9999" title="Statistics"/>
+		<add id="Lof_SendGrid::lof_sendgrid" module="Lof_SendGrid" resource="Magento_Backend::content" parent="Lof_All::lof_all"  sortOrder="9999" title="SendGrid"/>
+		<add action="lof_sendgrid/singlesend/index" id="Lof_SendGrid::lof_sendgrid_singlesend" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Magento_Backend::content" sortOrder="9999" title="SingleSend"/>
+		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_statistics" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Magento_Backend::content" sortOrder="9999" title="Statistics"/>
+		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_addressbook" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::lof_sendgrid" sortOrder="9999" title="Address Book"/>
 	</menu>
 </config>

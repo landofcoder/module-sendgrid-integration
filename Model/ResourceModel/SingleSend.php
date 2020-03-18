@@ -38,6 +38,6 @@ class SingleSend extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     protected function _construct()
     {
-        $this->_init('lof_sendgrid_singlesend', 'singlesend_id');
+        $this->_init('lof_sendgrid_singlesend', 'entity_id');
     }
 }
