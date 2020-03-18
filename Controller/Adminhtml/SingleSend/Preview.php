@@ -23,6 +23,10 @@
 
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
+use Lof\SendGrid\Model\SingleSendFactory;
+use Lof\SendGrid\Model\VersionsFactory;
+use Magento\Cms\Model\Template\FilterProvider;
+
 /**
  * Class Index
  *
@@ -31,22 +35,39 @@ namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 class Preview extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
+    /**
+     * @var FilterProvider
+     */
+    private $_filterProvider;
+    /**
+     * @var SingleSendFactory
+     */
+    private $_singlesend;
+    /**
+     * @var VersionsFactory
+     */
+    private $_version;
 
     /**
      * Constructor
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param VersionsFactory $versionsFactory
+     * @param FilterProvider $filterProvider
+     * @param SingleSendFactory $singleSendFactory
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
-        \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
-        \Lof\SendGrid\Model\SingleSendFactory $singleSendFactory
+        VersionsFactory $versionsFactory,
+        FilterProvider $filterProvider,
+        SingleSendFactory $singleSendFactory
     ) {
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
         $this->_singlesend = $singleSendFactory;
+        $this->_filterProvider = $filterProvider;
         $this->_version = $versionsFactory;
     }
 
@@ -58,7 +79,7 @@ class Preview extends \Magento\Backend\App\Action
     public function execute()
     {
         $version = $this->getVersion();
-        echo $version->getHtmlContent();
+        echo $this->getCmsFilterContent($version->getHtmlContent());
         return;
     }
     public function getVersion()
@@ -70,5 +91,10 @@ class Preview extends \Magento\Backend\App\Action
         $versions = $version->getCollection()->addFieldToFilter('version_id', $singlesend->getTemplateVersion())->getData();
         $version->load($versions['0']['id']);
         return $version;
+    }
+    public function getCmsFilterContent($value = '')
+    {
+        $html = $this->_filterProvider->getPageFilter()->filter($value);
+        return $html;
     }
 }

@@ -147,21 +147,29 @@
                 </validation>
             </settings>
         </field>
-        <field formElement="textarea" name="html_content" sortOrder="100">
+        <field name="html_content" sortOrder="150" formElement="wysiwyg">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">SingleSend</item>
-                    <item name="rows" xsi:type="number">9</item>
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="height" xsi:type="string">100px</item>
+                        <item name="add_variables" xsi:type="boolean">true</item>
+                        <item name="add_widgets" xsi:type="boolean">true</item>
+                        <item name="add_images" xsi:type="boolean">true</item>
+                        <item name="add_directives" xsi:type="boolean">true</item>
+                    </item>
                 </item>
             </argument>
             <settings>
-                <dataType>text</dataType>
-                <label translate="true">HTML Content</label>
-                <dataScope>html_content</dataScope>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">false</rule>
-                </validation>
+                <label>HTML Content</label>
             </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
         </field>
     </fieldset>
 </form>
