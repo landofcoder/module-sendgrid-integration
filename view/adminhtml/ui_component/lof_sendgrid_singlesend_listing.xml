@@ -61,15 +61,6 @@
     </listingToolbar>
     <columns name="lof_sendgrid_singlesend_columns">
         <settings>
-            <editorConfig>
-                <param name="selectProvider" xsi:type="string">lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_columns.ids</param>
-                <param name="enabled" xsi:type="boolean">true</param>
-                <param name="indexField" xsi:type="string">entity_id</param>
-                <param name="clientConfig" xsi:type="array">
-                    <item name="saveUrl" path="lof_sendgrid/SingleSend/inlineEdit" xsi:type="url"/>
-                    <item name="validateBeforeSave" xsi:type="boolean">false</item>
-                </param>
-            </editorConfig>
             <childDefaults>
                 <param name="fieldAction" xsi:type="array">
                     <item name="provider" xsi:type="string">lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_listing.lof_sendgrid_singlesend_columns_editor</item>
