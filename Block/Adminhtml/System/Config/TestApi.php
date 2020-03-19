@@ -6,7 +6,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class ButtonSync extends Field
+class TestApi extends Field
 {
     /**
      * @param UrlInterface $backendUrl
@@ -30,9 +30,9 @@ class ButtonSync extends Field
     protected function _getElementHtml(\Magento\Framework\Data\Form\Element\AbstractElement $element)
     {
         $html = "";
-        $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/sync", []);
+        $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/testapi", []);
         $html .= '
-        <div class="pp-buttons-container"><button type="button" id="sync"><span><span><span>'.__("Sync").'</span></span></span></button></div>
+        <div class="pp-buttons-container"><button type="button" id="test"><span><span><span>'.__("Test Api").'</span></span></span></button></div>
         <style>
         #sync{
             width:31px;
@@ -46,7 +46,7 @@ class ButtonSync extends Field
                 'jquery'
             ],
             function($) {
-                $('#sync').on('click', function(){
+                $('#test').on('click', function(){
                     window.location = '".$url."';
                 });
         });</script>";

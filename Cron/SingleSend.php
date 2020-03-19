@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2020  Landofcoder
+ * Copyright (c) 2019  Landofcoder
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ class SingleSend extends \Magento\Backend\App\Action
      *
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Lof\SendGrid\Helper\Data $helper
-     * @param \Lof\SendGrid\Model\VersionsFactory $versionsFactory
      * @param \Lof\SendGrid\Model\SingleSendFactory $singlesend
      */
     public function __construct(

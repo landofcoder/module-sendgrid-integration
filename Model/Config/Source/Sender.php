@@ -56,7 +56,7 @@ class Sender implements \Magento\Framework\Option\ArrayInterface
     public function toOptionArray()
     {
         $options = [];
-        $list = $this->_collection->create();
+        $list = $this->_collection->create()->addFieldToFilter('verified','1');
         foreach ($list as $item) {
             $options[] = [
                 'label' => __($item->getNickName()),

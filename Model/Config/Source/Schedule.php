@@ -23,46 +23,35 @@
 
 namespace Lof\SendGrid\Model\Config\Source;
 
-use Lof\SendGrid\Helper\Data;
 use Magento\Framework\App\Action\Context;
 
 /**
- * Class SubscribeList
+ * Class Schedule
  *
  * @package Lof\SendGrid\Model\Config\Source
  */
-class OtherList implements \Magento\Framework\Option\ArrayInterface
+class Schedule implements \Magento\Framework\Option\ArrayInterface
 {
-    /**
-     * @var Data
-     */
-    private $data;
     /**
      * @var Context
      */
     private $context;
-    /**
-     * @var Data
-     */
-    private $helper;
-
     public function __construct(
-        Context $context,
-        Data $helper
+        Context $context
     ) {
         $this->context = $context;
-        $this->helper = $helper;
     }
     public function toOptionArray()
     {
-        $options = [];
-        $list = $this->helper->getUnsubscriberGroup();
-        foreach ($list as $item) {
-            $options[] = [
-                'label' => $item->name,
-                'value' => __($item->name),
-            ];
-        }
-        return $options;
+        return [
+            1 => [
+                'label' => 'Send Imediately',
+                'value' => 1
+            ],
+            2  => [
+                'label' => 'Specify a Date and Time',
+                'value' => 2
+            ]
+        ];
     }
 }

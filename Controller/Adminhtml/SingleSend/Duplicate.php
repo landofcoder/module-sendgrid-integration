@@ -63,6 +63,10 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
+                if(isset(json_decode($response)->errors)) {
+                    $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
+                    return $resultRedirect->setPath('*/*/');
+                }
                 $new_model->setSinglesendId(json_decode($response)->id);
                 $new_model->save();
                 $this->messageManager->addSuccessMessage(__('You duplicated the Singlesend.'));

@@ -3,10 +3,11 @@
 	<menu>
 		<add id="Lof_SendGrid::lof_sendgrid" module="Lof_SendGrid" resource="Magento_Backend::content" parent="Lof_All::lof_all"  sortOrder="9999" title="SendGrid"/>
 		<add action="lof_sendgrid/singlesend/index" id="Lof_SendGrid::lof_sendgrid_singlesend" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Magento_Backend::content" sortOrder="9999" title="SingleSend"/>
-		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_statistics" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Magento_Backend::content" sortOrder="9999" title="Statistics"/>
-		<add action="lof_sendgrid/addressbook/index" id="Lof_SendGrid::lof_sendgrid_addressbook" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::lof_sendgrid" sortOrder="9999" title="Address Book"/>
-		<add action="lof_sendgrid/sender/index" id="Lof_SendGrid::lof_sendgrid_sender" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::lof_sendgrid" sortOrder="9999" title="Sender"/>
-		<add action="lof_sendgrid/subscriber/index" id="Lof_SendGrid::lof_sendgrid_subscriber" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::lof_sendgrid" sortOrder="9999" title="Subscriber"/>
-		<add action="lof_sendgrid/unsubscriber/index" id="Lof_SendGrid::lof_sendgrid_unsubscriber" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::lof_sendgrid" sortOrder="9999" title="UnSubscriber"/>
+		<add action="lof_sendgrid/statistics/index" id="Lof_SendGrid::lof_sendgrid_statistics" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Magento_Backend::Statistics" sortOrder="9999" title="Statistics"/>
+		<add action="lof_sendgrid/addressbook/index" id="Lof_SendGrid::lof_sendgrid_addressbook" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::AddressBook" sortOrder="9999" title="Address Book"/>
+		<add action="lof_sendgrid/sender/index" id="Lof_SendGrid::lof_sendgrid_sender" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::Sender" sortOrder="9999" title="Sender"/>
+		<add action="lof_sendgrid/subscriber/index" id="Lof_SendGrid::lof_sendgrid_subscriber" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::Subscriber" sortOrder="9999" title="Subscriber"/>
+		<add action="lof_sendgrid/unsubscriber/index" id="Lof_SendGrid::lof_sendgrid_unsubscriber" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::UnSubscriber" sortOrder="9999" title="UnSubscriber"/>
+		<add action="adminhtml/system_config/edit/section/sendgrid" id="Lof_SendGrid::lof_sendgrid_config" module="Lof_SendGrid" parent="Lof_SendGrid::lof_sendgrid" resource="Lof_SendGrid::config_lof_sendgrid" sortOrder="9999" title="Configuration"/>
 	</menu>
 </config>

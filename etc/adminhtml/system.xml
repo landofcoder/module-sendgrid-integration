@@ -42,7 +42,7 @@
 				<field id="other_group" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
 					<label>Other List</label>
 					<comment/>
-					<source_model>Lof\SendGrid\Model\Config\Source\OtherList</source_model>
+					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
 					<validate>required-entry</validate>
 					<depends>
 						<field id="enabled">1</field>
