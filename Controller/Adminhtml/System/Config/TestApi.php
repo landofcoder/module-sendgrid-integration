@@ -59,11 +59,11 @@ class TestApi extends \Magento\Backend\App\Action
         $api_key = $this->helper->getSendGridConfig('general','api_key');
         if($this->helper->testAPI($api_key) == false) {
             $this->messageManager->addErrorMessage(__("Somethings went wrong. Please check your Api key"));
-            return $resultRedirect->setPath('*/*/');
+            return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
         else {
             $this->messageManager->addSuccessMessage(__("Your Api key run successfully"));
-            return $resultRedirect->setPath('*/*/');
+            return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
     }
 }
