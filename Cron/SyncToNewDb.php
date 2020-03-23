@@ -35,7 +35,7 @@ use Lof\SendGrid\Model\AddressBookFactory;
 /**
  * Class SyncToNewDb
  *
- * @package Lof\SendGrid\Controller\Adminhtml\System/Config
+ * @package Lof\SendGrid\Cron
  */
 class SyncToNewDb extends \Magento\Backend\App\Action
 {
@@ -128,12 +128,12 @@ class SyncToNewDb extends \Magento\Backend\App\Action
             $existOnThis = $addressbookCollection->addFieldToFilter('email_address', $order->getCustomerEmail())->getData();
             if ((count($exist) == 0) && (count($existOnThis) == 0)) {
                 $addressbook = $this->addressbook->create();
-                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
+                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setIsSync('0')->setGroupId($group);
                 $addressbook->save();
             } elseif (count($exist) == 0) {
                 $entity_id = $existOnThis['0']['id'];
                 $addressbook = $this->addressbook->create()->load($entity_id);
-                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
+                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setIsSync('0')->setGroupId($group);
                 $addressbook->save();
             }
         }

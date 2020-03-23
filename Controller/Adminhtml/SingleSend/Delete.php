@@ -37,10 +37,14 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 // init model and delete
                 $model = $this->_objectManager->create(\Lof\SendGrid\Model\SingleSend::class);
                 $model->load($id);
-                $model->delete();
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $singlesend_id = $model->getSinglesendId();
-                $this->_helperdata->deleteSingleSend($api_key, $singlesend_id);
+                $response = $this->_helperdata->deleteSingleSend($api_key, $singlesend_id);
+                if(isset(json_decode($response)->errors)) {
+                    $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
+                    return $resultRedirect->setPath('*/*/');
+                }
+                $model->delete();
                 // display success message
                 $this->messageManager->addSuccessMessage(__('You deleted the Singlesend.'));
                 // go to grid

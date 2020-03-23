@@ -21,48 +21,40 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Model\Config\Source;
-
-use Lof\SendGrid\Helper\Data;
-use Magento\Framework\App\Action\Context;
+namespace Lof\SendGrid\Controller\Adminhtml\Subscriber;
 
 /**
- * Class SubscribeList
+ * Class Index
  *
- * @package Lof\SendGrid\Model\Config\Source
+ * @package Lof\SendGrid\Controller\Adminhtml\Subscriber
  */
-class OtherList implements \Magento\Framework\Option\ArrayInterface
+class Index extends \Magento\Backend\App\Action
 {
-    /**
-     * @var Data
-     */
-    private $data;
-    /**
-     * @var Context
-     */
-    private $context;
-    /**
-     * @var Data
-     */
-    private $helper;
+    protected $resultPageFactory;
 
+    /**
+     * Constructor
+     *
+     * @param \Magento\Backend\App\Action\Context $context
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     */
     public function __construct(
-        Context $context,
-        Data $helper
+        \Magento\Backend\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $resultPageFactory
     ) {
-        $this->context = $context;
-        $this->helper = $helper;
+        $this->resultPageFactory = $resultPageFactory;
+        parent::__construct($context);
     }
-    public function toOptionArray()
+
+    /**
+     * Index action
+     *
+     * @return \Magento\Framework\Controller\ResultInterface
+     */
+    public function execute()
     {
-        $options = [];
-        $list = $this->helper->getUnsubscriberGroup();
-        foreach ($list as $item) {
-            $options[] = [
-                'label' => $item->name,
-                'value' => __($item->name),
-            ];
-        }
-        return $options;
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->prepend(__("Subscriber Management"));
+        return $resultPage;
     }
 }

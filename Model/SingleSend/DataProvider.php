@@ -71,9 +71,11 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         if (count($version) != 0) {
             $this->version->load($version['0']['id']);
             $this->loadedData[$model->getEntityId()]['version_name'] = $this->version->getVersionName();
+            $this->loadedData[$model->getEntityId()]['subject'] = $this->version->getSubject();
             $this->loadedData[$model->getEntityId()]['template_name'] = $this->version->getTemplateName();
             $this->loadedData[$model->getEntityId()]['template_generation'] = $this->version->getTemplateGeneration();
             $this->loadedData[$model->getEntityId()]['html_content'] = $this->version->getHtmlContent();
+            $this->loadedData[$model->getEntityId()]['list_ids'] = json_decode($model->getListIds());
         }
         $this->dataPersistor->clear('lof_sendgrid_singlesend');
         return $this->loadedData;
