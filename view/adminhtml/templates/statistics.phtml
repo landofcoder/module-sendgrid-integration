@@ -1,62 +1,107 @@
 <html>
+<?php
+$helper = $this->helper("Lof\SendGrid\Helper\Data");
+$api_key = $helper->getSendGridConfig('general', 'api_key');
+?>
 <head>
-    <?php $stats = $block->getStatistics();
-    foreach ($stats as $item) {
-        var_dump($item->stats['0']->metrics);
-    }
-    ?>
-
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['line']});
         google.charts.setOnLoadCallback(drawChart);
-
+        function getResponse(callback) {
+            require(['jquery', 'jquery/ui'], function($){
+                $('#btn-apply').on("click", function() {
+                    var start = $('#start').val();
+                    var end = $('#end').val();
+                    var settings = {
+                        "async": true,
+                        "crossDomain": true,
+                        "url": "https://api.sendgrid.com/v3/stats?start_date="+start+"&end_date="+end+"&aggregated_by=day",
+                        "method": "GET",
+                        "headers": {
+                            "authorization": "Bearer <?= $api_key?>"
+                        },
+                        "data": "{}"
+                    }
+                    $.ajax(settings).done(function (response) {
+                        callback(response);
+                    });
+                });
+            });
+        }
         function drawChart() {
-
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Day');
-            data.addColumn('number', 'Guardians of the Galaxy');
-            data.addColumn('number', 'The Avengers');
-            data.addColumn('number', 'Transformers: Age of Extinction');
-            data.addRows([
-                ["2020-3-15",  1, 80.8, 41.8],
-                ["2020-3-16",  0, 80.8, 41.8],
-                ["2020-3-17",  30.9, 69.5, 32.4],
-                ["2020-3-18",  25.4,   57, 25.7],
-                ["2020-3-19",  11.7, 18.8, 10.5],
-                ["2020-3-20",  11.9, 17.6, 10.4],
-                ["2020-3-21",   8.8, 13.6,  7.7],
-                ["2020-3-22",   7.6, 12.3,  9.6],
-                ["2020-3-23",  12.3, 29.2, 10.6],
-                ["2020-3-24",  16.9, 42.9, 14.8],
-                ["2020-3-25", 12.8, 30.9, 11.6],
-                ["2020-3-26",  5.3,  7.9,  4.7],
-                ["2020-3-27",  6.6,  8.4,  5.2],
-                ["2020-3-28",  4.8,  6.3,  3.6],
-                ["2020-3-29",  4.2,  6.2,  3.4]
-            ]);
-
-            var options = {
-                chart: {
-                    title: 'Box Office Earnings in First Two Weeks of Opening',
-                    subtitle: 'in millions of dollars (USD)'
-                },
-                width: 1600,
-                height: 700,
-                axes: {
-                    x: {
-                        0: {side: 'bottom'}
-                    }
+            data.addColumn('number', 'Blocks');
+            data.addColumn('number', 'Bounce Drop');
+            data.addColumn('number', 'Bounces');
+            data.addColumn('number', 'Clicks');
+            data.addColumn('number', 'Deferred');
+            data.addColumn('number', 'Delivered');
+            data.addColumn('number', 'Invalid Emails');
+            data.addColumn('number', 'Opens');
+            data.addColumn('number', 'Processed');
+            data.addColumn('number', 'Requests');
+            data.addColumn('number', 'Spam Report Drops');
+            data.addColumn('number', 'Spam Report');
+            data.addColumn('number', 'Unique Clicks');
+            data.addColumn('number', 'Unique Opens');
+            data.addColumn('number', 'Unsubscribe Drops');
+            data.addColumn('number', 'Unsubscribes');
+            getResponse(function(response) {
+                response.forEach(myFunction);
+                function myFunction(item) {
+                    data.addRows([
+                        [
+                            item.date,
+                            item.stats['0'].metrics.blocks,
+                            item.stats['0'].metrics.bounce_drops,
+                            item.stats['0'].metrics.bounces,
+                            item.stats['0'].metrics.clicks,
+                            item.stats['0'].metrics.deferred,
+                            item.stats['0'].metrics.delivered,
+                            item.stats['0'].metrics.invalid_emails,
+                            item.stats['0'].metrics.opens,
+                            item.stats['0'].metrics.processed,
+                            item.stats['0'].metrics.requests,
+                            item.stats['0'].metrics.spam_report_drops,
+                            item.stats['0'].metrics.spam_reports,
+                            item.stats['0'].metrics.unique_clicks,
+                            item.stats['0'].metrics.unique_opens,
+                            item.stats['0'].metrics.unsubscribe_drops,
+                            item.stats['0'].metrics.unsubscribes
+                        ],
+                    ]);
                 }
-            };
-
-            var chart = new google.charts.Line(document.getElementById('statistics'));
-
-            chart.draw(data, google.charts.Line.convertOptions(options));
+                var options = {
+                    chart: {
+                        title: 'SendGrid Statistics',
+                        subtitle: '(times)'
+                    },
+                    width: 1600,
+                    height: 700,
+                    axes: {
+                        x: {
+                            0: {side: 'bottom'}
+                        }
+                    }
+                };
+                var chart = new google.charts.Line(document.getElementById('statistics'));
+                chart.draw(data, google.charts.Line.convertOptions(options));
+            })
         }
     </script>
 </head>
 <body>
+<label for="start">Start date:</label>
+<input type="date" id="start" name="trip-start"
+       value = "<?= $block->getTimeNow() ?>"
+       min="2020-01-01" max="<?= $block->getTimeNow() ?>">
+<label for="start">End date:</label>
+<input type="date" id="end" name="trip-end"
+       value="<?= $block->getTimeNow() ?>"
+       min="2020-01-01" max="<?= $block->getTimeNow() ?>">
+<button id="btn-apply">Apply</button>
 <div id="statistics"></div>
 </body>
 </html>

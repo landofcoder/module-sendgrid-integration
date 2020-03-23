@@ -19,53 +19,27 @@
  * @license    http://www.landofcoder.com/LICENSE-1.0.html
  */
 namespace Lof\SendGrid\Block\Adminhtml\Statistics;
+use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
+use Lof\SendGrid\Helper\Data;
 
-use Magento\Framework\View\Element\Template;
-use Magento\Framework\UrlInterface;
 
 class Index extends \Magento\Framework\View\Element\Template
 {
-    protected $urlBuilder;
-    /**
-     * @var \Lof\SendGrid\Helper\Data
-     */
-    private $helper;
 
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
-        UrlInterface $urlBuilder,
-        \Lof\SendGrid\Helper\Data $helper,
-        \Magento\Cms\Model\Template\FilterProvider $filterProvider,
+        DateTimeFactory $dateFactory,
+        Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $data);
-        $this->urlBuilder = $urlBuilder;
-        $this->_filterProvider = $filterProvider;
+        $this->_dateFactory = $dateFactory;
         $this->helper = $helper;
     }
     public function execute()
     {
     }
-    public function getStatistics() {
-
-        $curl = curl_init();
-        $api_key = $this->helper->getSendGridConfig('general','api_key');
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/stats?start_date=2020-03-15&aggregated_by=day",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return json_decode($response);
+    public function getTimeNow() {
+        return $this->_dateFactory->create()->gmtDate('Y-m-d');
     }
 }
