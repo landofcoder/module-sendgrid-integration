@@ -96,11 +96,11 @@ $api_key = $helper->getSendGridConfig('general', 'api_key');
 <label for="start">Start date:</label>
 <input type="date" id="start" name="trip-start"
        value = "<?= $block->getTimeNow() ?>"
-       min="2020-01-01" max="<?= $block->getTimeNow() ?>">
+       min="2018-01-01" max="<?= $block->getTimeNow() ?>">
 <label for="start">End date:</label>
 <input type="date" id="end" name="trip-end"
        value="<?= $block->getTimeNow() ?>"
-       min="2020-01-01" max="<?= $block->getTimeNow() ?>">
+       min="2018-01-01" max="<?= $block->getTimeNow() ?>">
 <button id="btn-apply">Apply</button>
 <div id="statistics"></div>
 </body>
