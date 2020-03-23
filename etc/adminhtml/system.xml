@@ -74,6 +74,7 @@
 					<label>List for New Customer</label>
 					<validate>required-entry</validate>
 					<depends>
+						<field id="enabled">1</field>
 						<field id="add_customer">1</field>
 					</depends>
 					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
