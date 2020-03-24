@@ -24,6 +24,7 @@ $api_key = $helper->getSendGridConfig('general', 'api_key');
                         "data": "{}"
                     }
                     $.ajax(settings).done(function (response) {
+                        $("#statistics").html('');
                         callback(response);
                     });
                 });
