@@ -69,6 +69,14 @@ class Sync extends \Magento\Backend\App\Action
      * @var \Lof\SendGrid\Model\SenderFactory
      */
     private $_sender;
+    /**
+     * @var \Lof\SendGrid\Model\SubscriberFactory
+     */
+    private $_subcriber;
+    /**
+     * @var \Lof\SendGrid\Model\UnSubscriberFactory
+     */
+    private $_unsubscriber;
 
     /**
      * Constructor
@@ -91,6 +99,8 @@ class Sync extends \Magento\Backend\App\Action
         \Lof\SendGrid\Model\SingleSendFactory $singleSendFactory,
         \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
         \Lof\SendGrid\Model\SenderFactory $senderFactory,
+        \Lof\SendGrid\Model\SubscriberFactory $subscriber,
+        \Lof\SendGrid\Model\UnSubscriberFactory $unsubscriber,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
     ) {
         $this->helper = $helper;
@@ -99,6 +109,8 @@ class Sync extends \Magento\Backend\App\Action
         $this->singlesend = $singleSendFactory;
         $this->_version = $versionsFactory;
         $this->_sender = $senderFactory;
+        $this->_subscriber = $subscriber;
+        $this->_unsubscriber = $unsubscriber;
         $this->_messageManager = $messageManager;
         $this->addressBookCollection = $addressBookCollection;
         $this->_orderCollectionFactory = $orderCollectionFactory;
@@ -296,6 +308,43 @@ class Sync extends \Magento\Backend\App\Action
         }
         $this->helper->syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_id);
         $this->helper->syncSubscriberToM2($curl, $api_key, $list_subscriber_id);
+        $subscribers_groups = $this->helper->getAllList();
+        $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+        foreach ($subscribers_groups as $subscribers_group) {
+            $model = $this->_subscriber->create();
+            $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id',$subscribers_group->id)->getData();
+            if(count($exits) == 0) {
+                $model->setSubscriberGroupId($subscribers_group->id)
+                    ->setSubscriberGroupName($subscribers_group->name)
+                    ->setSubscriberCount($subscribers_group->contact_count);
+                $model->save();
+            }
+            else {
+                $model->load($exits['0']['id']);
+                $model->setSubscriberGroupId($subscribers_group->id)
+                    ->setSubscriberGroupName($subscribers_group->name)
+                    ->setSubscriberCount($subscribers_group->contact_count);
+                $model->save();
+            }
+        }
+        $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
+        foreach ($unsubscribers_groups as $unsubscribers_group) {
+            $model = $this->_unsubscriber->create();
+            $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id',$unsubscribers_group->id)->getData();
+            if(count($exits) == 0) {
+                $model->setUnsubscriberGroupId($unsubscribers_group->id)
+                    ->setUnsubscriberGroupName($unsubscribers_group->name)
+                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                $model->save();
+            }
+            else {
+                $model->load($exits['0']['id']);
+                $model->setUnsubscriberGroupId($unsubscribers_group->id)
+                    ->setUnsubscriberGroupName($unsubscribers_group->name)
+                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                $model->save();
+            }
+        }
         curl_close($curl);
         $resultRedirect = $this->resultRedirectFactory->create();
         return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
