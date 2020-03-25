@@ -68,4 +68,5 @@
 			</argument>
 		</arguments>
 	</type>
+	<preference for="Lof\SendGrid\Api\WebhookInterface" type="Lof\SendGrid\Model\Webhook"/>
 </config>

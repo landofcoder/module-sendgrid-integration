@@ -53,7 +53,8 @@ class Webhook extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $data = $this->getRequest()->getPostValue();
-        var_dump($data);
+        $data = file_get_contents("php://input");
+        $events = json_encode($data);
+        $this->logger->critical('Webhook Data: ', [$events]);
     }
 }
