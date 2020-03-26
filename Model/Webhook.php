@@ -31,12 +31,31 @@ class Webhook implements WebhookInterface
         $data = file_get_contents("php://input");
         $events = json_decode($data);
         foreach ($events as $item) {
-            $event = $this->eventfactory->create();
-            $event->setEmails($item->email);
-            $event->setTime(date('m/d/Y H:i:s', $item->timestamp));
-            $event->setEvent($item->event);
-            $event->setCategory($item->category);
-            $event->save();
+            if ($item->mc_stats == "singlesend") {
+                $event = $this->eventfactory->create();
+                $event->setEmails($item->email);
+                $event->setTimestamp(date('m/d/Y H:i:s', $item->timestamp));
+                $event->setEvent($item->event);
+                $event->setMcStats($item->mc_stats);
+                $event->setPhaseId($item->phase_id);
+                $event->setSendAt(date('m/d/Y H:i:s', $item->send_at));
+                $event->setSgEventId($item->sg_event_id);
+                $event->setSgMessageId($item->sg_message_id);
+                $event->setSgTemplateId($item->sg_template_id);
+                $event->setSgTemplateName($item->sg_template_name);
+                $event->setSinglesendId($item->singlesend_id);
+                $event->setTemplateId($item->template_id);
+                if (isset($item->ip)) {
+                    $event->setIp($item->ip);
+                }
+                if (isset($item->useragent)) {
+                    $event->setUseragent($item->useragent);
+                }
+                if (isset($item->category)) {
+                    $event->setCategory($item->category);
+                }
+                $event->save();
+            }
         }
     }
 }

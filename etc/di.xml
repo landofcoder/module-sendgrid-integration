@@ -68,5 +68,18 @@
 			</argument>
 		</arguments>
 	</type>
+	<virtualType name="Lof\SendGrid\Model\ResourceModel\Event\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">lof_sendgrid_events</argument>
+			<argument name="resourceModel" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Event\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="lof_sendgrid_event_listing_data_source" xsi:type="string">Lof\SendGrid\Model\ResourceModel\Event\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
 	<preference for="Lof\SendGrid\Api\WebhookInterface" type="Lof\SendGrid\Model\Webhook"/>
 </config>
