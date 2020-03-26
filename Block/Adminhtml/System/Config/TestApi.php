@@ -32,7 +32,7 @@ class TestApi extends Field
         $html = "";
         $url = $this->_backendUrl->getUrl("lof_sendgrid/system_config/testapi", []);
         $html .= '
-        <div class="pp-buttons-container"><button type="button" id="test"><span><span><span>'.__("Test Api").'</span></span></span></button></div>
+        <div class="pp-buttons-container"><button type="button" id="test"><span><span><span>'.__("Test Api Key").'</span></span></span></button></div>
         <style>
         #sync{
             width:31px;

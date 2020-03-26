@@ -88,5 +88,25 @@
         <column name="update_at" nullable="true" xsi:type="datetime"/>
         <column name="verified" nullable="true" xsi:type="boolean"/>
     </table>
-
+    <table comment="lof_sendgrid_events Table" engine="innodb" name="lof_sendgrid_events" resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="emails" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="timestamp" nullable="false" xsi:type="datetime"/>
+        <column name="event" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="ip" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="mc_stats" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="phase_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="send_at" nullable="true" xsi:type="datetime" length="50"/>
+        <column name="sg_event_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="sg_message_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="sg_template_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="sg_template_name" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="singlesend_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="template_id" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="useragent" nullable="true" xsi:type="varchar" length="50"/>
+        <column name="category" nullable="true" xsi:type="varchar" length="50"/>
+    </table>
 </schema>

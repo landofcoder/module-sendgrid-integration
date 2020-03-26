@@ -60,7 +60,7 @@ class Save extends \Magento\Backend\App\Action
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
         $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
-        if($this->_helperdata->testAPI($api_key) == false) {
+        if ($this->_helperdata->testAPI($api_key) == false) {
             $this->messageManager->addErrorMessage(__("Somethings went wrong. Please check your Api key"));
             return $resultRedirect->setPath('*/*/');
         }
@@ -78,24 +78,22 @@ class Save extends \Magento\Backend\App\Action
             $html = preg_replace("/\s+|\n+|\r/", ' ', $html);
             $list = '';
             foreach ($list_ids as $key => $list_id) {
-                if($key == '0') {
+                if ($key == '0') {
                     $list .= "\"".$list_id."\"";
-                }
-                else {
+                } else {
                     $list .= ",\"".$list_id."\"";
                 }
             }
             $name = $data['name'];
             $model->setName($name)->setListIds(json_encode($list_ids))->setSenderId($senderId)->setSuppressionGroupId($suppression_group_id);
             if ($id) {
-                if($model->getStatus() == "triggered") {
+                if ($model->getStatus() == "triggered") {
                     $this->messageManager->addErrorMessage(__("Single send has been Triggered. Can't edit or schedule this single send"));
                     return $resultRedirect->setPath('*/*/');
-                }
-                else {
+                } else {
                     $template_id = $model->getTemplateId();
                     $version = $this->version->create();
-                    $version_id = $version->getCollection()->addFieldToFilter('version_id',$model->getTemplateVersion())->getData()['0']['id'];
+                    $version_id = $version->getCollection()->addFieldToFilter('version_id', $model->getTemplateVersion())->getData()['0']['id'];
                     $version->load($version_id);
                     $version->setHtmlContent($data['html_content']);
                     $version->setTemplateName($data['template_name']);
@@ -164,13 +162,12 @@ class Save extends \Magento\Backend\App\Action
                 curl_close($curl);
                 $model->setSinglesendId(json_decode($response)->id);
             }
-            if($data['schedule'] == 1) {
-                if($data['schedule_at'] == '1') {
+            if ($data['schedule'] == 1) {
+                if ($data['schedule_at'] == '1') {
                     $date = 'now';
-                }
-                else {
+                } else {
                     $date = $data['send_at'];
-                    if($date < $this->_dateFactory->create()->gmtDate()) {
+                    if ($date < $this->_dateFactory->create()->gmtDate()) {
                         $this->messageManager->addErrorMessage(__("Can't schedule send single send in the past. Please enter a time in the future"));
                         return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
                     }

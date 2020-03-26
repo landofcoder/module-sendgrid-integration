@@ -21,14 +21,14 @@
  * SOFTWARE.
  */
 
-namespace Lof\SendGrid\Controller\Adminhtml\Webhook;
+namespace Lof\SendGrid\Controller\Adminhtml\Event;
 
 /**
- * Class Webhook
+ * Class Index
  *
- * @package Lof\SendGrid\Controller\Adminhtml\Webhook
+ * @package Lof\SendGrid\Controller\Adminhtml\Event
  */
-class Webhook extends \Magento\Backend\App\Action
+class Index extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
 
@@ -53,7 +53,8 @@ class Webhook extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $data = $this->getRequest()->getPostValue();
-        var_dump($data);
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->prepend(__("Event Management"));
+        return $resultPage;
     }
 }
