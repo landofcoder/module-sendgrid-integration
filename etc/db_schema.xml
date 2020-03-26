@@ -88,5 +88,14 @@
         <column name="update_at" nullable="true" xsi:type="datetime"/>
         <column name="verified" nullable="true" xsi:type="boolean"/>
     </table>
-
+    <table comment="lof_sendgrid_events Table" engine="innodb" name="lof_sendgrid_events" resource="default">
+        <column comment="Entity Id" identity="true" name="id" nullable="false" padding="6" unsigned="false" xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column name="emails" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="time" nullable="false" xsi:type="datetime"/>
+        <column name="event" nullable="false" xsi:type="varchar" length="50"/>
+        <column name="category" nullable="false" xsi:type="varchar" length="50"/>
+    </table>
 </schema>
