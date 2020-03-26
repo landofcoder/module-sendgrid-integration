@@ -60,9 +60,9 @@
 						<field id="enabled">1</field>
 					</depends>
 				</field>
-				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text" canRestore="1" >
 					<label>Webhook Url</label>
-					<comment/>
+					<comment>Replace your domain into "yourdomain". Then copy and paste this url into sendgrid. Example: http://B2bsolution.demo4coder.com/rest/V1/lof-sendgrid/webhook</comment>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
