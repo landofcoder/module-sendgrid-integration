@@ -69,7 +69,6 @@
 				</field>
 				<field id="list_for_new_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
 					<label>List for New Customer</label>
-					<validate>required-entry</validate>
 					<depends>
 						<field id="enabled">1</field>
 						<field id="add_customer">1</field>

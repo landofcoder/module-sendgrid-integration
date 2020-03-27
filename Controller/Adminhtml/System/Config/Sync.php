@@ -347,7 +347,7 @@ class Sync extends \Magento\Backend\App\Action
         }
         if ($list_other_email != '') {
             $response = $this->helper->syncUnsubscriber($curl, $token, $other_list_id, $list_other_email);
-            if (count($response->recipient_emails) > 0) {
+            if (isset($response->recipient_emails)) {
                 foreach ($addressBookCollection as $addressBook) {
                     $addressBook->setIsSynced('1');
                     $addressBook->save();
