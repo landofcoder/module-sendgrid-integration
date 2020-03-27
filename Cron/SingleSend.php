@@ -87,25 +87,42 @@ class SingleSend extends \Magento\Backend\App\Action
             $response = $client->send($request);
             $collection = ($response->getBody());
             $object = json_decode($collection, false);
+            if (isset($object->errors)) {
+                $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
+                $resultRedirect = $this->resultRedirectFactory->create();
+                return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
+            }
             $items = get_object_vars($object)['result'];
             foreach ($items as $item) {
                 $model = $this->singlesend->create();
                 $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
+                $data = $this->helper->getDataSinglesend($item->id, $token);
                 $template_id = $this->helper->getTemplateId($item->id, $token);
-                $data_version = $this->helper->getVersion($template_id, $token);
+                $data_template = $this->helper->getTemplate($template_id, $token);
+                $data_version = $data_template->versions;
                 $version = $this->_version->create();
                 $existing_version = $version->getCollection()->addFieldToFilter("version_id", $data_version['0']->id)->getData();
                 if (count($existing_version) == 0) {
                     $version->setVersionId($data_version['0']->id);
                     $version->setTemplateId($data_version['0']->template_id);
                     $version->setActive($data_version['0']->active);
-                    $version->setName($data_version['0']->name);
-                    $version->setHtmlContent($data_version['0']->html_content);
-                    $version->setPlainContent($data_version['0']->plain_content);
-                    $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
+                    $version->setTemplateName($data_template->name);
+                    $version->setTemplateGeneration($data_template->generation);
+                    $version->setVersionName($data_version['0']->name);
+                    if (isset($data_version['0']->html_content)) {
+                        $version->setHtmlContent($data_version['0']->html_content);
+                    }
+                    if (isset($data_version['0']->plain_content)) {
+                        $version->setPlainContent($data_version['0']->plain_content);
+                    }
+                    if (isset($data_version['0']->generate_plain_content)) {
+                        $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
+                    }
                     $version->setUpdateAt($data_version['0']->updated_at);
                     $version->setEditor($data_version['0']->editor);
-                    $version->setSubject($data_version['0']->subject);
+                    if (isset($data_version['0']->subject)) {
+                        $version->setSubject($data_version['0']->subject);
+                    }
                     $version->save();
                 } else {
                     $id = $existing_version[0]['id'];
@@ -113,13 +130,23 @@ class SingleSend extends \Magento\Backend\App\Action
                     $version->setVersionId($data_version['0']->id);
                     $version->setTemplateId($data_version['0']->template_id);
                     $version->setActive($data_version['0']->active);
-                    $version->setName($data_version['0']->name);
-                    $version->setHtmlContent($data_version['0']->html_content);
-                    $version->setPlainContent($data_version['0']->plain_content);
-                    $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
+                    $version->setTemplateName($data_template->name);
+                    $version->setTemplateGeneration($data_template->generation);
+                    $version->setVersionName($data_version['0']->name);
+                    if (isset($data_version['0']->html_content)) {
+                        $version->setHtmlContent($data_version['0']->html_content);
+                    }
+                    if (isset($data_version['0']->plain_content)) {
+                        $version->setPlainContent($data_version['0']->plain_content);
+                    }
+                    if (isset($data_version['0']->generate_plain_content)) {
+                        $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
+                    }
                     $version->setUpdateAt($data_version['0']->updated_at);
                     $version->setEditor($data_version['0']->editor);
-                    $version->setSubject($data_version['0']->subject);
+                    if (isset($data_version['0']->subject)) {
+                        $version->setSubject($data_version['0']->subject);
+                    }
                     $version->save();
                 }
                 if (count($existing) == 0) {
@@ -130,6 +157,18 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setStatus($item->status);
                     $model->setTemplateId($template_id);
                     $model->setTemplateVersion($data_version['0']->id);
+                    if (isset($data->send_at)) {
+                        $model->setSendAt($data->send_at);
+                    }
+                    if (isset($data->sender_id)) {
+                        $model->setSenderId($data->sender_id);
+                    }
+                    if (isset($data->suppression_group_id)) {
+                        $model->setSuppressionGroupId($data->suppression_group_id);
+                    }
+                    if (isset($data->filter->list_ids)) {
+                        $model->setListIds(json_encode($data->filter->list_ids));
+                    }
                     $model->save();
                 } else {
                     $entity_id = $existing[0]['entity_id'];
@@ -141,7 +180,19 @@ class SingleSend extends \Magento\Backend\App\Action
                     $model->setStatus($item->status);
                     $model->setTemplateId($template_id);
                     $model->setTemplateVersion($data_version['0']->id);
-                    $model->save($model);
+                    if (isset($data->send_at)) {
+                        $model->setSendAt($data->send_at);
+                    }
+                    if (isset($data->sender_id)) {
+                        $model->setSenderId($data->sender_id);
+                    }
+                    if (isset($data->suppression_group_id)) {
+                        $model->setSuppressionGroupId($data->suppression_group_id);
+                    }
+                    if (isset($data->filter->list_ids)) {
+                        $model->setListIds(json_encode($data->filter->list_ids));
+                    }
+                    $model->save();
                 }
             }
         }

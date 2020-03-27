@@ -22,9 +22,15 @@
 						<field id="enabled">1</field>
 					</depends>
 				</field>
+				<field id="test" type="button" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="1">
+					<frontend_model>Lof\SendGrid\Block\Adminhtml\System\Config\TestApi</frontend_model>
+					<label>Test Api key</label>
+					<depends>
+						<field id="sendgrid/general/enabled">1</field>
+					</depends>
+				</field>
 				<field id="subscribe_list" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="13" translate="label" type="select">
 					<label>Subscribe List</label>
-					<validate>required-entry</validate>
 					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>
 					<depends>
 						<field id="enabled">1</field>
@@ -34,7 +40,6 @@
 					<label>Unsubscribe List	</label>
 					<comment/>
 					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
-					<validate>required-entry</validate>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
@@ -42,8 +47,7 @@
 				<field id="other_group" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
 					<label>Other List</label>
 					<comment/>
-					<source_model>Lof\SendGrid\Model\Config\Source\OtherList</source_model>
-					<validate>required-entry</validate>
+					<source_model>Lof\SendGrid\Model\Config\Source\UnsubscribeList</source_model>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
@@ -56,17 +60,17 @@
 						<field id="enabled">1</field>
 					</depends>
 				</field>
-				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+				<field id="webhook_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text" canRestore="1" >
 					<label>Webhook Url</label>
-					<comment/>
+					<comment>Replace your domain into "yourdomain". Then copy and paste this url into sendgrid. Example: http://B2bsolution.demo4coder.com/rest/V1/lof-sendgrid/webhook</comment>
 					<depends>
 						<field id="enabled">1</field>
 					</depends>
 				</field>
 				<field id="list_for_new_customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="16" translate="label" type="select">
 					<label>List for New Customer</label>
-					<validate>required-entry</validate>
 					<depends>
+						<field id="enabled">1</field>
 						<field id="add_customer">1</field>
 					</depends>
 					<source_model>Lof\SendGrid\Model\Config\Source\SubscribeList</source_model>

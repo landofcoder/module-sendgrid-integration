@@ -10,5 +10,11 @@
         <job instance="Lof\SendGrid\Cron\SyncToNewDb" method="execute" name="lof_sendgrid_synctonewdb">
             <schedule>* * * * *</schedule>
         </job>
+        <job instance="Lof\SendGrid\Cron\SyncSender" method="execute" name="lof_sendgrid_syncsender">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job instance="Lof\SendGrid\Cron\SubscriberAndUnsubscriber" method="execute" name="lof_sendgrid_subscriber_and_unsubscriber_group">
+            <schedule>* * * * *</schedule>
+        </job>
     </group>
 </config>

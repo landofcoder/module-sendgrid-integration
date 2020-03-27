@@ -55,7 +55,7 @@
                 </validation>
             </settings>
         </field>
-        <field formElement="select" name="status" sortOrder="50">
+        <field formElement="input" name="subject" sortOrder="25">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
@@ -63,30 +63,12 @@
             </argument>
             <settings>
                 <dataType>text</dataType>
-                <label translate="true">Status</label>
-                <dataScope>status</dataScope>
+                <label translate="true">Subject</label>
+                <dataScope>subject</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <options>
-                            <option name="1" xsi:type="array">
-                                <item name="value" xsi:type="string">draft</item>
-                                <item name="label" xsi:type="string">Draft</item>
-                            </option>
-                            <option name="2" xsi:type="array">
-                                <item name="value" xsi:type="string">triggered</item>
-                                <item name="label" xsi:type="string">Triggered</item>
-                            </option>
-                            <option name="3" xsi:type="array">
-                                <item name="value" xsi:type="string">scheduled</item>
-                                <item name="label" xsi:type="string">Scheduled</item>
-                            </option>
-                        </options>
-                        <caption translate="true">-- Please Select --</caption>
-                    </settings>
-                </select>
-            </formElements>
         </field>
         <field formElement="input" name="template_name" sortOrder="60">
             <argument name="data" xsi:type="array">
@@ -147,21 +129,150 @@
                 </validation>
             </settings>
         </field>
-        <field formElement="textarea" name="html_content" sortOrder="100">
+        <field name="suppression_group_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\UnsubscribeListId</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Unsubscribe Group</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="sender_id">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\Sender</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Sender</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="list_ids">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\ListIds</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string">Recipients</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="dataType" xsi:type="string">multiselect</item>
+                    <item name="formElement" xsi:type="string">multiselect</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="schedule">
+        <settings>
+            <label>Schedule Single Send</label>
+        </settings>
+        <field name="schedule" sortOrder="1" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">SingleSend</item>
-                    <item name="rows" xsi:type="number">9</item>
+                    <item name="component" xsi:type="string">Lof_SendGrid/js/form/element/schedule</item>
                 </item>
             </argument>
             <settings>
-                <dataType>text</dataType>
-                <label translate="true">HTML Content</label>
-                <dataScope>html_content</dataScope>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">false</rule>
-                </validation>
+                <dataType>boolean</dataType>
+                <label translate="true">Schedule Single Send</label>
+                <dataScope>schedule</dataScope>
             </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">0</item>
+                                <item name="label" xsi:type="string">No</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">1</item>
+                                <item name="label" xsi:type="string">Yes</item>
+                            </option>
+                        </options>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="schedule_at">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">Lof\SendGrid\Model\Config\Source\Schedule</item>
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Schedule</item>
+                    <item name="component" xsi:type="string">Lof_SendGrid/js/form/element/options</item>
+                    <item name="visible" xsi:type="boolean">false</item>
+                    <item name="dataType" xsi:type="string">number</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">item</item>
+                    <item name="dataScope" xsi:type="string">schedule_at</item>
+                    <item name="sortOrder" xsi:type="number">210</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+        <field name="send_at">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" xsi:type="string" translate="true">Send At</item>
+                    <item name="formElement" xsi:type="string">date</item>
+                    <item name="source" xsi:type="string">page</item>
+                    <item name="sortOrder" xsi:type="number">250</item>
+                    <item name="dataScope" xsi:type="string">send_at</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="options" xsi:type="array">
+                        <item name="dateFormat" xsi:type="string">yyyy-MM-dd</item>
+                        <item name="timeFormat" xsi:type="string">HH:mm:ss</item>
+                        <item name="showsTime" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="visible" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="html_content">
+        <settings>
+            <label>HTML Content</label>
+        </settings>
+        <field name="html_content" sortOrder="150" formElement="wysiwyg">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="height" xsi:type="string">150px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
+                        <item name="add_images" xsi:type="boolean">true</item>
+                        <item name="add_directives" xsi:type="boolean">false</item>
+                    </item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
         </field>
     </fieldset>
 </form>

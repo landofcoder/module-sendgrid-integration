@@ -66,8 +66,8 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             ),
                             'label' => __('Delete'),
                             'confirm' => [
-                                'title' => __('Delete "${ $.$data.title }"'),
-                                'message' => __('Are you sure you wan\'t to delete a "${ $.$data.title }" record?')
+                                'title' => __('Delete "%1"',$item['name']),
+                                'message' => __('Are you sure you wan\'t to delete a "%1" record?',$item['name'])
                             ]
                         ],
                         'duplicate' => [
@@ -79,8 +79,8 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             ),
                             'label' => __('Duplicate'),
                             'confirm' => [
-                                'title' => __('Duplicate "${ $.$data.title }"'),
-                                'message' => __('Are you sure you wan\'t to duplicate a "${ $.$data.title }" record?')
+                                'title' => __('Duplicate "%1"',$item['name']),
+                                'message' => __('Are you sure you wan\'t to duplicate a "%1" record?',$item['name'])
                             ]
                         ],
                         'preview' => [
