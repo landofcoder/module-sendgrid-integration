@@ -41,6 +41,9 @@ class Webhook implements WebhookInterface
         $this->eventfactory = $eventFactory;
         $this->request = $request;
     }
+    /**
+     * {@inheritdoc}
+     */
     public function getDataWebhook()
     {
         $data = file_get_contents("php://input");
