@@ -99,7 +99,7 @@
         <column name="ip" nullable="true" xsi:type="varchar" length="50"/>
         <column name="mc_stats" nullable="true" xsi:type="varchar" length="50"/>
         <column name="phase_id" nullable="true" xsi:type="varchar" length="50"/>
-        <column name="send_at" nullable="true" xsi:type="datetime" length="50"/>
+        <column name="send_at" nullable="true" xsi:type="datetime"/>
         <column name="sg_event_id" nullable="true" xsi:type="varchar" length="50"/>
         <column name="sg_message_id" nullable="true" xsi:type="varchar" length="50"/>
         <column name="sg_template_id" nullable="true" xsi:type="varchar" length="50"/>
