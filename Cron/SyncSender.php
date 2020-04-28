@@ -77,35 +77,36 @@ class SyncSender extends \Magento\Backend\App\Action
         $api_key = $this->helper->getSendGridConfig('general','api_key');
         $senders = $this->helper->getAllSenders($api_key);
         foreach ($senders as $sender) {
-            $model = $this->_sender->create();
-            $exits = $model->getCollection()->addFieldToFilter('sender_id',$sender->id)->getData();
-            if(count($exits) == 0) {
-                $model->setNickName($sender->nickname)
-                    ->setSenderId($sender->id)
-                    ->setFrom($sender->from->email)
-                    ->setFromName($sender->from->name)
-                    ->setReplyTo($sender->reply_to->email)
-                    ->setAddress($sender->address)
-                    ->setCity($sender->city)
-                    ->setCountry($sender->country)
-                    ->setVerified($sender->verified->status)
-                    ->setUpdateAt($sender->updated_at)
-                    ->setCreateAt($sender->created_at);
-                $model->save();
-            }
-            else {
-                $model->load($exits['0']['id']);
-                $model->setNickName($sender->nickname)
-                    ->setFrom($sender->from->email)
-                    ->setFromName($sender->from->name)
-                    ->setReplyTo($sender->reply_to->email)
-                    ->setAddress($sender->address)
-                    ->setCity($sender->city)
-                    ->setCountry($sender->country)
-                    ->setVerified($sender->verified->status)
-                    ->setUpdateAt($sender->updated_at)
-                    ->setCreateAt($sender->created_at);
-                $model->save();
+            if($sender && $sender->id){
+                $model = $this->_sender->create();
+                $exits = $model->getCollection()->addFieldToFilter('sender_id',$sender->id)->getData();
+                if(count($exits) == 0) {
+                    $model->setNickName($sender->nickname)
+                        ->setSenderId($sender->id)
+                        ->setFrom($sender->from->email)
+                        ->setFromName($sender->from->name)
+                        ->setReplyTo($sender->reply_to->email)
+                        ->setAddress($sender->address)
+                        ->setCity($sender->city)
+                        ->setCountry($sender->country)
+                        ->setVerified($sender->verified->status)
+                        ->setUpdateAt($sender->updated_at)
+                        ->setCreateAt($sender->created_at);
+                    $model->save();
+                }else {
+                    $model->load($exits['0']['id']);
+                    $model->setNickName($sender->nickname)
+                        ->setFrom($sender->from->email)
+                        ->setFromName($sender->from->name)
+                        ->setReplyTo($sender->reply_to->email)
+                        ->setAddress($sender->address)
+                        ->setCity($sender->city)
+                        ->setCountry($sender->country)
+                        ->setVerified($sender->verified->status)
+                        ->setUpdateAt($sender->updated_at)
+                        ->setCreateAt($sender->created_at);
+                    $model->save();
+                }
             }
         }
     }

@@ -82,8 +82,9 @@ class SubscriberAndUnsubscriber extends \Magento\Backend\App\Action
     public function execute()
     {
         $api_key = $this->helper->getSendGridConfig('general','api_key');
-        $subscribers_groups = $this->helper->getAllList();
-        $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+        $subscribers_groups_list = $this->helper->getAllList();
+        $groups = get_object_vars($subscribers_groups_list);
+        $subscribers_groups = isset($groups['result'])?$groups['result']:[];
         foreach ($subscribers_groups as $subscribers_group) {
             $model = $this->_subscriber->create();
             $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id',$subscribers_group->id)->getData();
