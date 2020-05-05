@@ -85,39 +85,47 @@ class SubscriberAndUnsubscriber extends \Magento\Backend\App\Action
         $subscribers_groups_list = $this->helper->getAllList();
         $groups = get_object_vars($subscribers_groups_list);
         $subscribers_groups = isset($groups['result'])?$groups['result']:[];
-        foreach ($subscribers_groups as $subscribers_group) {
-            $model = $this->_subscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id',$subscribers_group->id)->getData();
-            if(count($exits) == 0) {
-                $model->setSubscriberGroupId($subscribers_group->id)
-                    ->setSubscriberGroupName($subscribers_group->name)
-                    ->setSubscriberCount($subscribers_group->contact_count);
-                $model->save();
-            }
-            else {
-                $model->load($exits['0']['id']);
-                $model->setSubscriberGroupId($subscribers_group->id)
-                    ->setSubscriberGroupName($subscribers_group->name)
-                    ->setSubscriberCount($subscribers_group->contact_count);
-                $model->save();
+        if($subscribers_groups){
+            foreach ($subscribers_groups as $subscribers_group) {
+                if($subscribers_group && is_object($subscribers_group) && isset($subscribers_group->id)){
+                    $model = $this->_subscriber->create();
+                    $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id',$subscribers_group->id)->getData();
+                    if(count($exits) == 0) {
+                        $model->setSubscriberGroupId($subscribers_group->id)
+                            ->setSubscriberGroupName($subscribers_group->name)
+                            ->setSubscriberCount($subscribers_group->contact_count);
+                        $model->save();
+                    }
+                    else {
+                        $model->load($exits['0']['id']);
+                        $model->setSubscriberGroupId($subscribers_group->id)
+                            ->setSubscriberGroupName($subscribers_group->name)
+                            ->setSubscriberCount($subscribers_group->contact_count);
+                        $model->save();
+                    }
+                }
             }
         }
         $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
-        foreach ($unsubscribers_groups as $unsubscribers_group) {
-            $model = $this->_unsubscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id',$unsubscribers_group->id)->getData();
-            if(count($exits) == 0) {
-                $model->setUnsubscriberGroupId($unsubscribers_group->id)
-                    ->setUnsubscriberGroupName($unsubscribers_group->name)
-                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
-                $model->save();
-            }
-            else {
-                $model->load($exits['0']['id']);
-                $model->setUnsubscriberGroupId($unsubscribers_group->id)
-                    ->setUnsubscriberGroupName($unsubscribers_group->name)
-                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
-                $model->save();
+        if($unsubscribers_groups){
+            foreach ($unsubscribers_groups as $unsubscribers_group) {
+                if($unsubscribers_group && is_object($unsubscribers_group) && isset($unsubscribers_group->id)){
+                    $model = $this->_unsubscriber->create();
+                    $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id',$unsubscribers_group->id)->getData();
+                    if(count($exits) == 0) {
+                        $model->setUnsubscriberGroupId($unsubscribers_group->id)
+                            ->setUnsubscriberGroupName($unsubscribers_group->name)
+                            ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                        $model->save();
+                    }
+                    else {
+                        $model->load($exits['0']['id']);
+                        $model->setUnsubscriberGroupId($unsubscribers_group->id)
+                            ->setUnsubscriberGroupName($unsubscribers_group->name)
+                            ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                        $model->save();
+                    }
+                }
             }
         }
     }

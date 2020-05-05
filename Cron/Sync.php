@@ -100,7 +100,7 @@ class Sync extends \Magento\Backend\App\Action
         $list = $this->helper->getAllList($curl, $api_key);
         $items = get_object_vars($list)['result'];
         foreach ($items as $item) {
-            if (isset($item->name)) {
+            if ($item && is_object($item) && isset($item->name)) {
                 if ($item->name == $subscriber_list) {
                     $list_subscriber_id = $item->id;
                 }
@@ -110,7 +110,7 @@ class Sync extends \Magento\Backend\App\Action
         $unsubscriber_id = '';
         $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
-            if(isset($item->name)) {
+            if($item && is_object($item) && isset($item->name)) {
                 if ($item->name == $unsubscriber_list) {
                     $unsubscriber_id = $item->id;
                 }
