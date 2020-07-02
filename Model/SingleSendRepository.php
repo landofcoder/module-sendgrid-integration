@@ -19,168 +19,194 @@
  * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
  */
 
-namespace Lof\SendGrid\Model\Data;
+namespace Lof\SendGrid\Model;
 
-use Lof\SendGrid\Api\Data\SingleSendInterface;
-
+use Lof\SendGrid\Api\SingleSendRepositoryInterface;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Json\Helper\Data;
+use Magento\Framework\Reflection\DataObjectProcessor;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Authorization\Model\UserContextInterface;
+use Magento\Framework\AuthorizationInterface;
+use Magento\Framework\App\ObjectManager;
 /**
  * Class SingleSend
  *
  * @package Lof\SendGrid\Model\Data
  */
-class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject implements SingleSendInterface
+class SingleSendRepository implements SingleSendRepositoryInterface
 {
 
-    /**
-     * Get singlesend_id
-     * @return string|null
-     */
-    public function getSinglesendId()
-    {
-        return $this->_get(self::SINGLESEND_ID);
-    }
+    protected $resource;
+    protected $modelFactory;
+    protected $collectionFactory;
+    protected $searchResultsFactory;
+    protected $dataObjectHelper;
+    protected $dataObjectProcessor;
+    protected $dataFactory;
+    protected $extensionAttributesJoinProcessor;
+    private $storeManager;
+    private $collectionProcessor;
+    protected $_resource;
+    protected $jsonHelper;
 
     /**
-     * Set singlesend_id
-     * @param string $singlesendId
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * @var UserContextInterface
      */
-    public function setSinglesendId($singlesendId)
-    {
-        return $this->setData(self::SINGLESEND_ID, $singlesendId);
-    }
-
+    private $userContext;
     /**
-     * Get entity_id
-     * @return string|null
+     * @var AuthorizationInterface
      */
-    public function getEntityId()
-    {
-        return $this->_get(self::ENTITY_ID);
-    }
-
+    private $authorization;
     /**
-     * Set entity_id
-     * @param string $entityId
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * @param \Lof\SendGrid\Model\ResourceModel\SingleSend $resource
+     * @param \Lof\SendGrid\Model\SingleSendFactory $modelFactory
+     * @param \Lof\SendGrid\Api\Data\SingleSendInterfaceFactory $dataFactory
+     * @param \Lof\SendGrid\Model\ResourceModel\SingleSend\CollectionFactory $collectionFactory,
+     * @param \Lof\SendGrid\Api\Data\SingleSendSearchResultsInterfaceFactory $searchResultsFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param DataObjectProcessor $dataObjectProcessor
+     * @param StoreManagerInterface $storeManager
+     * @param CollectionProcessorInterface $collectionProcessor
      */
-    public function setEntityId($entityId)
-    {
-        return $this->setData(self::ENTITY_ID, $entityId);
-    }
-
-    /**
-     * Retrieve existing extension attributes object or create a new one.
-     * @return \Lof\SendGrid\Api\Data\SingleSendExtensionInterface|null
-     */
-    public function getExtensionAttributes()
-    {
-        return $this->_getExtensionAttributes();
-    }
-
-    /**
-     * Set an extension attributes object.
-     * @param \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
-     * @return $this
-     */
-    public function setExtensionAttributes(
-        \Lof\SendGrid\Api\Data\SingleSendExtensionInterface $extensionAttributes
+    public function __construct(
+        \Lof\SendGrid\Model\ResourceModel\SingleSend $resource,
+        \Lof\SendGrid\Model\SingleSendFactory $modelFactory,
+        \Lof\SendGrid\Api\Data\SingleSendInterface $dataFactory,
+        \Lof\SendGrid\Model\ResourceModel\SingleSend\CollectionFactory $collectionFactory,
+        \Lof\SendGrid\Api\Data\SingleSendSearchResultsInterfaceFactory $searchResultsFactory,
+        DataObjectHelper $dataObjectHelper,
+        DataObjectProcessor $dataObjectProcessor,
+        StoreManagerInterface $storeManager,
+        CollectionProcessorInterface $collectionProcessor,
+        ResourceConnection $Resource,
+        Data $jsonHelper
     ) {
-        return $this->_setExtensionAttributes($extensionAttributes);
+        $this->resource = $resource;
+        $this->_resource = $Resource;
+        $this->modelFactory = $modelFactory;
+        $this->collectionFactory = $collectionFactory;
+        $this->searchResultsFactory = $searchResultsFactory;
+        $this->dataObjectHelper = $dataObjectHelper;
+        $this->dataFactory = $dataFactory;
+        $this->dataObjectProcessor = $dataObjectProcessor;
+        $this->storeManager = $storeManager;
+        $this->collectionProcessor = $collectionProcessor;
+        $this->jsonHelper = $jsonHelper;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function save(
+        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
+    ){
+        try {
+            $model = $this->modelFactory->create();
+            $id = $singleSend->getEntityId();
+            $model = $model->load($id);
+            $data = [
+                'singlesend_id' => $singleSend->getSinglesendId(),
+                'name' => $singleSend->getName(),
+                'create_date' => $singleSend->getCreateDate(),
+                'update_date' => $singleSend->getUpdateDate(),
+                'status' => $singleSend->getStatus(),
+                'template_version' => $singleSend->getTemplateVersion(),
+                'template_id' => $singleSend->getTemplateId(),
+                'send_at' => $singleSend->getSendAt(),
+                'sender_id' => $singleSend->getSenderId(),
+                'suppression_group_id' => $singleSend->getSuppressionGroupId(),
+                'list_ids' => $singleSend->getListIds()
+            ];
+            $model->setData($data);
+            $model->save();
+        } catch (\Exception $exception) {
+            throw new CouldNotSaveException(__(
+                'Could not save the single send: %1',
+                $exception->getMessage()
+            ));
+        }
+        return $singleSend;
     }
 
     /**
-     * Get name
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->_get(self::NAME);
+    public function get($singlesendId){
+        $singleSend = $this->modelFactory->create();
+        $this->resource->load($singleSend, $singlesendId);
+        if (!$singleSend->getId()) {
+            throw new NoSuchEntityException(__('Single Send with id "%1" does not exist.', $singlesendId));
+        }
+        return $singleSend;
     }
 
     /**
-     * Set name
-     * @param string $name
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * {@inheritdoc}
      */
-    public function setName($name)
-    {
-        return $this->setData(self::NAME, $name);
+    public function getList(
+        \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
+    ){
+        $collection = $this->collectionFactory->create();
+        foreach ($criteria->getFilterGroups() as $filterGroup) {
+            $fields = [];
+            $conditions = [];
+            foreach ($filterGroup->getFilters() as $filter) {
+                if ($filter->getField() === 'store_id') {
+                    $collection->addStoreFilter($filter->getValue(), false);
+                    continue;
+                }
+                $fields[] = $filter->getField();
+                $condition = $filter->getConditionType() ?: 'eq';
+                $conditions[] = [$condition => $filter->getValue()];
+            }
+            $collection->addFieldToFilter($fields, $conditions);
+        }
+        
+        $sortOrders = $criteria->getSortOrders();
+        if ($sortOrders) {
+            /** @var SortOrder $sortOrder */
+            foreach ($sortOrders as $sortOrder) {
+                $collection->addOrder(
+                    $sortOrder->getField(),
+                    ($sortOrder->getDirection() == SortOrder::SORT_ASC) ? 'ASC' : 'DESC'
+                );
+            }
+        }
+        $collection->setCurPage($criteria->getCurrentPage());
+        $collection->setPageSize($criteria->getPageSize());
+        
+        $searchResults = $this->searchResultsFactory->create();
+        $searchResults->setSearchCriteria($criteria);
+        $searchResults->setTotalCount($collection->getSize());
+        $searchResults->setItems($collection->getItems());
+        return $searchResults;
     }
 
     /**
-     * Get create_date
-     * @return string|null
+     * {@inheritdoc}
      */
-    public function getCreateDate()
-    {
-        return $this->_get(self::CREATE_DATE);
+    public function delete(
+        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
+    ){
+        try {
+            $this->resource->delete($singleSend);
+        } catch (\Exception $exception) {
+            throw new CouldNotDeleteException(__(
+                'Could not delete the Single Send: %1',
+                $exception->getMessage()
+            ));
+        }
+        return true;
     }
 
     /**
-     * Set create_date
-     * @param string $createDate
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     * {@inheritdoc}
      */
-    public function setCreateDate($createDate)
-    {
-        return $this->setData(self::CREATE_DATE, $createDate);
-    }
-
-    /**
-     * Get update_date
-     * @return string|null
-     */
-    public function getUpdateDate()
-    {
-        return $this->_get(self::UPDATE_DATE);
-    }
-
-    /**
-     * Set update_date
-     * @param string $updateDate
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setUpdateDate($updateDate)
-    {
-        return $this->setData(self::UPDATE_DATE, $updateDate);
-    }
-
-    /**
-     * Get status
-     * @return string|null
-     */
-    public function getStatus()
-    {
-        return $this->_get(self::STATUS);
-    }
-
-    /**
-     * Set status
-     * @param string $status
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setStatus($status)
-    {
-        return $this->setData(self::STATUS, $status);
-    }
-
-    /**
-     * Get email_html
-     * @return string|null
-     */
-    public function getEmailHtml()
-    {
-        return $this->_get(self::EMAIL_HTML);
-    }
-
-    /**
-     * Set email_html
-     * @param string $emailHtml
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setEmailHtml($emailHtml)
-    {
-        return $this->setData(self::EMAIL_HTML, $emailHtml);
+    public function deleteById($singlesendId){
+        return $this->delete($this->getById($singlesendId));
     }
 }

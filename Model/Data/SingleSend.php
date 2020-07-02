@@ -14,6 +14,101 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
 {
 
     /**
+     * Get send_at
+     * @return string|null
+     */
+    public function getSendAt()
+    {
+        return $this->_get(self::SEND_AT);
+    }
+
+    /**
+     * Set send_at
+     * @param string $send_at
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSendAt($send_at)
+    {
+        return $this->setData(self::SEND_AT, $send_at);
+    }
+
+    /**
+     * Get sender_id
+     * @return string|null
+     */
+    public function getSenderId()
+    {
+        return $this->_get(self::SENDER_ID);
+    }
+
+    /**
+     * Set sender_id
+     * @param string $sender_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSenderId($sender_id)
+    {
+        return $this->setData(self::SENDER_ID, $sender_id);
+    }
+
+    /**
+     * Get list_ids
+     * @return string|null
+     */
+    public function getListIds()
+    {
+        return $this->_get(self::LIST_IDS);
+    }
+
+    /**
+     * Set list_ids
+     * @param string $list_ids
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setListIds($list_ids)
+    {
+        return $this->setData(self::LIST_IDS, $list_ids);
+    }
+
+    /**
+     * Get suppression_group_id
+     * @return string|null
+     */
+    public function getSuppressionGroupId()
+    {
+        return $this->_get(self::SUPPRESSION_GROUP_ID);
+    }
+
+    /**
+     * Set suppression_group_id
+     * @param string $suppression_group_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSuppressionGroupId($suppression_group_id)
+    {
+        return $this->setData(self::SUPPRESSION_GROUP_ID, $suppression_group_id);
+    }
+
+    /**
+     * Get template_id
+     * @return string|null
+     */
+    public function getTemplateId()
+    {
+        return $this->_get(self::TEMPLATE_ID);
+    }
+
+    /**
+     * Set template_id
+     * @param string $template_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setTemplateId($template_id)
+    {
+        return $this->setData(self::TEMPLATE_ID, $template_id);
+    }
+
+    /**
      * Get singlesend_id
      * @return string|null
      */
@@ -135,6 +230,25 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
     public function getStatus()
     {
         return $this->_get(self::STATUS);
+    }
+
+    /**
+     * Set template_version
+     * @param string $template_version
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setTemplateVersion($template_version)
+    {
+        return $this->setData(self::TEMPLATE_VERSION, $template_version);
+    }
+
+    /**
+     * Get setTemplateVersion
+     * @return string|null
+     */
+    public function getTemplateVersion()
+    {
+        return $this->_get(self::TEMPLATE_VERSION);
     }
 
     /**

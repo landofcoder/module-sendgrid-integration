@@ -36,6 +36,12 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     const SINGLESEND_ID = 'singlesend_id';
     const UPDATE_DATE = 'update_date';
     const EMAIL_HTML = 'email_html';
+    const TEMPLATE_VERSION = 'template_version';
+    const TEMPLATE_ID = 'template_id';
+    const SEND_AT = 'send_at';
+    const SENDER_ID = 'sender_id';
+    const SUPPRESSION_GROUP_ID = 'suppression_group_id';
+    const LIST_IDS = 'list_ids';
 
     /**
      * Get singlesend_id
@@ -49,6 +55,72 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
      * @return \Lof\SendGrid\Api\Data\SingleSendInterface
      */
     public function setSinglesendId($singlesendId);
+
+     /**
+     * Get send_at
+     * @return string|null
+     */
+    public function getSendAt();
+
+    /**
+     * Set send_at
+     * @param string $send_at
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSendAt($send_at);
+
+    /**
+     * Get sender_id
+     * @return string|null
+     */
+    public function getSenderId();
+
+    /**
+     * Set sender_id
+     * @param string $sender_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSenderId($sender_id);
+
+    /**
+     * Get list_ids
+     * @return string|null
+     */
+    public function getListIds();
+
+    /**
+     * Set list_ids
+     * @param string $list_ids
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setListIds($list_ids);
+
+     /**
+     * Get suppression_group_id
+     * @return string|null
+     */
+    public function getSuppressionGroupId();
+
+    /**
+     * Set suppression_group_id
+     * @param string $suppression_group_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setSuppressionGroupId($suppression_group_id);
+
+
+    /**
+     * Get template_id
+     * @return string|null
+     */
+    public function getTemplateId();
+
+    /**
+     * Set template_id
+     * @param string $template_id
+     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
+     */
+    public function setTemplateId($template_id);
 
     /**
      * Get entity_id
