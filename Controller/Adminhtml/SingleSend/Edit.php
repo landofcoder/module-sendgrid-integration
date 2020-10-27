@@ -3,26 +3,41 @@
 
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
+use Lof\SendGrid\Controller\Adminhtml\SingleSend;
+use Lof\SendGrid\Model\SingleSendFactory;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
+
 /**
  * Class Edit
  *
  * @package Lof\SendGrid\Controller\Adminhtml\SingleSend
  */
-class Edit extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
+class Edit extends SingleSend
 {
 
     protected $resultPageFactory;
+    /**
+     * @var SingleSendFactory
+     */
+    private SingleSendFactory $singleSend;
 
     /**
-     * @param \Magento\Backend\App\Action\Context $context
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param SingleSendFactory $singleSend
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Framework\View\Result\PageFactory $resultPageFactory
+        Context $context,
+        Registry $coreRegistry,
+        SingleSendFactory $singleSend,
+        PageFactory $resultPageFactory
     ) {
+        $this->singleSend = $singleSend;
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context, $coreRegistry);
     }
@@ -30,20 +45,20 @@ class Edit extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
     /**
      * Edit action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
         // 1. Get ID and create model
         $id = $this->getRequest()->getParam('entity_id');
-        $model = $this->_objectManager->create(\Lof\SendGrid\Model\SingleSend::class);
+        $model = $this->singleSend->create();
 
         // 2. Initial checking
         if ($id) {
             $model->load($id);
             if (!$model->getId()) {
-                $this->messageManager->addErrorMessage(__('This Singlesend no longer exists.'));
-                /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+                $this->messageManager->addErrorMessage(__('This Single Send no longer exists.'));
+                /** @var Redirect $resultRedirect */
                 $resultRedirect = $this->resultRedirectFactory->create();
                 return $resultRedirect->setPath('*/*/');
             }

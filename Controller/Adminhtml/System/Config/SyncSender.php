@@ -76,12 +76,12 @@ class SyncSender extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $api_key = $this->helper->getSendGridConfig('general','api_key');
+        $api_key = $this->helper->getSendGridConfig('general', 'api_key');
         $senders = $this->helper->getAllSenders($api_key);
         foreach ($senders as $sender) {
             $model = $this->_sender->create();
-            $exits = $model->getCollection()->addFieldToFilter('sender_id',$sender->id)->getData();
-            if(count($exits) == 0) {
+            $exits = $model->getCollection()->addFieldToFilter('sender_id', $sender->id)->getData();
+            if (count($exits) == 0) {
                 $model->setNickName($sender->nickname)
                     ->setSenderId($sender->id)
                     ->setFrom($sender->from->email)
@@ -94,8 +94,7 @@ class SyncSender extends \Magento\Backend\App\Action
                     ->setUpdateAt($sender->updated_at)
                     ->setCreateAt($sender->created_at);
                 $model->save();
-            }
-            else {
+            } else {
                 $model->load($exits['0']['id']);
                 $model->setNickName($sender->nickname)
                     ->setFrom($sender->from->email)

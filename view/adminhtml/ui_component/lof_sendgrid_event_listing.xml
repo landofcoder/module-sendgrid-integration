@@ -162,15 +162,6 @@
                 </editor>
             </settings>
         </column>
-        <column name="template_id">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Template Id</label>
-                <editor>
-                    <editorType>text</editorType>
-                </editor>
-            </settings>
-        </column>
         <column name="timestamp">
             <settings>
                 <filter>text</filter>

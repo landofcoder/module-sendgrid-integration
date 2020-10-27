@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2019  Landofcoder
+ * Copyright (c) 2020  Landofcoder
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,12 @@ namespace Lof\SendGrid\Controller\Adminhtml\System\Config;
 use Lof\SendGrid\Helper\Data;
 use Lof\SendGrid\Model\SenderFactory;
 use Lof\SendGrid\Model\SingleSendFactory;
-use Lof\SendGrid\Model\VersionsFactory;
+use Lof\SendGrid\Model\UnSubscriberFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Lof\SendGrid\Model\AddressBookFactory;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
-use Magento\Backend\Model\View\Result\Redirect;
 
 /**
  * Class Sync
@@ -67,19 +66,11 @@ class Sync extends \Magento\Backend\App\Action
      */
     private $singlesend;
     /**
-     * @var VersionsFactory
-     */
-    private $_version;
-    /**
      * @var SenderFactory
      */
     private $_sender;
     /**
-     * @var \Lof\SendGrid\Model\SubscriberFactory
-     */
-    private $_subcriber;
-    /**
-     * @var \Lof\SendGrid\Model\UnSubscriberFactory
+     * @var UnSubscriberFactory
      */
     private $_unsubscriber;
 
@@ -90,13 +81,13 @@ class Sync extends \Magento\Backend\App\Action
      * @param Data $helper
      * @param CollectionFactory $orderCollectionFactory
      * @param ManagerInterface $messageManager
-     * @param SubscriberFactory $subscriberFactory
      * @param \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory $addressBookCollection
      * @param SingleSendFactory $singleSendFactory
-     * @param VersionsFactory $versionsFactory
      * @param SenderFactory $senderFactory
+     * @param DateTimeFactory $dateFactory
+     * @param AddressBookFactory $addressBookFactory
      * @param \Lof\SendGrid\Model\SubscriberFactory $subscriber
-     * @param \Lof\SendGrid\Model\UnSubscriberFactory $unsubscriber
+     * @param UnSubscriberFactory $unsubscriber
      * @param \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
      */
     public function __construct(
@@ -104,23 +95,19 @@ class Sync extends \Magento\Backend\App\Action
         Data $helper,
         CollectionFactory $orderCollectionFactory,
         ManagerInterface $messageManager,
-        SubscriberFactory $subscriberFactory,
         \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory $addressBookCollection,
         SingleSendFactory $singleSendFactory,
-        VersionsFactory $versionsFactory,
         SenderFactory $senderFactory,
         DateTimeFactory $dateFactory,
         AddressBookFactory $addressBookFactory,
         \Lof\SendGrid\Model\SubscriberFactory $subscriber,
-        \Lof\SendGrid\Model\UnSubscriberFactory $unsubscriber,
+        UnSubscriberFactory $unsubscriber,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
     ) {
         $this->helper = $helper;
         $this->_dateFactory = $dateFactory;
         $this->addressBookCollection = $addressBookCollection;
-        $this->subscriberFactory= $subscriberFactory;
         $this->singlesend = $singleSendFactory;
-        $this->_version = $versionsFactory;
         $this->_sender = $senderFactory;
         $this->_subscriber = $subscriber;
         $this->_unsubscriber = $unsubscriber;
@@ -140,32 +127,9 @@ class Sync extends \Magento\Backend\App\Action
     public function execute()
     {
         $curl = curl_init();
-        $token = $this->helper->getSendGridConfig('general', 'api_key');
-        $httpHeaders = new \Zend\Http\Headers();
-        $httpHeaders->addHeaders([
-            'Authorization' => 'Bearer ' . $token,
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json'
-        ]);
-        $request = new \Zend\Http\Request();
-        $request->setHeaders($httpHeaders);
-        $request->setUri('https://api.sendgrid.com/v3/marketing/singlesends');
-        $request->setMethod(\Zend\Http\Request::METHOD_GET);
-
-        $params = new \Zend\Stdlib\Parameters();
-
-        $request->setQuery($params);
-        $client = new \Zend\Http\Client();
-        $options = [
-            'adapter'   => 'Zend\Http\Client\Adapter\Curl',
-            'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
-            'maxredirects' => 0,
-            'timeout' => 30
-        ];
-        $client->setOptions($options);
-        $response = $client->send($request);
-        $collection = ($response->getBody());
-        $object = json_decode($collection, false);
+        $token = $this->helper->getSendGridConfig('general', 'api_key'); //get Api Key
+        //get All Single Send
+        $object = $this->helper->getAllSingleSend($token);
         if (isset($object->errors)) {
             $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
             $resultRedirect = $this->resultRedirectFactory->create();
@@ -173,139 +137,79 @@ class Sync extends \Magento\Backend\App\Action
         }
         $items = get_object_vars($object)['result'];
         foreach ($items as $item) {
+            //save singlge send
             $model = $this->singlesend->create();
-            $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
             $data = $this->helper->getDataSinglesend($item->id, $token);
-            $template_id = $this->helper->getTemplateId($item->id, $token);
-            $data_template = $this->helper->getTemplate($template_id, $token);
-            $data_version = $data_template->versions;
-            $version = $this->_version->create();
-            $existing_version = $version->getCollection()->addFieldToFilter("version_id", $data_version['0']->id)->getData();
-            if (count($existing_version) == 0) {
-                $version->setVersionId($data_version['0']->id);
-                $version->setTemplateId($data_version['0']->template_id);
-                $version->setActive($data_version['0']->active);
-                $version->setTemplateName($data_template->name);
-                $version->setTemplateGeneration($data_template->generation);
-                $version->setVersionName($data_version['0']->name);
-                if (isset($data_version['0']->html_content)) {
-                    $version->setHtmlContent($data_version['0']->html_content);
-                }
-                if (isset($data_version['0']->plain_content)) {
-                    $version->setPlainContent($data_version['0']->plain_content);
-                }
-                if (isset($data_version['0']->generate_plain_content)) {
-                    $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
-                }
-                $version->setUpdateAt($data_version['0']->updated_at);
-                $version->setEditor($data_version['0']->editor);
-                if (isset($data_version['0']->subject)) {
-                    $version->setSubject($data_version['0']->subject);
-                }
-                $version->save();
-            } else {
-                $id = $existing_version[0]['id'];
-                $version->load($id);
-                $version->setVersionId($data_version['0']->id);
-                $version->setTemplateId($data_version['0']->template_id);
-                $version->setActive($data_version['0']->active);
-                $version->setTemplateName($data_template->name);
-                $version->setTemplateGeneration($data_template->generation);
-                $version->setVersionName($data_version['0']->name);
-                if (isset($data_version['0']->html_content)) {
-                    $version->setHtmlContent($data_version['0']->html_content);
-                }
-                if (isset($data_version['0']->plain_content)) {
-                    $version->setPlainContent($data_version['0']->plain_content);
-                }
-                if (isset($data_version['0']->generate_plain_content)) {
-                    $version->setGeneratePlainContent($data_version['0']->generate_plain_content);
-                }
-                $version->setUpdateAt($data_version['0']->updated_at);
-                $version->setEditor($data_version['0']->editor);
-                if (isset($data_version['0']->subject)) {
-                    $version->setSubject($data_version['0']->subject);
-                }
-                $version->save();
-            }
-            if (count($existing) == 0) {
-                $model->setSinglesendId($item->id);
-                $model->setName($item->name);
-                $model->setUpdateDate($item->updated_at);
-                $model->setCreateDate($item->created_at);
-                $model->setStatus($item->status);
-                $model->setTemplateId($template_id);
-                $model->setTemplateVersion($data_version['0']->id);
-                if (isset($data->send_at)) {
-                    $model->setSendAt($data->send_at);
-                }
-                if (isset($data->sender_id)) {
-                    $model->setSenderId($data->sender_id);
-                }
-                if (isset($data->suppression_group_id)) {
-                    $model->setSuppressionGroupId($data->suppression_group_id);
-                }
-                if (isset($data->filter->list_ids)) {
-                    $model->setListIds(json_encode($data->filter->list_ids));
-                }
-                $model->save();
-            } else {
+            $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
+            if (count($existing)) {
                 $entity_id = $existing[0]['entity_id'];
                 $model->load($entity_id);
-                $model->setSinglesendId($item->id);
-                $model->setName($item->name);
-                $model->setUpdateDate($item->updated_at);
-                $model->setCreateDate($item->created_at);
-                $model->setStatus($item->status);
-                $model->setTemplateId($template_id);
-                $model->setTemplateVersion($data_version['0']->id);
-                if (isset($data->send_at)) {
-                    $model->setSendAt($data->send_at);
-                }
-                if (isset($data->sender_id)) {
-                    $model->setSenderId($data->sender_id);
-                }
-                if (isset($data->suppression_group_id)) {
-                    $model->setSuppressionGroupId($data->suppression_group_id);
-                }
-                if (isset($data->filter->list_ids)) {
-                    $model->setListIds(json_encode($data->filter->list_ids));
-                }
-                $model->save();
             }
+            if (isset($item->id)) {
+                $model->setSinglesendId($item->id);
+            }
+            if (isset($item->name)) {
+                $model->setName($item->name);
+            }
+            if (isset($item->updated_at)) {
+                $model->setUpdateDate($item->updated_at);
+            }
+            if (isset($item->created_at)) {
+                $model->setCreateDate($item->created_at);
+            }
+            if (isset($item->status)) {
+                $model->setStatus($item->status);
+            }
+            if (isset($data->send_at)) {
+                $model->setSendAt($data->send_at);
+            }
+            if (isset($data->email_config->sender_id)) {
+                $model->setSenderId($data->email_config->sender_id);
+            }
+            if (isset($data->email_config->suppression_group_id)) {
+                $model->setSuppressionGroupId($data->email_config->suppression_group_id);
+            }
+            if (isset($data->send_to->list_ids)) {
+                $model->setListIds(json_encode($data->send_to->list_ids));
+            }
+            if (isset($data->email_config->subject)) {
+                $model->setSubject($data->email_config->subject);
+            }
+            if (isset($data->email_config->html_content)) {
+                $model->setHtmlContent($data->email_config->html_content);
+            }
+            if (isset($data->email_config->plain_content)) {
+                $model->setPlainContent($data->email_config->plain_content);
+            }
+            if (isset($data->email_config->editor)) {
+                $model->setEditor($data->email_config->editor);
+            }
+            $model->save();
         }
+
+        // sync sender
         $senders = $this->helper->getAllSenders($token);
         foreach ($senders as $sender) {
             $model = $this->_sender->create();
             $exits = $model->getCollection()->addFieldToFilter('sender_id', $sender->id)->getData();
-            if (count($exits) == 0) {
-                $model->setNickName($sender->nickname)
-                    ->setSenderId($sender->id)
-                    ->setFrom($sender->from->email)
-                    ->setFromName($sender->from->name)
-                    ->setReplyTo($sender->reply_to->email)
-                    ->setAddress($sender->address)
-                    ->setCity($sender->city)
-                    ->setCountry($sender->country)
-                    ->setVerified($sender->verified->status)
-                    ->setUpdateAt($sender->updated_at)
-                    ->setCreateAt($sender->created_at);
-                $model->save();
-            } else {
+            if (count($exits)) {
                 $model->load($exits['0']['id']);
-                $model->setNickName($sender->nickname)
-                    ->setFrom($sender->from->email)
-                    ->setFromName($sender->from->name)
-                    ->setReplyTo($sender->reply_to->email)
-                    ->setAddress($sender->address)
-                    ->setCity($sender->city)
-                    ->setCountry($sender->country)
-                    ->setVerified($sender->verified->status)
-                    ->setUpdateAt($sender->updated_at)
-                    ->setCreateAt($sender->created_at);
-                $model->save();
             }
+            $model->setSenderId($sender->id)
+                ->setNickName($sender->nickname)
+                ->setFrom($sender->from->email)
+                ->setFromName($sender->from->name)
+                ->setReplyTo($sender->reply_to->email)
+                ->setAddress($sender->address)
+                ->setCity($sender->city)
+                ->setCountry($sender->country)
+                ->setVerified($sender->verified->status)
+                ->setUpdateAt($sender->updated_at)
+                ->setCreateAt($sender->created_at);
+            $model->save();
         }
+
+        //sync sunscriber and unsubscriber groups
         if ($this->helper->getSendGridConfig('general', 'add_customer') == 1) {
             $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
         } else {
@@ -336,7 +240,39 @@ class Sync extends \Magento\Backend\App\Action
                 }
             }
         }
-        $addressBookCollection = $this->addressBookCollection->create()->addFieldToFilter('is_subscribed', '0')->addFieldToFilter('is_synced', '0');
+
+        $this->helper->syncSubscriber($curl, $token, $list_subscriber_id, $unsubscriber_id);
+        $this->helper->syncSubscriberToM2($curl, $token, $list_subscriber_id);
+        $subscribers_groups = $this->helper->getAllList();
+        $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+        foreach ($subscribers_groups as $subscribers_group) {
+            $model = $this->_subscriber->create();
+            $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();
+            if (count($exits)) {
+                $model->load($exits['0']['id']);
+            }
+            $model->setSubscriberGroupId($subscribers_group->id)
+                ->setSubscriberGroupName($subscribers_group->name)
+                ->setSubscriberCount($subscribers_group->contact_count);
+            $model->save();
+        }
+        $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
+        foreach ($unsubscribers_groups as $unsubscribers_group) {
+            $model = $this->_unsubscriber->create();
+            $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)->getData();
+            if (count($exits)) {
+                $model->load($exits['0']['id']);
+            }
+            $model->setUnsubscriberGroupId($unsubscribers_group->id)
+                ->setUnsubscriberGroupName($unsubscribers_group->name)
+                ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+            $model->save();
+        }
+
+        //sync address book (contact)
+        $addressBookCollection = $this->addressBookCollection->create()
+                                ->addFieldToFilter('is_subscribed', '0')
+                                ->addFieldToFilter('is_synced', '0');
         $list_other_email = '';
         foreach ($addressBookCollection as $addressBook) {
             if ($list_other_email == '') {
@@ -354,44 +290,8 @@ class Sync extends \Magento\Backend\App\Action
                 }
             }
         }
-        $this->helper->syncSubscriber($curl, $token, $list_subscriber_id, $unsubscriber_id);
-        $this->helper->syncSubscriberToM2($curl, $token, $list_subscriber_id);
-        $subscribers_groups = $this->helper->getAllList();
-        $subscribers_groups = get_object_vars($subscribers_groups)['result'];
-        foreach ($subscribers_groups as $subscribers_group) {
-            $model = $this->_subscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();
-            if (count($exits) == 0) {
-                $model->setSubscriberGroupId($subscribers_group->id)
-                    ->setSubscriberGroupName($subscribers_group->name)
-                    ->setSubscriberCount($subscribers_group->contact_count);
-                $model->save();
-            } else {
-                $model->load($exits['0']['id']);
-                $model->setSubscriberGroupId($subscribers_group->id)
-                    ->setSubscriberGroupName($subscribers_group->name)
-                    ->setSubscriberCount($subscribers_group->contact_count);
-                $model->save();
-            }
-        }
-        $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
-        foreach ($unsubscribers_groups as $unsubscribers_group) {
-            $model = $this->_unsubscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)->getData();
-            if (count($exits) == 0) {
-                $model->setUnsubscriberGroupId($unsubscribers_group->id)
-                    ->setUnsubscriberGroupName($unsubscribers_group->name)
-                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
-                $model->save();
-            } else {
-                $model->load($exits['0']['id']);
-                $model->setUnsubscriberGroupId($unsubscribers_group->id)
-                    ->setUnsubscriberGroupName($unsubscribers_group->name)
-                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
-                $model->save();
-            }
-        }
         curl_close($curl);
+
         $group = $this->helper->getSendGridConfig('general', 'other_group');
         $customerCollection = $this->helper->getCustomerCollection();
         foreach ($customerCollection as $customer) {
@@ -399,13 +299,13 @@ class Sync extends \Magento\Backend\App\Action
             $exist = $subscriberCollection->addFieldToFilter('subscriber_email', $customer->getEmail())->getData();
             $addressbookCollection = $this->addressbook->create()->getCollection();
             $existOnThis = $addressbookCollection->addFieldToFilter('email_address', $customer->getEmail())->getData();
-            if ((count($exist) == 0) && (count($existOnThis) == 0)) {
-                $addressbook = $this->addressbook->create();
-                $addressbook->setEmailAddress($customer->getEmail())->setFirstname($customer->getFirstname())->setLastname($customer->getLastname())->setSourceFrom('Customer')->setCustomerId($customer->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
-                $addressbook->save();
-            } elseif (count($exist) == 0) {
-                $entity_id = $existOnThis['0']['id'];
-                $addressbook = $this->addressbook->create()->load($entity_id);
+            if (!count($exist) && !count($existOnThis)) {
+                if (!count($existOnThis)) {
+                    $addressbook = $this->addressbook->create();
+                } else {
+                    $entity_id = $existOnThis['0']['id'];
+                    $addressbook = $this->addressbook->create()->load($entity_id);
+                }
                 $addressbook->setEmailAddress($customer->getEmail())->setFirstname($customer->getFirstname())->setLastname($customer->getLastname())->setSourceFrom('Customer')->setCustomerId($customer->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
                 $addressbook->save();
             }
@@ -416,13 +316,13 @@ class Sync extends \Magento\Backend\App\Action
             $exist = $subscriberCollection->addFieldToFilter('subscriber_email', $order->getCustomerEmail())->getData();
             $addressbookCollection = $this->addressbook->create()->getCollection();
             $existOnThis = $addressbookCollection->addFieldToFilter('email_address', $order->getCustomerEmail())->getData();
-            if ((count($exist) == 0) && (count($existOnThis) == 0)) {
-                $addressbook = $this->addressbook->create();
-                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
-                $addressbook->save();
-            } elseif (count($exist) == 0) {
-                $entity_id = $existOnThis['0']['id'];
-                $addressbook = $this->addressbook->create()->load($entity_id);
+            if (!count($exist)) {
+                if (!count($existOnThis)) {
+                    $addressbook = $this->addressbook->create();
+                } else {
+                    $entity_id = $existOnThis['0']['id'];
+                    $addressbook = $this->addressbook->create()->load($entity_id);
+                }
                 $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
                 $addressbook->save();
             }

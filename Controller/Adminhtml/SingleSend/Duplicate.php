@@ -44,7 +44,6 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $new_model->setStatus($model->getStatus());
                 $name = $new_model->getName();
                 $status = $new_model->getStatus();
-                $template_id = $new_model->getTemplateId();
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $curl = curl_init();
                 curl_setopt_array($curl, array(

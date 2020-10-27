@@ -24,6 +24,7 @@
 namespace Lof\SendGrid\Model\Config\Source;
 
 use Lof\SendGrid\Helper\Data;
+use Lof\SendGrid\Model\ResourceModel\Sender\CollectionFactory;
 use Magento\Framework\App\Action\Context;
 
 /**
@@ -42,13 +43,13 @@ class Sender implements \Magento\Framework\Option\ArrayInterface
      */
     private $context;
     /**
-     * @var \Lof\SendGrid\Model\ResourceModel\Sender\CollectionFactory
+     * @var CollectionFactory
      */
     private $_collection;
 
     public function __construct(
         Context $context,
-        \Lof\SendGrid\Model\ResourceModel\Sender\CollectionFactory $collection
+        CollectionFactory $collection
     ) {
         $this->context = $context;
         $this->_collection = $collection;
@@ -56,7 +57,7 @@ class Sender implements \Magento\Framework\Option\ArrayInterface
     public function toOptionArray()
     {
         $options = [];
-        $list = $this->_collection->create()->addFieldToFilter('verified','1');
+        $list = $this->_collection->create()->addFieldToFilter('verified', '1');
         foreach ($list as $item) {
             $options[] = [
                 'label' => __($item->getNickName()),

@@ -70,21 +70,6 @@
                 </validation>
             </settings>
         </field>
-        <field formElement="input" name="template_name" sortOrder="60">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">SingleSend</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Template Name</label>
-                <dataScope>template_name</dataScope>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
-            </settings>
-        </field>
         <field formElement="select" name="template_generation" sortOrder="80">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -113,21 +98,6 @@
                     </settings>
                 </select>
             </formElements>
-        </field>
-        <field formElement="input" name="version_name" sortOrder="90">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">SingleSend</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <label translate="true">Version Name</label>
-                <dataScope>version_name</dataScope>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
-            </settings>
         </field>
         <field name="suppression_group_id">
             <argument name="data" xsi:type="array">

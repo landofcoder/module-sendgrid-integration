@@ -21,10 +21,6 @@ class Save extends \Magento\Backend\App\Action
      */
     private $_dateFactory;
     /**
-     * @var \Lof\SendGrid\Model\VersionsFactory
-     */
-    private $version;
-    /**
      * @var Data
      */
     private $_helperdata;

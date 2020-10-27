@@ -4,7 +4,6 @@
 namespace Lof\SendGrid\Model\SingleSend;
 
 use Lof\SendGrid\Model\ResourceModel\SingleSend\CollectionFactory;
-use Lof\SendGrid\Model\VersionsFactory;
 use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
@@ -14,11 +13,19 @@ use Magento\Framework\App\Request\DataPersistorInterface;
  */
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
+    /**
+     * @var DataPersistorInterface
+     */
     protected $dataPersistor;
 
+    /**
+     * @var
+     */
     protected $loadedData;
+    /**
+     * @var
+     */
     protected $collection;
-    private $version;
 
 
     /**
@@ -37,13 +44,11 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
-        VersionsFactory $versionsFactory,
         DataPersistorInterface $dataPersistor,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
-        $this->version = $versionsFactory->create();
         $this->dataPersistor = $dataPersistor;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -66,16 +71,9 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         }
         $model = $this->collection->getNewEmptyItem();
         $model->load($id);
-        $version = $this->version->getCollection()->addFieldToFilter('version_id', $model->getTemplateVersion())->getData();
         $this->loadedData[$model->getId()] = $model->getData();
-        if (count($version) != 0) {
-            $this->version->load($version['0']['id']);
-            $this->loadedData[$model->getEntityId()]['version_name'] = $this->version->getVersionName();
-            $this->loadedData[$model->getEntityId()]['subject'] = $this->version->getSubject();
-            $this->loadedData[$model->getEntityId()]['template_name'] = $this->version->getTemplateName();
-            $this->loadedData[$model->getEntityId()]['template_generation'] = $this->version->getTemplateGeneration();
-            $this->loadedData[$model->getEntityId()]['html_content'] = $this->version->getHtmlContent();
-            $this->loadedData[$model->getEntityId()]['list_ids'] = json_decode($model->getListIds());
+        if ($model->getData('list_ids')) {
+            $this->loadedData[$model->getId()]['list_ids'] = json_decode($model->getData('list_ids'));
         }
         $this->dataPersistor->clear('lof_sendgrid_singlesend');
         return $this->loadedData;

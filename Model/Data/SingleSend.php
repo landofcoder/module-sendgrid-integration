@@ -90,25 +90,6 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
     }
 
     /**
-     * Get template_id
-     * @return string|null
-     */
-    public function getTemplateId()
-    {
-        return $this->_get(self::TEMPLATE_ID);
-    }
-
-    /**
-     * Set template_id
-     * @param string $template_id
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setTemplateId($template_id)
-    {
-        return $this->setData(self::TEMPLATE_ID, $template_id);
-    }
-
-    /**
      * Get singlesend_id
      * @return string|null
      */
@@ -230,25 +211,6 @@ class SingleSend extends \Magento\Framework\Api\AbstractExtensibleObject impleme
     public function getStatus()
     {
         return $this->_get(self::STATUS);
-    }
-
-    /**
-     * Set template_version
-     * @param string $template_version
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setTemplateVersion($template_version)
-    {
-        return $this->setData(self::TEMPLATE_VERSION, $template_version);
-    }
-
-    /**
-     * Get setTemplateVersion
-     * @return string|null
-     */
-    public function getTemplateVersion()
-    {
-        return $this->_get(self::TEMPLATE_VERSION);
     }
 
     /**

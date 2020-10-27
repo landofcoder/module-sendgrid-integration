@@ -1,18 +1,18 @@
 <?php
 /**
  * LandOfCoder
- * 
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
  * http://www.landofcoder.com/license-agreement.html
- * 
+ *
  * DISCLAIMER
- * 
+ *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
- * 
+ *
  * @category   LandOfCoder
  * @package    Lof_SendGrid
  * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
@@ -56,33 +56,32 @@ class Data extends AbstractHelper
     {
         return $this->getConfigValue(self::XML_PATH_SENDGRID .$group.'/'. $code, $storeId);
     }
-    public function getSingleSend()
+
+    public function getAllSingleSend($token)
     {
-        $curl = curl_init();
-        $api_key = $this->getSendGridConfig('general', 'api_key');
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            echo $response;
-        }
+        $httpHeaders = new \Zend\Http\Headers();
+        $httpHeaders->addHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json'
+        ]);
+        $request = new \Zend\Http\Request();
+        $request->setHeaders($httpHeaders);
+        $request->setUri('https://api.sendgrid.com/v3/marketing/singlesends');
+        $request->setMethod(\Zend\Http\Request::METHOD_GET);
+        $params = new \Zend\Stdlib\Parameters();
+        $request->setQuery($params);
+        $client = new \Zend\Http\Client();
+        $options = [
+            'adapter'   => 'Zend\Http\Client\Adapter\Curl',
+            'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
+            'maxredirects' => 0,
+            'timeout' => 30
+        ];
+        $client->setOptions($options);
+        $response = $client->send($request);
+        $collection = ($response->getBody());
+        return json_decode($collection, false);
     }
     public function getCustomerCollection()
     {
@@ -270,26 +269,6 @@ class Data extends AbstractHelper
         $err = curl_error($curl);
         return json_decode($response);
     }
-    public function getTemplateId($id, $token)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $token"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return json_decode($response, false)->template_id;
-    }
     public function getDataSinglesend($id, $token)
     {
         $curl = curl_init();
@@ -310,97 +289,7 @@ class Data extends AbstractHelper
         curl_close($curl);
         return json_decode($response, false);
     }
-    public function getTemplate($template_id, $token)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$template_id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $token"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($response) {
-            return json_decode($response);
-        }
-    }
-    public function createTemplate($api_key, $name, $generation)
-    {
-        $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/templates",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"generation\":\"$generation\"}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return json_decode($response);
-    }
-    public function createVersion($api_key, $name, $templateId, $html)
-    {
-        $curl = curl_init();
-        $html = str_replace('"', '\"', $html);
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$templateId/versions",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"active\":1,\"name\":\"$name\",\"html_content\":\"$html\"}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return json_decode($response);
-    }
-    public function editVersion($api_key, $name, $html, $templateId, $versionId)
-    {
-        $curl = curl_init();
-        $html = str_replace('"', '\"', $html);
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$templateId/versions/$versionId",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PATCH",
-            CURLOPT_POSTFIELDS => "{\"active\":1,\"name\":\"$name\",\"html_content\":\"$html\"}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-    }
     public function deleteSingleSend($api_key, $singlesend_id)
     {
         $curl = curl_init();
@@ -422,7 +311,8 @@ class Data extends AbstractHelper
         curl_close($curl);
         return $response;
     }
-    public function getAllSenders($api_key) {
+    public function getAllSenders($api_key)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/senders",
@@ -446,31 +336,8 @@ class Data extends AbstractHelper
             return json_decode($response);
         }
     }
-    public function getVersion($api_key, $templateId, $versionId) {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/templates/$templateId/versions/$versionId",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            return json_decode($response);
-        }
-    }
-    public function schedule($api_key, $singlesendId, $date) {
+    public function schedule($api_key, $singlesendId, $date)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$singlesendId/schedule",
@@ -489,7 +356,8 @@ class Data extends AbstractHelper
         $err = curl_error($curl);
         curl_close($curl);
     }
-    public function testAPI($api_key) {
+    public function testAPI($api_key)
+    {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/scopes",
@@ -507,10 +375,9 @@ class Data extends AbstractHelper
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-        if(isset(json_decode($response)->scopes)){
+        if (isset(json_decode($response)->scopes)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
