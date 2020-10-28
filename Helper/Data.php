@@ -30,7 +30,18 @@ use Magento\Framework\Message\ManagerInterface;
 class Data extends AbstractHelper
 {
     const XML_PATH_SENDGRID = 'sendgrid/';
-    private $_subcriberFactory;
+    /**
+     * @var ManagerInterface
+     */
+    private $_messageManager;
+    /**
+     * @var CollectionFactory
+     */
+    private $_customerFactory;
+    /**
+     * @var SubscriberFactory
+     */
+    private $_subscriberFactory;
 
     public function __construct(
         CollectionFactory $customerFactory,
@@ -271,23 +282,17 @@ class Data extends AbstractHelper
     }
     public function getDataSinglesend($id, $token)
     {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $token"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return json_decode($response, false);
+//        $campaign_id = "test_url_param";
+//
+//        try {
+//            $response = $sg->client->campaigns()->_($id)->get();
+//            print $response->statusCode() . "\n";
+//            print_r($response->headers());
+//            print $response->body() . "\n";
+//        } catch (Exception $e) {
+//            echo 'Caught exception: ',  $e->getMessage(), "\n";
+//        }
+//        return json_decode($response, false);
     }
 
     public function deleteSingleSend($api_key, $singlesend_id)
@@ -379,6 +384,44 @@ class Data extends AbstractHelper
             return true;
         } else {
             return false;
+        }
+    }
+
+    public function createSingleSend($sg, $data)
+    {
+        $data = json_decode($data);
+        try {
+            $response = $sg->client->campaigns()->post($data);
+            print $response->statusCode() . "\n";
+            print_r($response->headers());
+            print $response->body() . "\n";
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
+    }
+
+    public function updateSingleSend($sg, $singleSendId, $data)
+    {
+
+        $query_params = json_decode('{"limit": 1, "offset": 1}');
+
+        try {
+            $response = $sg->client->campaigns()->get(null, $query_params);
+            print $response->statusCode() . "\n";
+            print_r($response->headers());
+            print $response->body() . "\n";
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
+
+        $request_body = json_decode($data);
+        try {
+            $response = $sg->client->campaigns()->_($singleSendId)->patch($request_body);
+            print $response->statusCode() . "\n";
+            print_r($response->headers());
+            print $response->body() . "\n";
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
     }
 }

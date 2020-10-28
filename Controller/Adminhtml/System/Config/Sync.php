@@ -328,6 +328,7 @@ class Sync extends \Magento\Backend\App\Action
             }
         }
         $resultRedirect = $this->resultRedirectFactory->create();
+        $this->_messageManager->addSuccessMessage(__("Sync with Sendgrid successfully."));
         return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
     }
 }
