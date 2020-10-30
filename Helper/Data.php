@@ -126,10 +126,8 @@ class Data extends AbstractHelper
             }
         }
     }
-    public function getAllList()
+    public function getAllList($curl, $api_key)
     {
-        $api_key = $this->getSendGridConfig('general', 'api_key');
-        $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/lists?page_size=100",
             CURLOPT_RETURNTRANSFER => true,
@@ -170,11 +168,8 @@ class Data extends AbstractHelper
         $response = curl_exec($curl);
         return json_decode($response, false);
     }
-    public function getUnsubscriberGroup()
+    public function getUnsubscriberGroup($curl, $api_key)
     {
-        $api_key = $this->getSendGridConfig('general', 'api_key');
-        $curl = curl_init();
-
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups",
             CURLOPT_RETURNTRANSFER => true,
@@ -280,19 +275,23 @@ class Data extends AbstractHelper
         $err = curl_error($curl);
         return json_decode($response);
     }
-    public function getDataSinglesend($id, $token)
+    public function getDataSinglesend($curl, $id, $token)
     {
-//        $campaign_id = "test_url_param";
-//
-//        try {
-//            $response = $sg->client->campaigns()->_($id)->get();
-//            print $response->statusCode() . "\n";
-//            print_r($response->headers());
-//            print $response->body() . "\n";
-//        } catch (Exception $e) {
-//            echo 'Caught exception: ',  $e->getMessage(), "\n";
-//        }
-//        return json_decode($response, false);
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$id",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $token"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        return json_decode($response, false);
     }
 
     public function deleteSingleSend($api_key, $singlesend_id)

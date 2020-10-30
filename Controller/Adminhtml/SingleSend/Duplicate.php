@@ -2,6 +2,9 @@
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
 use Lof\SendGrid\Helper\Data;
+use Magento\Backend\App\Action\Context;
+use Magento\Cms\Model\Template\FilterProvider;
+use Magento\Framework\Registry;
 
 /**
  * Class Duplicate
@@ -10,13 +13,30 @@ use Lof\SendGrid\Helper\Data;
  */
 class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
 {
+    /**
+     * @var Data
+     */
     protected $_helperdata;
+    /**
+     * @var FilterProvider
+     */
+    private $_filterProvider;
+
+    /**
+     * Duplicate constructor.
+     * @param Context $context
+     * @param Data $helper
+     * @param FilterProvider $filterProvider
+     * @param Registry $coreRegistry
+     */
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
+        Context $context,
         Data $helper,
-        \Magento\Framework\Registry $coreRegistry
+        FilterProvider $filterProvider,
+        Registry $coreRegistry
     ) {
         $this->_helperdata = $helper;
+        $this->_filterProvider = $filterProvider;
         parent::__construct($context, $coreRegistry);
     }
 
@@ -39,11 +59,26 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $new_model->setName($model->getName());
                 $new_model->setCreateDate($model->getCreateDate());
                 $new_model->setUpdateDate($model->getUpdateDate());
-                $new_model->setTemplateId($model->getTemplateId());
-                $new_model->setTemplateVersion($model->getTemplateVersion());
+                $new_model->setSuppressionGroupId($model->getSuppressionGroupId());
+                $new_model->setListId($model->getListId());
                 $new_model->setStatus($model->getStatus());
+                $new_model->setHtmlContent($model->getHtmlContent());
+                $new_model->setPlainContent($model->getPlainContent());
+                $new_model->setStatus($model->getStatus());
+                $new_model->setSubject($model->getSubject());
+                $new_model->setEditor($model->getEditor());
+                $new_model->setSenderId($model->getSenderId());
+
                 $name = $new_model->getName();
-                $status = $new_model->getStatus();
+                $listSeller = json_encode($new_model->getListId());
+                $subject = $new_model->getSubject();
+                $plainContent = $new_model->getPlainContent();
+                $editor = $new_model->getEditor();
+                $suppression_group_id = $new_model->getSuppressionGroupId();
+                $html = $this->getCmsFilterContent($new_model->getHtmlContent());
+                $senderId = $new_model->getSenderId();
+                $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$listSeller.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
@@ -54,7 +89,7 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                     CURLOPT_TIMEOUT => 30,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => "{\"name\":\"$name\",\"status\":\"$status\",\"template_id\":\"$template_id\"}",
+                    CURLOPT_POSTFIELDS => $dataUpdate,
                     CURLOPT_HTTPHEADER => array(
                         "authorization: Bearer $api_key"
                     ),
@@ -62,7 +97,7 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $response = curl_exec($curl);
                 $err = curl_error($curl);
                 curl_close($curl);
-                if(isset(json_decode($response)->errors)) {
+                if (isset(json_decode($response)->errors)) {
                     $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                     return $resultRedirect->setPath('*/*/');
                 }
@@ -77,5 +112,16 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
         }
         $this->messageManager->addErrorMessage(__('We can\'t find a Singlesend to duplicate.'));
         return $resultRedirect->setPath('*/*/');
+    }
+
+    /**
+     * @param string $value
+     * @return string
+     * @throws Exception
+     */
+    public function getCmsFilterContent($value = '')
+    {
+        $html = $this->_filterProvider->getPageFilter()->filter($value);
+        return $html;
     }
 }

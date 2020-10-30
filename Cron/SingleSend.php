@@ -23,141 +23,115 @@ namespace Lof\SendGrid\Cron;
 
 use Lof\SendGrid\Helper\Data;
 use Lof\SendGrid\Model\SingleSendFactory;
-use Magento\Backend\App\Action\Context;
-use Zend\Http\Client;
-use Zend\Http\Headers;
-use Zend\Http\Request;
-use Zend\Stdlib\Parameters;
+use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 
 /**
  * Class SingleSend
  *
  * @package Lof\SendGrid\Cron
  */
-class SingleSend extends \Magento\Backend\App\Action
+class SingleSend
 {
     /**
      * @var Data
      */
-    protected $helper;
+    private $helper;
+    /**
+     * @var DateTimeFactory
+     */
+    private $_dateFactory;
     /**
      * @var SingleSendFactory
      */
-    private SingleSendFactory $singlesend;
+    private $singlesend;
 
     /**
-     * Constructor
-     *
-     * @param Context $context
+     * SingleSend constructor.
      * @param Data $helper
-     * @param SingleSendFactory $singlesend
+     * @param SingleSendFactory $singleSendFactory
+     * @param DateTimeFactory $dateFactory
      */
     public function __construct(
-        Context $context,
         Data $helper,
-        SingleSendFactory $singlesend
+        SingleSendFactory $singleSendFactory,
+        DateTimeFactory $dateFactory
     ) {
-        $this->singlesend = $singlesend;
         $this->helper = $helper;
-        parent::__construct($context);
+        $this->_dateFactory = $dateFactory;
+        $this->singlesend = $singleSendFactory;
     }
 
     /**
-     * Execute view action
-     *
-     * @return \Magento\Framework\Controller\ResultInterface
-     * @throws \Exception
+     * @return void
      */
     public function execute()
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
-        if ($cron_enable == 1) {
+        if ($cron_enable) {
+            $curl = curl_init();
             $token = $this->helper->getSendGridConfig('general', 'api_key');
-            $httpHeaders = new Headers();
-            $httpHeaders->addHeaders([
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-            ]);
-            $request = new Request();
-            $request->setHeaders($httpHeaders);
-            $request->setUri('https://api.sendgrid.com/v3/marketing/singlesends');
-            $request->setMethod(Request::METHOD_GET);
 
-            $params = new Parameters();
-
-            $request->setQuery($params);
-            $client = new Client();
-            $options = [
-                'adapter'   => 'Zend\Http\Client\Adapter\Curl',
-                'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
-                'maxredirects' => 0,
-                'timeout' => 30
-            ];
-            $client->setOptions($options);
-            $response = $client->send($request);
-            $collection = ($response->getBody());
-            $object = json_decode($collection, false);
+            $object = $this->helper->getAllSingleSend($token);
             if (isset($object->errors)) {
-                $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
-                $resultRedirect = $this->resultRedirectFactory->create();
-                return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
+                return;
             }
             $items = get_object_vars($object)['result'];
-            if ($items) {
-                foreach ($items as $item) {
-                    if ($item && is_object($item) && isset($item->id)) {
-                        //save singlge send
-                        $model = $this->singlesend->create();
-                        $data = $this->helper->getDataSinglesend($item->id, $token);
-                        $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
-                        if (count($existing)) {
-                            $entity_id = $existing[0]['entity_id'];
-                            $model->load($entity_id);
-                        }
-                        if (isset($item->id)) {
-                            $model->setSinglesendId($item->id);
-                        }
-                        if (isset($item->name)) {
-                            $model->setName($item->name);
-                        }
-                        if (isset($item->updated_at)) {
-                            $model->setUpdateDate($item->updated_at);
-                        }
-                        if (isset($item->created_at)) {
-                            $model->setCreateDate($item->created_at);
-                        }
-                        if (isset($item->status)) {
-                            $model->setStatus($item->status);
-                        }
-                        if (isset($data->send_at)) {
-                            $model->setSendAt($data->send_at);
-                        }
-                        if (isset($data->email_config->sender_id)) {
-                            $model->setSenderId($data->email_config->sender_id);
-                        }
-                        if (isset($data->email_config->suppression_group_id)) {
-                            $model->setSuppressionGroupId($data->email_config->suppression_group_id);
-                        }
-                        if (isset($data->send_to->list_ids)) {
-                            $model->setListIds(json_encode($data->send_to->list_ids));
-                        }
-                        if (isset($data->email_config->subject)) {
-                            $model->setSubject($data->email_config->subject);
-                        }
-                        if (isset($data->email_config->html_content)) {
-                            $model->setHtmlContent($data->email_config->html_content);
-                        }
-                        if (isset($data->email_config->plain_content)) {
-                            $model->setPlainContent($data->email_config->plain_content);
-                        }
-                        if (isset($data->email_config->editor)) {
-                            $model->setEditor($data->email_config->editor);
-                        }
-                        $model->save();
-                    }
+            foreach ($items as $item) {
+                if (!isset($item->id)) {
+                    continue;
                 }
+                $model = $this->singlesend->create();
+                $data = $this->helper->getDataSinglesend($curl, $item->id, $token);
+                $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
+                if (count($existing)) {
+                    $entity_id = $existing[0]['entity_id'];
+                    $model->load($entity_id);
+                }
+                if (isset($item->id)) {
+                    $model->setSinglesendId($item->id);
+                }
+                if (isset($item->name)) {
+                    $model->setName($item->name);
+                }
+                if (isset($item->updated_at)) {
+                    $new_date_format = date('Y-m-d H:i:s', strtotime($item->updated_at));
+                    $model->setUpdateDate($new_date_format);
+                }
+                if (isset($item->created_at)) {
+                    $new_date_format = date('Y-m-d H:i:s', strtotime($item->created_at));
+                    $model->setCreateDate($new_date_format);
+                }
+                if (isset($item->status)) {
+                    $model->setStatus($item->status);
+                }
+                if (isset($data->send_at)) {
+                    $new_date_format = date('Y-m-d H:i:s', strtotime($item->send_at));
+                    $model->setSendAt($new_date_format);
+                }
+                if (isset($data->email_config->sender_id)) {
+                    $model->setSenderId($data->email_config->sender_id);
+                }
+                if (isset($data->email_config->suppression_group_id)) {
+                    $model->setSuppressionGroupId($data->email_config->suppression_group_id);
+                }
+                if (isset($data->send_to->list_ids)) {
+                    $model->setListIds(json_encode($data->send_to->list_ids));
+                }
+                if (isset($data->email_config->subject)) {
+                    $model->setSubject($data->email_config->subject);
+                }
+                if (isset($data->email_config->html_content)) {
+                    $model->setHtmlContent($data->email_config->html_content);
+                }
+                if (isset($data->email_config->plain_content)) {
+                    $model->setPlainContent($data->email_config->plain_content);
+                }
+                if (isset($data->email_config->editor)) {
+                    $model->setEditor($data->email_config->editor);
+                }
+                $model->save();
             }
+            curl_close($curl);
         }
     }
 }

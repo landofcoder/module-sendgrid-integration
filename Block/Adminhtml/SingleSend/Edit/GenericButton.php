@@ -4,6 +4,7 @@
 namespace Lof\SendGrid\Block\Adminhtml\SingleSend\Edit;
 
 use Magento\Backend\Block\Widget\Context;
+use Lof\SendGrid\Model\SingleSend;
 
 /**
  * Class GenericButton
@@ -12,14 +13,22 @@ use Magento\Backend\Block\Widget\Context;
  */
 abstract class GenericButton
 {
-
+    /**
+     * @var Context
+     */
     protected $context;
+    /**
+     * @var SingleSend
+     */
+    private $singleSend;
 
     /**
-     * @param \Magento\Backend\Block\Widget\Context $context
+     * @param Context $context
+     * @param SingleSend $singleSend
      */
-    public function __construct(Context $context)
+    public function __construct(Context $context, SingleSend $singleSend)
     {
+        $this->singleSend = $singleSend;
         $this->context = $context;
     }
 
@@ -43,5 +52,27 @@ abstract class GenericButton
     public function getUrl($route = '', $params = [])
     {
         return $this->context->getUrlBuilder()->getUrl($route, $params);
+    }
+
+    /**
+     * @return SingleSend
+     */
+    public function getSingleSend()
+    {
+        $id = $this->getModelId();
+        return $this->singleSend->load($id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkStatusTrigger()
+    {
+        $model = $this->getSingleSend();
+        if ($model->getStatus() == "triggered") {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

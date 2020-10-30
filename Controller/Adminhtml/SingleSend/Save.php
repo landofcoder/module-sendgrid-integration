@@ -101,7 +101,6 @@ class Save extends \Magento\Backend\App\Action
                 $senderId = $data['sender_id'];
                 $html = $this->getCmsFilterContent($data['html_content']);
                 $html = preg_replace("/\s+|\n+|\r/", ' ', $html);
-                $suppression_group_id = $data['suppression_group_id'];
                 $name = $data['name'];
                 $data['list_ids'] = json_encode($data['list_ids']);
                 $list = $data['list_ids'];
@@ -118,16 +117,16 @@ class Save extends \Magento\Backend\App\Action
                         $plainContent = $model->getPlainContent();
                         $editor = $model->getEditor();
                         $suppression_group_id = $model->getSuppressionGroupId();
-                        $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+                        $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subjet":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
                         $curl = curl_init();
                         curl_setopt_array($curl, array(
-                            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
+                            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/".$model->getSinglesendId(),
                             CURLOPT_RETURNTRANSFER => true,
                             CURLOPT_ENCODING => "",
                             CURLOPT_MAXREDIRS => 10,
                             CURLOPT_TIMEOUT => 30,
                             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                            CURLOPT_CUSTOMREQUEST => "POST",
+                            CURLOPT_CUSTOMREQUEST => "PATCH",
                             CURLOPT_POSTFIELDS => $dataUpdate,
                             CURLOPT_HTTPHEADER => array(
                                 "authorization: Bearer $api_key"
@@ -148,27 +147,30 @@ class Save extends \Magento\Backend\App\Action
                     $plainContent = $model->getPlainContent();
                     $editor = $model->getEditor();
                     $suppression_group_id = $model->getSuppressionGroupId();
-                    $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","editor":"'.$editor.'","suppression_group_id":"'.$suppression_group_id.'","sender_id":"'.$senderId.'"}}';
-
-                    $curl = curl_init();
-                    curl_setopt_array($curl, array(
-                        CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
-                        CURLOPT_RETURNTRANSFER => true,
-                        CURLOPT_ENCODING => "",
-                        CURLOPT_MAXREDIRS => 10,
-                        CURLOPT_TIMEOUT => 30,
-                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "POST",
-                        CURLOPT_POSTFIELDS => $dataUpdate,
-                        CURLOPT_HTTPHEADER => array(
-                            "authorization: Bearer $api_key"
-                        ),
-                    ));
-                    $response = curl_exec($curl);
-                    $err = curl_error($curl);
-                    curl_close($curl);
-                    if ($err) {
-                        throw new \Exception(__($err));
+                    $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+                    try {
+                        $curl = curl_init();
+                        curl_setopt_array($curl, array(
+                            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING => "",
+                            CURLOPT_MAXREDIRS => 10,
+                            CURLOPT_TIMEOUT => 30,
+                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST => "POST",
+                            CURLOPT_POSTFIELDS => $dataUpdate,
+                            CURLOPT_HTTPHEADER => array(
+                                "authorization: Bearer $api_key"
+                            ),
+                        ));
+                        $response = curl_exec($curl);
+                        $err = curl_error($curl);
+                        curl_close($curl);
+                        if ($err) {
+                            throw new \Exception(__($err));
+                        }
+                    } catch (\Exception $e) {
+                        $this->messageManager->addErrorMessage($e);
                     }
                     $model->setSinglesendId(json_decode($response)->id);
                 }

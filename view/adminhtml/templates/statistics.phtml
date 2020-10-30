@@ -7,8 +7,8 @@ $api_key = $helper->getSendGridConfig('general', 'api_key');
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['line']});
-        google.charts.setOnLoadCallback(drawChart);
-        function getResponse(callback) {
+        // google.charts.setOnLoadCallback(drawChart);
+        function getResponse() {
             require(['jquery', 'jquery/ui'], function($){
                 $('#btn-apply').on("click", function() {
                     var start = $('#start').val();
@@ -24,73 +24,71 @@ $api_key = $helper->getSendGridConfig('general', 'api_key');
                         "data": "{}"
                     }
                     $.ajax(settings).done(function (response) {
-                        $("#statistics").html('');
-                        callback(response);
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('string', 'Day');
+                        data.addColumn('number', 'Blocks');
+                        data.addColumn('number', 'Bounce Drop');
+                        data.addColumn('number', 'Bounces');
+                        data.addColumn('number', 'Clicks');
+                        data.addColumn('number', 'Deferred');
+                        data.addColumn('number', 'Delivered');
+                        data.addColumn('number', 'Invalid Emails');
+                        data.addColumn('number', 'Opens');
+                        data.addColumn('number', 'Processed');
+                        data.addColumn('number', 'Requests');
+                        data.addColumn('number', 'Spam Report Drops');
+                        data.addColumn('number', 'Spam Report');
+                        data.addColumn('number', 'Unique Clicks');
+                        data.addColumn('number', 'Unique Opens');
+                        data.addColumn('number', 'Unsubscribe Drops');
+                        data.addColumn('number', 'Unsubscribes');
+
+                        response.forEach(myFunction);
+                        var chart = new google.charts.Line(document.getElementById('statistics'));
+                        function myFunction(item) {
+                            data.addRows([
+                                [
+                                    item.date,
+                                    item.stats['0'].metrics.blocks,
+                                    item.stats['0'].metrics.bounce_drops,
+                                    item.stats['0'].metrics.bounces,
+                                    item.stats['0'].metrics.clicks,
+                                    item.stats['0'].metrics.deferred,
+                                    item.stats['0'].metrics.delivered,
+                                    item.stats['0'].metrics.invalid_emails,
+                                    item.stats['0'].metrics.opens,
+                                    item.stats['0'].metrics.processed,
+                                    item.stats['0'].metrics.requests,
+                                    item.stats['0'].metrics.spam_report_drops,
+                                    item.stats['0'].metrics.spam_reports,
+                                    item.stats['0'].metrics.unique_clicks,
+                                    item.stats['0'].metrics.unique_opens,
+                                    item.stats['0'].metrics.unsubscribe_drops,
+                                    item.stats['0'].metrics.unsubscribes
+                                ],
+                            ]);
+                        }
+                        var options = {
+                            chart: {
+                                title: 'SendGrid Statistics',
+                                subtitle: '(times)'
+                            },
+                            width: 1600,
+                            height: 700,
+                            axes: {
+                                x: {
+                                    0: {side: 'bottom'}
+                                }
+                            }
+                        };
+                        chart.clearChart();
+                        chart.draw(data, google.charts.Line.convertOptions(options));
                     });
                 });
             });
         }
-        function drawChart() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Day');
-            data.addColumn('number', 'Blocks');
-            data.addColumn('number', 'Bounce Drop');
-            data.addColumn('number', 'Bounces');
-            data.addColumn('number', 'Clicks');
-            data.addColumn('number', 'Deferred');
-            data.addColumn('number', 'Delivered');
-            data.addColumn('number', 'Invalid Emails');
-            data.addColumn('number', 'Opens');
-            data.addColumn('number', 'Processed');
-            data.addColumn('number', 'Requests');
-            data.addColumn('number', 'Spam Report Drops');
-            data.addColumn('number', 'Spam Report');
-            data.addColumn('number', 'Unique Clicks');
-            data.addColumn('number', 'Unique Opens');
-            data.addColumn('number', 'Unsubscribe Drops');
-            data.addColumn('number', 'Unsubscribes');
-            getResponse(function(response) {
-                response.forEach(myFunction);
-                function myFunction(item) {
-                    data.addRows([
-                        [
-                            item.date,
-                            item.stats['0'].metrics.blocks,
-                            item.stats['0'].metrics.bounce_drops,
-                            item.stats['0'].metrics.bounces,
-                            item.stats['0'].metrics.clicks,
-                            item.stats['0'].metrics.deferred,
-                            item.stats['0'].metrics.delivered,
-                            item.stats['0'].metrics.invalid_emails,
-                            item.stats['0'].metrics.opens,
-                            item.stats['0'].metrics.processed,
-                            item.stats['0'].metrics.requests,
-                            item.stats['0'].metrics.spam_report_drops,
-                            item.stats['0'].metrics.spam_reports,
-                            item.stats['0'].metrics.unique_clicks,
-                            item.stats['0'].metrics.unique_opens,
-                            item.stats['0'].metrics.unsubscribe_drops,
-                            item.stats['0'].metrics.unsubscribes
-                        ],
-                    ]);
-                }
-                var options = {
-                    chart: {
-                        title: 'SendGrid Statistics',
-                        subtitle: '(times)'
-                    },
-                    width: 1600,
-                    height: 700,
-                    axes: {
-                        x: {
-                            0: {side: 'bottom'}
-                        }
-                    }
-                };
-                var chart = new google.charts.Line(document.getElementById('statistics'));
-                chart.draw(data, google.charts.Line.convertOptions(options));
-            })
-        }
+
+        getResponse();
     </script>
 </head>
 <body>
