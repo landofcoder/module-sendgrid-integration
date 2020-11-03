@@ -2,7 +2,13 @@
 
 
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
+
 use Lof\SendGrid\Helper\Data;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Registry;
+
 /**
  * Class Delete
  *
@@ -12,11 +18,10 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
 {
     protected $_helperdata;
     public function __construct(
-        \Magento\Backend\App\Action\Context $context,
+        Context $context,
         Data $helper,
-        \Magento\Framework\Registry $coreRegistry
-    )
-    {
+        Registry $coreRegistry
+    ) {
         $this->_helperdata = $helper;
         parent::__construct($context, $coreRegistry);
     }
@@ -24,11 +29,11 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
     /**
      * Delete action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
-        /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
+        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         // check if we know what should be deleted
         $id = $this->getRequest()->getParam('entity_id');
@@ -40,7 +45,7 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $singlesend_id = $model->getSinglesendId();
                 $response = $this->_helperdata->deleteSingleSend($api_key, $singlesend_id);
-                if(isset(json_decode($response)->errors)) {
+                if (isset(json_decode($response)->errors)) {
                     $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                     return $resultRedirect->setPath('*/*/');
                 }

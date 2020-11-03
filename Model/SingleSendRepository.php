@@ -1,18 +1,18 @@
 <?php
 /**
  * LandOfCoder
- * 
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
  * http://www.landofcoder.com/license-agreement.html
- * 
+ *
  * DISCLAIMER
- * 
+ *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
- * 
+ *
  * @category   LandOfCoder
  * @package    Lof_SendGrid
  * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
@@ -21,6 +21,7 @@
 
 namespace Lof\SendGrid\Model;
 
+use Lof\SendGrid\Api\Data\SingleSendInterface;
 use Lof\SendGrid\Api\SingleSendRepositoryInterface;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\App\ResourceConnection;
@@ -33,6 +34,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\App\ObjectManager;
+
 /**
  * Class SingleSend
  *
@@ -40,7 +42,6 @@ use Magento\Framework\App\ObjectManager;
  */
 class SingleSendRepository implements SingleSendRepositoryInterface
 {
-
     protected $resource;
     protected $modelFactory;
     protected $collectionFactory;
@@ -76,7 +77,7 @@ class SingleSendRepository implements SingleSendRepositoryInterface
     public function __construct(
         \Lof\SendGrid\Model\ResourceModel\SingleSend $resource,
         \Lof\SendGrid\Model\SingleSendFactory $modelFactory,
-        \Lof\SendGrid\Api\Data\SingleSendInterface $dataFactory,
+        SingleSendInterface $dataFactory,
         \Lof\SendGrid\Model\ResourceModel\SingleSend\CollectionFactory $collectionFactory,
         \Lof\SendGrid\Api\Data\SingleSendSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
@@ -102,8 +103,8 @@ class SingleSendRepository implements SingleSendRepositoryInterface
      * {@inheritdoc}
      */
     public function save(
-        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
-    ){
+        SingleSendInterface $singleSend
+    ) {
         try {
             $model = $this->modelFactory->create();
             $id = $singleSend->getEntityId();
@@ -114,8 +115,6 @@ class SingleSendRepository implements SingleSendRepositoryInterface
                 'create_date' => $singleSend->getCreateDate(),
                 'update_date' => $singleSend->getUpdateDate(),
                 'status' => $singleSend->getStatus(),
-                'template_version' => $singleSend->getTemplateVersion(),
-                'template_id' => $singleSend->getTemplateId(),
                 'send_at' => $singleSend->getSendAt(),
                 'sender_id' => $singleSend->getSenderId(),
                 'suppression_group_id' => $singleSend->getSuppressionGroupId(),
@@ -135,7 +134,8 @@ class SingleSendRepository implements SingleSendRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function get($singlesendId){
+    public function get($singlesendId)
+    {
         $singleSend = $this->modelFactory->create();
         $this->resource->load($singleSend, $singlesendId);
         if (!$singleSend->getId()) {
@@ -149,7 +149,7 @@ class SingleSendRepository implements SingleSendRepositoryInterface
      */
     public function getList(
         \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-    ){
+    ) {
         $collection = $this->collectionFactory->create();
         foreach ($criteria->getFilterGroups() as $filterGroup) {
             $fields = [];
@@ -165,7 +165,7 @@ class SingleSendRepository implements SingleSendRepositoryInterface
             }
             $collection->addFieldToFilter($fields, $conditions);
         }
-        
+
         $sortOrders = $criteria->getSortOrders();
         if ($sortOrders) {
             /** @var SortOrder $sortOrder */
@@ -178,7 +178,7 @@ class SingleSendRepository implements SingleSendRepositoryInterface
         }
         $collection->setCurPage($criteria->getCurrentPage());
         $collection->setPageSize($criteria->getPageSize());
-        
+
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
         $searchResults->setTotalCount($collection->getSize());
@@ -190,8 +190,8 @@ class SingleSendRepository implements SingleSendRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        \Lof\SendGrid\Api\Data\SingleSendInterface $singleSend
-    ){
+        SingleSendInterface $singleSend
+    ) {
         try {
             $this->resource->delete($singleSend);
         } catch (\Exception $exception) {
@@ -206,7 +206,8 @@ class SingleSendRepository implements SingleSendRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteById($singlesendId){
+    public function deleteById($singlesendId)
+    {
         return $this->delete($this->getById($singlesendId));
     }
 }

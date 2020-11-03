@@ -1,18 +1,18 @@
 <?php
 /**
  * LandOfCoder
- * 
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
  * http://www.landofcoder.com/license-agreement.html
- * 
+ *
  * DISCLAIMER
- * 
+ *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
- * 
+ *
  * @category   LandOfCoder
  * @package    Lof_SendGrid
  * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
@@ -28,7 +28,6 @@ namespace Lof\SendGrid\Api\Data;
  */
 interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInterface
 {
-
     const ENTITY_ID = 'entity_id';
     const CREATE_DATE = 'create_date';
     const NAME = 'name';
@@ -36,8 +35,6 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     const SINGLESEND_ID = 'singlesend_id';
     const UPDATE_DATE = 'update_date';
     const EMAIL_HTML = 'email_html';
-    const TEMPLATE_VERSION = 'template_version';
-    const TEMPLATE_ID = 'template_id';
     const SEND_AT = 'send_at';
     const SENDER_ID = 'sender_id';
     const SUPPRESSION_GROUP_ID = 'suppression_group_id';
@@ -56,10 +53,10 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
      */
     public function setSinglesendId($singlesendId);
 
-     /**
-     * Get send_at
-     * @return string|null
-     */
+    /**
+    * Get send_at
+    * @return string|null
+    */
     public function getSendAt();
 
     /**
@@ -95,10 +92,10 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
      */
     public function setListIds($list_ids);
 
-     /**
-     * Get suppression_group_id
-     * @return string|null
-     */
+    /**
+    * Get suppression_group_id
+    * @return string|null
+    */
     public function getSuppressionGroupId();
 
     /**
@@ -109,18 +106,6 @@ interface SingleSendInterface extends \Magento\Framework\Api\ExtensibleDataInter
     public function setSuppressionGroupId($suppression_group_id);
 
 
-    /**
-     * Get template_id
-     * @return string|null
-     */
-    public function getTemplateId();
-
-    /**
-     * Set template_id
-     * @param string $template_id
-     * @return \Lof\SendGrid\Api\Data\SingleSendInterface
-     */
-    public function setTemplateId($template_id);
 
     /**
      * Get entity_id

@@ -23,32 +23,29 @@
 
 namespace Lof\SendGrid\Model\Config\Source;
 
-use Lof\SendGrid\Helper\Data;
+use Lof\SendGrid\Model\ResourceModel\Subscriber\CollectionFactory;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\Option\ArrayInterface;
 
 /**
  * Class Sender
  *
  * @package Lof\SendGrid\Model\Config\Source
  */
-class ListIds implements \Magento\Framework\Option\ArrayInterface
+class ListIds implements ArrayInterface
 {
-    /**
-     * @var Data
-     */
-    private $helper;
     /**
      * @var Context
      */
     private $context;
     /**
-     * @var \Lof\SendGrid\Model\ResourceModel\Subscriber\CollectionFactory
+     * @var CollectionFactory
      */
     private $_collection;
 
     public function __construct(
         Context $context,
-        \Lof\SendGrid\Model\ResourceModel\Subscriber\CollectionFactory $collection
+        CollectionFactory $collection
     ) {
         $this->context = $context;
         $this->_collection = $collection;

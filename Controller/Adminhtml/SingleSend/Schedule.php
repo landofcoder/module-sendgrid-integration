@@ -20,10 +20,6 @@ class Schedule extends \Magento\Backend\App\Action
      */
     private $_dateFactory;
     /**
-     * @var \Lof\SendGrid\Model\VersionsFactory
-     */
-    private $version;
-    /**
      * @var Data
      */
     private $_helperdata;
@@ -36,13 +32,11 @@ class Schedule extends \Magento\Backend\App\Action
         \Magento\Backend\App\Action\Context $context,
         \Lof\SendGrid\Helper\Data $helper,
         FilterProvider $filterProvider,
-        \Lof\SendGrid\Model\VersionsFactory $versionsFactory,
         DateTimeFactory $dateFactory,
         \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
     ) {
         $this->_helperdata = $helper;
         $this->dataPersistor = $dataPersistor;
-        $this->version = $versionsFactory;
         $this->_filterProvider = $filterProvider;
         $this->_dateFactory = $dateFactory;
         parent::__construct($context);

@@ -3,6 +3,10 @@
 
 namespace Lof\SendGrid\Ui\Component\Listing\Column;
 
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
+
 /**
  * Class SingleSendActions
  *
@@ -10,7 +14,6 @@ namespace Lof\SendGrid\Ui\Component\Listing\Column;
  */
 class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
 {
-
     const URL_PATH_DELETE = 'lof_sendgrid/singlesend/delete';
     const URL_PATH_DUPLICATE = 'lof_sendgrid/singlesend/duplicate';
     const URL_PATH_EDIT = 'lof_sendgrid/singlesend/edit';
@@ -18,16 +21,16 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
     const URL_PATH_PREVIEW = 'lof_sendgrid/singlesend/preview';
 
     /**
-     * @param \Magento\Framework\View\Element\UiComponent\ContextInterface $context
-     * @param \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory
-     * @param \Magento\Framework\UrlInterface $urlBuilder
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param UrlInterface $urlBuilder
      * @param array $components
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\View\Element\UiComponent\ContextInterface $context,
-        \Magento\Framework\View\Element\UiComponentFactory $uiComponentFactory,
-        \Magento\Framework\UrlInterface $urlBuilder,
+        ContextInterface $context,
+        UiComponentFactory $uiComponentFactory,
+        UrlInterface $urlBuilder,
         array $components = [],
         array $data = []
     ) {
@@ -51,8 +54,7 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             'href' => $this->urlBuilder->getUrl(
                                 static::URL_PATH_EDIT,
                                 [
-                                    'entity_id' => $item['entity_id'],
-                                    'template_version' =>$item['template_version']
+                                    'entity_id' => $item['entity_id']
                                 ]
                             ),
                             'label' => __('Edit')
@@ -66,8 +68,8 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             ),
                             'label' => __('Delete'),
                             'confirm' => [
-                                'title' => __('Delete "%1"',$item['name']),
-                                'message' => __('Are you sure you wan\'t to delete a "%1" record?',$item['name'])
+                                'title' => __('Delete "%1"', $item['name']),
+                                'message' => __('Are you sure you wan\'t to delete a "%1" record?', $item['name'])
                             ]
                         ],
                         'duplicate' => [
@@ -79,8 +81,8 @@ class SingleSendActions extends \Magento\Ui\Component\Listing\Columns\Column
                             ),
                             'label' => __('Duplicate'),
                             'confirm' => [
-                                'title' => __('Duplicate "%1"',$item['name']),
-                                'message' => __('Are you sure you wan\'t to duplicate a "%1" record?',$item['name'])
+                                'title' => __('Duplicate "%1"', $item['name']),
+                                'message' => __('Are you sure you wan\'t to duplicate a "%1" record?', $item['name'])
                             ]
                         ],
                         'preview' => [
