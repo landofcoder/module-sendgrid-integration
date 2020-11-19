@@ -42,7 +42,7 @@ class SyncContact
     /**
      * @var UnSubscriberFactory
      */
-    private UnSubscriberFactory $_unsubscriber;
+    private $_unsubscriber;
     /**
      * @var \Lof\SendGrid\Model\SubscriberFactory
      */
