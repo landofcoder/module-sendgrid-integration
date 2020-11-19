@@ -23,7 +23,7 @@ class Edit extends SingleSend
     /**
      * @var SingleSendFactory
      */
-    private SingleSendFactory $singleSend;
+    private $singleSend;
 
     /**
      * @param Context $context

@@ -33,7 +33,7 @@ class Save extends \Magento\Backend\App\Action
     /**
      * @var FilterProvider
      */
-    private FilterProvider $_filterProvider;
+    private $_filterProvider;
 
     /**
      * @param Context $context
