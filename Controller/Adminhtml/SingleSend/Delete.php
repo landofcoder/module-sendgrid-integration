@@ -44,7 +44,7 @@ class Delete extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $model->load($id);
                 $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
                 $singlesend_id = $model->getSinglesendId();
-                $response = $this->_helperdata->deleteSingleSend($api_key, $singlesend_id);
+                $response = $this->_helperdata->deleteSingleSend($singlesend_id);
                 if (isset(json_decode($response)->errors)) {
                     $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                     return $resultRedirect->setPath('*/*/');

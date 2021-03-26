@@ -1,0 +1,19 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: $row().status === 'DRAFT' -->
+<div class="data-grid-cell-content lofbl-status-box lofbl-status-draft" text="$col.getLabel($row())"/>
+<!-- /ko -->
+
+<!-- ko if: $row().status === 'TRIGGERED' -->
+<div class="data-grid-cell-content lofbl-status-box lofbl-status-triggered" text="$col.getLabel($row())"/>
+<!-- /ko -->
+
+<!-- ko if: $row().status === 'SCHEDULED' -->
+<div class="data-grid-cell-content lofbl-status-box lofbl-status-scheduled" text="$col.getLabel($row())"/>
+<!-- /ko -->
+
+

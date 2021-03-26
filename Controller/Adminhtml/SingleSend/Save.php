@@ -187,7 +187,7 @@ class Save extends \Magento\Backend\App\Action
                                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
                             }
                         }
-                        $this->_helperdata->schedule($api_key, $model->getSinglesendId(), $date);
+                        $this->_helperdata->schedule($model->getSinglesendId(), $date);
                         $model->setStatus('scheduled');
                         $model->save();
                     }

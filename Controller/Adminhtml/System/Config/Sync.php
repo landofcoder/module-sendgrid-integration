@@ -100,7 +100,7 @@ class Sync extends \Lof\SendGrid\Controller\Adminhtml\Sync
         $this->SyncSingleSend($curl, $token);
 
         // sync sender
-        $this->SyncSender($token);
+        $this->SyncSender();
 
         //sync unscriber and unsubscriber groups
         $this->SyncContact($curl, $token);

@@ -69,7 +69,7 @@ class MassDelete extends \Magento\Backend\App\Action implements HttpPostActionIn
             $singlesend->delete();
             $api_key = $this->_helperData->getSendGridConfig('general', 'api_key');
             $singlesend_id = $singlesend->getSinglesendId();
-            $response = $this->_helperData->deleteSingleSend($api_key, $singlesend_id);
+            $response = $this->_helperData->deleteSingleSend($singlesend_id);
             if (isset(json_decode($response)->errors)) {
                 $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                 return $resultRedirect->setPath('*/*/');

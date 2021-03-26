@@ -147,7 +147,7 @@ abstract class Sync extends \Magento\Backend\App\Action
                 continue;
             }
             $model = $this->singlesend->create();
-            $data = $this->helper->getDataSinglesend($curl, $item->id, $token);
+            $data = $this->helper->getDataSinglesend($item->id);
             $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
             if (count($existing)) {
                 $entity_id = $existing[0]['entity_id'];
@@ -199,12 +199,10 @@ abstract class Sync extends \Magento\Backend\App\Action
         }
     }
 
-    /**
-     * @param $token
-     */
-    public function SyncSender($token)
+
+    public function SyncSender()
     {
-        $senders = $this->helper->getAllSenders($token);
+        $senders = $this->helper->getAllSenders();
         foreach ($senders as $sender) {
             $model = $this->_sender->create();
             if (!isset($sender->id)) {
@@ -268,14 +266,14 @@ abstract class Sync extends \Magento\Backend\App\Action
         $unsubscriber_list = $this->helper->getSendGridConfig('general', 'unsubscribe_list');
         $other_list = $this->helper->getSendGridConfig('general', 'other_group');
         $list_subscriber_id = '';
-        $list = $this->helper->getAllList($curl, $token);
+        $list = $this->helper->getAllList();
         $items = get_object_vars($list)['result'];
         foreach ($items as $item) {
             if (isset($item->name) && $item->name == $subscriber_list) {
                 $list_subscriber_id = $item->id;
             }
         }
-        $list_unsubscriber = $this->helper->getUnsubscriberGroup($curl, $token);
+        $list_unsubscriber = $this->helper->getUnsubscriberGroup();
         $unsubscriber_id = '';
         $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
@@ -290,9 +288,9 @@ abstract class Sync extends \Magento\Backend\App\Action
         }
 
         $this->helper->syncSubscriber($curl, $token, $list_subscriber_id, $unsubscriber_id);
-        $this->helper->syncSubscriberToM2($curl, $token, $list_subscriber_id);
+        $this->helper->syncSubscriberToM2($list_subscriber_id);
 
-        $subscribers_groups = $this->helper->getAllList($curl, $token);
+        $subscribers_groups = $this->helper->getAllList();
         $subscribers_groups = get_object_vars($subscribers_groups)['result'];
         foreach ($subscribers_groups as $subscribers_group) {
             $model = $this->_subscriber->create();
@@ -305,7 +303,7 @@ abstract class Sync extends \Magento\Backend\App\Action
                 ->setSubscriberCount($subscribers_group->contact_count);
             $model->save();
         }
-        $unsubscribers_groups = $this->helper->getUnsubscriberGroup($curl, $token);
+        $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
         foreach ($unsubscribers_groups as $unsubscribers_group) {
             $model = $this->_unsubscriber->create();
             $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)->getData();
@@ -331,7 +329,7 @@ abstract class Sync extends \Magento\Backend\App\Action
             }
         }
         if ($list_other_email != '') {
-            $response = $this->helper->syncUnsubscriber($curl, $token, $other_list_id, $list_other_email);
+            $response = $this->helper->syncUnsubscriber($other_list_id, $list_other_email);
             if (isset($response->recipient_emails)) {
                 foreach ($addressBookCollection as $addressBook) {
                     $addressBook->setIsSynced('1');

@@ -1,0 +1,30 @@
+.lofbl-status-box {
+    border: 1px solid;
+    display: block;
+    font-weight: 700;
+    line-height: 17px;
+    padding: 0 3px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.lofbl-status-draft {
+    background: rgba(250, 137, 137, 0.92);
+    border-color: #1C1C1C;
+    color: #1C1C1C;
+}
+
+.lofbl-status-scheduled {
+    background: rgba(0, 255, 127, 0.92);
+    border-color: #1C1C1C;
+    color: #1C1C1C;
+}
+
+.lofbl-status-triggered {
+    background: rgba(0, 191, 255, 0.92);
+    border-color: #1C1C1C;
+    color: #1C1C1C;
+}
+
+
+

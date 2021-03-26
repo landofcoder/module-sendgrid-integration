@@ -81,7 +81,7 @@ class SingleSend
                     continue;
                 }
                 $model = $this->singlesend->create();
-                $data = $this->helper->getDataSinglesend($curl, $item->id, $token);
+                $data = $this->helper->getDataSinglesend($item->id);
                 $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
                 if (count($existing)) {
                     $entity_id = $existing[0]['entity_id'];

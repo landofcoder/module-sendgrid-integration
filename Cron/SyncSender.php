@@ -58,7 +58,7 @@ class SyncSender
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
             $token = $this->helper->getSendGridConfig('general', 'api_key');
-            $senders = $this->helper->getAllSenders($token);
+            $senders = $this->helper->getAllSenders();
             foreach ($senders as $sender) {
                 $model = $this->_sender->create();
                 if (!isset($sender->id)) {

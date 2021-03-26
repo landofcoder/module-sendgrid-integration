@@ -78,7 +78,7 @@ class Schedule extends \Magento\Backend\App\Action
                     $this->messageManager->addErrorMessage(__("Can't schedule send single send in the past. Please enter a time in the future"));
                     return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
                 }
-                $this->_helperdata->schedule($api_key, $singlesendId, $date);
+                $this->_helperdata->schedule($singlesendId, $date);
             } else {
                 $this->messageManager->addErrorMessage(__("Single send was not saved. Please save the single send then schedule it"));
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
