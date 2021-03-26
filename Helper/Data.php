@@ -108,7 +108,7 @@ class Data extends AbstractHelper
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => "{\"list_ids\": [\" $list_id  \"],\"contacts\":[".$contact."]}",
+            CURLOPT_POSTFIELDS => "{\"list_ids\": [\"$list_id\"],\"contacts\":[".$contact."]}",
             CURLOPT_HTTPHEADER => array(
                 "authorization: Bearer $api_key",
                 "content-type: application/json"
@@ -420,7 +420,7 @@ class Data extends AbstractHelper
             print_r($response->headers());
             print $response->body() . "\n";
         } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+            echo 'Caught exception: ', $e->getMessage(), "\n";
         }
     }
 }

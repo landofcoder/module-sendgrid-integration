@@ -256,6 +256,7 @@ abstract class Sync extends \Magento\Backend\App\Action
     /**
      * @param $curl
      * @param $token
+     * @throws \Exception
      */
     public function SyncContact($curl, $token)
     {
