@@ -1,36 +1,37 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Controller\Adminhtml;
 
 use Lof\SendGrid\Helper\Data;
+use Lof\SendGrid\Model\AddressBookFactory;
 use Lof\SendGrid\Model\SenderFactory;
 use Lof\SendGrid\Model\SingleSendFactory;
+use Lof\SendGrid\Model\SubscriberFactory;
 use Lof\SendGrid\Model\UnSubscriberFactory;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Newsletter\Model\SubscriberFactory;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
-use Lof\SendGrid\Model\AddressBookFactory;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 /**
  * Class Sync
@@ -80,7 +81,7 @@ abstract class Sync extends \Magento\Backend\App\Action
      */
     public $_subcriberCollectionFactory;
     /**
-     * @var \Lof\SendGrid\Model\SubscriberFactory
+     * @var SubscriberFactory
      */
     public $_subscriber;
 
@@ -95,7 +96,7 @@ abstract class Sync extends \Magento\Backend\App\Action
      * @param SenderFactory $senderFactory
      * @param DateTimeFactory $dateFactory
      * @param AddressBookFactory $addressBookFactory
-     * @param \Lof\SendGrid\Model\SubscriberFactory $subscriber
+     * @param SubscriberFactory $subscriber
      * @param UnSubscriberFactory $unsubscriber
      * @param \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
      */
@@ -109,7 +110,7 @@ abstract class Sync extends \Magento\Backend\App\Action
         SenderFactory $senderFactory,
         DateTimeFactory $dateFactory,
         AddressBookFactory $addressBookFactory,
-        \Lof\SendGrid\Model\SubscriberFactory $subscriber,
+        SubscriberFactory $subscriber,
         UnSubscriberFactory $unsubscriber,
         \Magento\Newsletter\Model\ResourceModel\Subscriber\CollectionFactory $subcriberCollectionFactory
     ) {
@@ -129,19 +130,17 @@ abstract class Sync extends \Magento\Backend\App\Action
     }
 
     /**
-     * @param $curl
-     * @param $token
-     * @return \Magento\Framework\Controller\Result\Redirect
+     * @return Redirect
      */
-    public function SyncSingleSend($curl, $token)
+    public function SyncSingleSend()
     {
-        $object = $this->helper->getAllSingleSend($token);
-        if (isset($object->errors)) {
+        $singleSends = $this->helper->getAllSingleSend();
+        if (!isset($singleSends->result)) {
             $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
             $resultRedirect = $this->resultRedirectFactory->create();
             return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
-        $items = get_object_vars($object)['result'];
+        $items = $singleSends->result;
         foreach ($items as $item) {
             if (!isset($item->id)) {
                 continue;
@@ -200,6 +199,9 @@ abstract class Sync extends \Magento\Backend\App\Action
     }
 
 
+    /**
+     *
+     */
     public function SyncSender()
     {
         $senders = $this->helper->getAllSenders();
@@ -252,11 +254,9 @@ abstract class Sync extends \Magento\Backend\App\Action
     }
 
     /**
-     * @param $curl
-     * @param $token
      * @throws \Exception
      */
-    public function SyncContact($curl, $token)
+    public function SyncContact()
     {
         if ($this->helper->getSendGridConfig('general', 'add_customer')) {
             $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
@@ -267,7 +267,12 @@ abstract class Sync extends \Magento\Backend\App\Action
         $other_list = $this->helper->getSendGridConfig('general', 'other_group');
         $list_subscriber_id = '';
         $list = $this->helper->getAllList();
-        $items = get_object_vars($list)['result'];
+        if (!isset($list->result)) {
+            $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
+            $resultRedirect = $this->resultRedirectFactory->create();
+            return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
+        }
+        $items = $list->result;
         foreach ($items as $item) {
             if (isset($item->name) && $item->name == $subscriber_list) {
                 $list_subscriber_id = $item->id;
@@ -287,11 +292,10 @@ abstract class Sync extends \Magento\Backend\App\Action
             }
         }
 
-        $this->helper->syncSubscriber($curl, $token, $list_subscriber_id, $unsubscriber_id);
+        $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
         $this->helper->syncSubscriberToM2($list_subscriber_id);
 
-        $subscribers_groups = $this->helper->getAllList();
-        $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+        $subscribers_groups = $items;
         foreach ($subscribers_groups as $subscribers_group) {
             $model = $this->_subscriber->create();
             $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();

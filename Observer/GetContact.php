@@ -1,22 +1,22 @@
 <?php
 /**
- * LandOfCoder
- * 
+ * Landofcoder
+ *
  * NOTICE OF LICENSE
- * 
+ *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
- * 
+ * https://landofcoder.com/terms
+ *
  * DISCLAIMER
- * 
+ *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
- * 
- * @category   LandOfCoder
+ *
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 namespace Lof\SendGrid\Observer;
 

@@ -6,7 +6,7 @@
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
@@ -14,15 +14,19 @@
  * version in the future.
  *
  * @category   Landofcoder
- * @package    Lof_PosReceipt
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.landofcoder.com/)
- * @license    http://www.landofcoder.com/LICENSE-1.0.html
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 namespace Lof\SendGrid\Controller\Adminhtml\Statistics;
 
 class Index extends \Magento\Framework\App\Action\Action
 {
     protected $_pageFactory;
+    /**
+     * @var \Lof\SendGrid\Helper\Data
+     */
+    private $_helperdata;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -36,8 +40,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
-        if ($this->_helperdata->testAPI($api_key) == false) {
+        if ($this->_helperdata->testAPI() == false) {
             $this->messageManager->addErrorMessage(__("Somethings went wrong. Please check your Api key"));
             return;
         }

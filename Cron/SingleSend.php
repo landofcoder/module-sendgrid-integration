@@ -1,22 +1,22 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Cron;
@@ -68,14 +68,11 @@ class SingleSend
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $curl = curl_init();
-            $token = $this->helper->getSendGridConfig('general', 'api_key');
-
-            $object = $this->helper->getAllSingleSend($token);
-            if (isset($object->errors)) {
+            $object = $this->helper->getAllSingleSend();
+            if (!isset($object->result) || !$object->result) {
                 return;
             }
-            $items = get_object_vars($object)['result'];
+            $items = $object->result;
             foreach ($items as $item) {
                 if (!isset($item->id)) {
                     continue;
@@ -131,7 +128,6 @@ class SingleSend
                 }
                 $model->save();
             }
-            curl_close($curl);
         }
     }
 }

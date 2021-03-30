@@ -1,5 +1,23 @@
 <?php
-
+/**
+ * Landofcoder
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Landofcoder.com license that is
+ * available through the world-wide-web at this URL:
+ * https://landofcoder.com/terms
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category   Landofcoder
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
+ */
 
 namespace Lof\SendGrid\Controller\Adminhtml\Sender;
 
@@ -20,6 +38,9 @@ use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
  */
 class Save extends \Magento\Backend\App\Action
 {
+    /**
+     * @var DataPersistorInterface
+     */
     protected $dataPersistor;
     /**
      * @var DateTimeFactory
@@ -66,14 +87,13 @@ class Save extends \Magento\Backend\App\Action
         /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
-        $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
         if ($data) {
             try {
                 $model = $this->_objectManager->create(\Lof\SendGrid\Model\Sender::class);
-                if (! (filter_var($data['from'], FILTER_VALIDATE_EMAIL))) {
+                if (!(filter_var($data['from'], FILTER_VALIDATE_EMAIL))) {
                     throw new \Exception(__('Please enter the correct email.'));
                 }
-                if (! (filter_var($data['reply_to'], FILTER_VALIDATE_EMAIL))) {
+                if (!(filter_var($data['reply_to'], FILTER_VALIDATE_EMAIL))) {
                     throw new \Exception(__('Please enter the correct email.'));
                 }
                 if (!$this->getRequest()->isPost()) {
@@ -108,37 +128,25 @@ class Save extends \Magento\Backend\App\Action
                 $address = $data['address'];
                 $city = $data['city'];
                 $country = $data['country'];
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/senders",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => "{\"nickname\":\"$nickname\",\"from\":{\"email\":\"$from\",\"name\":\"$fromName\"},\"reply_to\":{\"email\":\"$replyTo\"},\"address\":\"$address\",\"city\":\"$city\",\"country\":\"$country\"}",
-                    CURLOPT_HTTPHEADER => array(
-                        "authorization: Bearer $api_key",
-                        "content-type: application/json"
-                    ),
-                ));
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
-                if ($err) {
-                    throw new \Exception(__('Something went wrong while saving the Sender.'));
-                }
-                curl_close($curl);
-                $collection = $this->collection->create()->addFieldToFilter('nick_name', $model->getNickName())->getData();
+                $url = "https://api.sendgrid.com/v3/marketing/senders";
+                $data = "{\"nickname\":\"$nickname\",\"from\":{\"email\":\"$from\",\"name\":\"$fromName\"},\"reply_to\":{\"email\":\"$replyTo\"},\"address\":\"$address\",\"city\":\"$city\",\"country\":\"$country\"}";
+                $type = "POST";
+                $response = $this->_helperdata->sendRestApi($url, $type, $data);
+                $collection = $this->collection->create()
+                    ->addFieldToFilter('nick_name', $model->getNickName())->getData();
                 if (count($collection)) {
-                    $this->messageManager->addErrorMessage(__('You already have a sender identity with the same nickname.'));
+                    $this->messageManager->addErrorMessage(
+                        __('You already have a sender identity with the same nickname.')
+                    );
                     return $resultRedirect->setPath('*/*/');
                 }
                 if (isset(json_decode($response)->id)) {
                     $model->setSenderId(json_decode($response)->id);
                     try {
                         $model->save();
-                        $this->messageManager->addSuccessMessage(__('You have created the Sender. Please check your email and verify it'));
+                        $this->messageManager->addSuccessMessage(
+                            __('You have created the Sender. Please check your email and verify it')
+                        );
                         $this->dataPersistor->clear('lof_sendgrid_senders');
                         return $resultRedirect->setPath('*/*/');
                     } catch (LocalizedException $e) {

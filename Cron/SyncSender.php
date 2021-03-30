@@ -1,22 +1,22 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Cron;
@@ -57,7 +57,6 @@ class SyncSender
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $token = $this->helper->getSendGridConfig('general', 'api_key');
             $senders = $this->helper->getAllSenders();
             foreach ($senders as $sender) {
                 $model = $this->_sender->create();

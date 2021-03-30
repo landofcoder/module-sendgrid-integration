@@ -1,22 +1,22 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Cron;
@@ -69,8 +69,6 @@ class SyncContact
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $curl = curl_init();
-            $token = $this->helper->getSendGridConfig('general', 'api_key');
             if ($this->helper->getSendGridConfig('general', 'add_customer')) {
                 $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
             } else {
@@ -80,7 +78,10 @@ class SyncContact
             $other_list = $this->helper->getSendGridConfig('general', 'other_group');
             $list_subscriber_id = '';
             $list = $this->helper->getAllList();
-            $items = get_object_vars($list)['result'];
+            if (!isset($list->result) || !$list->result) {
+                return;
+            }
+            $items = $list->result;
             foreach ($items as $item) {
                 if (isset($item->name) && $item->name == $subscriber_list) {
                     $list_subscriber_id = $item->id;
@@ -103,8 +104,7 @@ class SyncContact
             $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
             $this->helper->syncSubscriberToM2($list_subscriber_id);
 
-            $subscribers_groups = $this->helper->getAllList();
-            $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+            $subscribers_groups = $items;
             foreach ($subscribers_groups as $subscribers_group) {
                 $model = $this->_subscriber->create();
                 $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();
@@ -150,7 +150,6 @@ class SyncContact
                     }
                 }
             }
-            curl_close($curl);
         }
     }
 }

@@ -1,3 +1,23 @@
+/*
+ * Landofcoder
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Landofcoder.com license that is
+ * available through the world-wide-web at this URL:
+ * https://landofcoder.com/terms
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category   Landofcoder
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
+ */
+
 .lofbl-status-box {
     border: 1px solid;
     display: block;
@@ -9,21 +29,21 @@
 }
 
 .lofbl-status-draft {
-    background: rgba(250, 137, 137, 0.92);
-    border-color: #1C1C1C;
-    color: #1C1C1C;
+    background: rgba(255, 253, 157, 0.92);
+    border-color: #615d01;
+    color: #615d01;
 }
 
 .lofbl-status-scheduled {
-    background: rgba(0, 255, 127, 0.92);
-    border-color: #1C1C1C;
-    color: #1C1C1C;
+    background: rgba(161, 227, 255, 0.92);
+    border-color: #24556c;
+    color: #24556c;
 }
 
 .lofbl-status-triggered {
-    background: rgba(0, 191, 255, 0.92);
-    border-color: #1C1C1C;
-    color: #1C1C1C;
+    background: #d0e5a9 none repeat scroll 0 0;
+    border-color: #5b8116;
+    color: #185b00;
 }
 
 
