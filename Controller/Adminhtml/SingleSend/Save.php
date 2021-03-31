@@ -133,24 +133,13 @@ class Save extends \Magento\Backend\App\Action
                         return $resultRedirect;
                     } else {
                         $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
-                        $plainContent = $model->getPlainContent();
-                        $editor = $model->getEditor();
                         $suppression_group_id = $model->getSuppressionGroupId();
-                        $dataUpdate = '{
-                            "name":"' . $name . '",
-                            "send_to":{"list_ids":' . $list . '},
-                            "email_config":{"subjet":"' . $subject . '",
-                            "html_content":' . $html . ',
-                            "plain_content":"' . $plainContent . '",
-                            "generate_plain_content":true,"editor":"' . $editor . '",
-                            "suppression_group_id":' . $suppression_group_id . ',
-                            "sender_id":' . $senderId . '}
-                        }';
-                        $url = "https://api.sendgrid.com/v3/marketing/singlesends/" . $model->getSinglesendId();
+                        $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+                        $url = "https://api.sendgrid.com/v3/marketing/singlesends/".$model->getSinglesendId();
                         $type = "PATCH";
 
                         $response = $this->_helperdata->sendRestApi($url, $type, $dataUpdate);
-                        if (isset(json_decode($response)->errors)) {
+                        if (!isset(json_decode($response)->id)) {
                             throw new \Exception(__("Something went wrong while save campaign."));
                         }
                     }
@@ -159,21 +148,21 @@ class Save extends \Magento\Backend\App\Action
                     $model->setCreateDate($this->_dateFactory->create()->gmtDate());
                     $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                     $model->setStatus('draft');
-                    $plainContent = $model->getPlainContent();
-                    $editor = $model->getEditor();
                     $suppression_group_id = $model->getSuppressionGroupId();
-                    $dataUpdate = '{"name":"' . $name . '","send_to":{"list_ids":' . $list . '},"email_config":{"subject":"' . $subject . '","html_content":"' . $html . '","plain_content":"' . $plainContent . '","generate_plain_content":true,"editor":"' . $editor . '","suppression_group_id":' . $suppression_group_id . ',"sender_id":' . $senderId . '}}';
+                    $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+
                     try {
                         $url = "https://api.sendgrid.com/v3/marketing/singlesends";
                         $type = "POST";
                         $response = $this->_helperdata->sendRestApi($url, $type, $dataUpdate);
-                        if (json_decode($response)->error) {
-                            throw new \Exception(__(json_decode($response)->error));
+                        if (isset(json_decode($response)->errors)) {
+                            throw new \Exception(__("Something went wrong while save campaign."));
+                        } else {
+                            $model->setSinglesendId(json_decode($response)->id);
                         }
                     } catch (\Exception $e) {
-                        $this->messageManager->addErrorMessage($e);
+                        throw new \Exception(__($e));
                     }
-                    $model->setSinglesendId(json_decode($response)->id);
                 }
 
                 try {
@@ -184,8 +173,13 @@ class Save extends \Magento\Backend\App\Action
                         } else {
                             $date = $data['send_at'];
                             if ($date < $this->_dateFactory->create()->gmtDate()) {
-                                $this->messageManager->addErrorMessage(__("Can't schedule send single send in the past. Please enter a time in the future"));
-                                return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
+                                $this->messageManager->addErrorMessage(
+                                    __("Can't schedule send single send in the past. Please enter a time in the future")
+                                );
+                                return $resultRedirect->setPath(
+                                    '*/*/edit',
+                                    ['entity_id' => $this->getRequest()->getParam('entity_id')]
+                                );
                             }
                         }
                         $this->_helperdata->schedule($model->getSinglesendId(), $date);
@@ -202,7 +196,10 @@ class Save extends \Magento\Backend\App\Action
                 } catch (LocalizedException $e) {
                     $this->messageManager->addErrorMessage($e->getMessage());
                 } catch (Exception $e) {
-                    $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the Single Send.'));
+                    $this->messageManager->addExceptionMessage(
+                        $e,
+                        __('Something went wrong while saving the Single Send.')
+                    );
                 }
                 $this->dataPersistor->set('lof_sendgrid_singlesend', $data);
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $model->getId()]);
@@ -221,7 +218,6 @@ class Save extends \Magento\Backend\App\Action
      */
     public function getCmsFilterContent($value = '')
     {
-        $html = $this->_filterProvider->getPageFilter()->filter($value);
-        return $html;
+        return $this->_filterProvider->getPageFilter()->filter($value);
     }
 }

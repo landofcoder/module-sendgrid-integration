@@ -102,7 +102,7 @@ class Data extends AbstractHelper
     public function getAllSingleSend()
     {
         $url = 'https://api.sendgrid.com/v3/marketing/singlesends';
-        return $this->sendApi($url);
+        return $this->sendApi($url, "GET", []);
     }
 
     /**
@@ -262,7 +262,7 @@ class Data extends AbstractHelper
     public function getDataSinglesend($id)
     {
         $url = "https://api.sendgrid.com/v3/marketing/singlesends/$id";
-        return $this->sendApi($url);
+        return $this->sendApi($url, "GET", []);
     }
 
     /**
@@ -349,9 +349,11 @@ class Data extends AbstractHelper
 
     /**
      * @param $url
+     * @param $type
+     * @param $data
      * @return mixed
      */
-    public function sendApi($url)
+    public function sendApi($url, $type, $data)
     {
         $token = $this->getSendGridConfig('general', 'api_key');
         $httpHeaders = new \Zend\Http\Headers();
@@ -363,9 +365,10 @@ class Data extends AbstractHelper
         $request = new \Zend\Http\Request();
         $request->setHeaders($httpHeaders);
         $request->setUri($url);
-        $request->setMethod(\Zend\Http\Request::METHOD_GET);
-        $params = new \Zend\Stdlib\Parameters();
+        $request->setMethod($type);
+        $params = new \Zend\Stdlib\Parameters($data);
         $request->setQuery($params);
+
         $client = new \Zend\Http\Client();
         $options = [
             'adapter'   => 'Zend\Http\Client\Adapter\Curl',
