@@ -1,4 +1,24 @@
 <?php
+/**
+ * Landofcoder
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Landofcoder.com license that is
+ * available through the world-wide-web at this URL:
+ * https://landofcoder.com/terms
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category   Landofcoder
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
+ */
+
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
 use Exception;
@@ -53,7 +73,6 @@ class Schedule extends \Magento\Backend\App\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
-        $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
         var_dump($data);
         if ($data) {
             $id = $this->getRequest()->getParam('entity_id');
@@ -78,7 +97,7 @@ class Schedule extends \Magento\Backend\App\Action
                     $this->messageManager->addErrorMessage(__("Can't schedule send single send in the past. Please enter a time in the future"));
                     return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
                 }
-                $this->_helperdata->schedule($api_key, $singlesendId, $date);
+                $this->_helperdata->schedule($singlesendId, $date);
             } else {
                 $this->messageManager->addErrorMessage(__("Single send was not saved. Please save the single send then schedule it"));
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);

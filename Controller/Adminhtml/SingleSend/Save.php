@@ -1,4 +1,23 @@
 <?php
+/**
+ * Landofcoder
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Landofcoder.com license that is
+ * available through the world-wide-web at this URL:
+ * https://landofcoder.com/terms
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category   Landofcoder
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
+ */
 
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
@@ -6,10 +25,10 @@ use Exception;
 use Lof\SendGrid\Helper\Data;
 use Lof\SendGrid\Model\SingleSendFactory;
 use Magento\Backend\App\Action\Context;
+use Magento\Cms\Model\Template\FilterProvider;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
-use Magento\Cms\Model\Template\FilterProvider;
 
 /**
  * Class Save
@@ -70,8 +89,7 @@ class Save extends \Magento\Backend\App\Action
         /** @var \Magento\Backend\Model\View\Result\Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $data = $this->getRequest()->getPostValue();
-        $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
-        if ($this->_helperdata->testAPI($api_key) == false) {
+        if ($this->_helperdata->testAPI() == false) {
             $this->messageManager->addErrorMessage(__("Somethings went wrong. Please check your Api key"));
             return $resultRedirect->setPath('*/*/');
         }
@@ -101,6 +119,7 @@ class Save extends \Magento\Backend\App\Action
                 $senderId = $data['sender_id'];
                 $html = $this->getCmsFilterContent($data['html_content']);
                 $html = preg_replace("/\s+|\n+|\r/", ' ', $html);
+                $html = str_replace("\"", "\\\"", $html);
                 $name = $data['name'];
                 $data['list_ids'] = json_encode($data['list_ids']);
                 $list = $data['list_ids'];
@@ -114,65 +133,36 @@ class Save extends \Magento\Backend\App\Action
                         return $resultRedirect;
                     } else {
                         $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
-                        $plainContent = $model->getPlainContent();
-                        $editor = $model->getEditor();
                         $suppression_group_id = $model->getSuppressionGroupId();
-                        $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subjet":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
-                        $curl = curl_init();
-                        curl_setopt_array($curl, array(
-                            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/".$model->getSinglesendId(),
-                            CURLOPT_RETURNTRANSFER => true,
-                            CURLOPT_ENCODING => "",
-                            CURLOPT_MAXREDIRS => 10,
-                            CURLOPT_TIMEOUT => 30,
-                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                            CURLOPT_CUSTOMREQUEST => "PATCH",
-                            CURLOPT_POSTFIELDS => $dataUpdate,
-                            CURLOPT_HTTPHEADER => array(
-                                "authorization: Bearer $api_key"
-                            ),
-                        ));
-                        $response = curl_exec($curl);
-                        $err = curl_error($curl);
-                        if ($err) {
-                            throw new \Exception(__($err));
+                        $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+                        $url = "https://api.sendgrid.com/v3/marketing/singlesends/".$model->getSinglesendId();
+                        $type = "PATCH";
+
+                        $response = $this->_helperdata->sendRestApi($url, $type, $dataUpdate);
+                        if (!isset(json_decode($response)->id)) {
+                            throw new \Exception(__("Something went wrong while save campaign."));
                         }
-                        curl_close($curl);
                     }
                 } else {
                     $model->setData($data);
                     $model->setCreateDate($this->_dateFactory->create()->gmtDate());
                     $model->setUpdateDate($this->_dateFactory->create()->gmtDate());
                     $model->setStatus('draft');
-                    $plainContent = $model->getPlainContent();
-                    $editor = $model->getEditor();
                     $suppression_group_id = $model->getSuppressionGroupId();
-                    $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+                    $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$list.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
+
                     try {
-                        $curl = curl_init();
-                        curl_setopt_array($curl, array(
-                            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
-                            CURLOPT_RETURNTRANSFER => true,
-                            CURLOPT_ENCODING => "",
-                            CURLOPT_MAXREDIRS => 10,
-                            CURLOPT_TIMEOUT => 30,
-                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                            CURLOPT_CUSTOMREQUEST => "POST",
-                            CURLOPT_POSTFIELDS => $dataUpdate,
-                            CURLOPT_HTTPHEADER => array(
-                                "authorization: Bearer $api_key"
-                            ),
-                        ));
-                        $response = curl_exec($curl);
-                        $err = curl_error($curl);
-                        curl_close($curl);
-                        if ($err) {
-                            throw new \Exception(__($err));
+                        $url = "https://api.sendgrid.com/v3/marketing/singlesends";
+                        $type = "POST";
+                        $response = $this->_helperdata->sendRestApi($url, $type, $dataUpdate);
+                        if (isset(json_decode($response)->errors)) {
+                            throw new \Exception(__("Something went wrong while save campaign."));
+                        } else {
+                            $model->setSinglesendId(json_decode($response)->id);
                         }
                     } catch (\Exception $e) {
-                        $this->messageManager->addErrorMessage($e);
+                        throw new \Exception(__($e));
                     }
-                    $model->setSinglesendId(json_decode($response)->id);
                 }
 
                 try {
@@ -183,11 +173,16 @@ class Save extends \Magento\Backend\App\Action
                         } else {
                             $date = $data['send_at'];
                             if ($date < $this->_dateFactory->create()->gmtDate()) {
-                                $this->messageManager->addErrorMessage(__("Can't schedule send single send in the past. Please enter a time in the future"));
-                                return $resultRedirect->setPath('*/*/edit', ['entity_id' => $this->getRequest()->getParam('entity_id')]);
+                                $this->messageManager->addErrorMessage(
+                                    __("Can't schedule send single send in the past. Please enter a time in the future")
+                                );
+                                return $resultRedirect->setPath(
+                                    '*/*/edit',
+                                    ['entity_id' => $this->getRequest()->getParam('entity_id')]
+                                );
                             }
                         }
-                        $this->_helperdata->schedule($api_key, $model->getSinglesendId(), $date);
+                        $this->_helperdata->schedule($model->getSinglesendId(), $date);
                         $model->setStatus('scheduled');
                         $model->save();
                     }
@@ -201,7 +196,10 @@ class Save extends \Magento\Backend\App\Action
                 } catch (LocalizedException $e) {
                     $this->messageManager->addErrorMessage($e->getMessage());
                 } catch (Exception $e) {
-                    $this->messageManager->addExceptionMessage($e, __('Something went wrong while saving the Single Send.'));
+                    $this->messageManager->addExceptionMessage(
+                        $e,
+                        __('Something went wrong while saving the Single Send.')
+                    );
                 }
                 $this->dataPersistor->set('lof_sendgrid_singlesend', $data);
                 return $resultRedirect->setPath('*/*/edit', ['entity_id' => $model->getId()]);
@@ -220,7 +218,6 @@ class Save extends \Magento\Backend\App\Action
      */
     public function getCmsFilterContent($value = '')
     {
-        $html = $this->_filterProvider->getPageFilter()->filter($value);
-        return $html;
+        return $this->_filterProvider->getPageFilter()->filter($value);
     }
 }

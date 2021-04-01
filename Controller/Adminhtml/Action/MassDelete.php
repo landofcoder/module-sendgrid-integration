@@ -6,7 +6,7 @@
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
@@ -15,8 +15,8 @@
  *
  * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.landofcoder.com/)
- * @license    http://www.landofcoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 namespace Lof\SendGrid\Controller\Adminhtml\Action;
 
@@ -67,9 +67,8 @@ class MassDelete extends \Magento\Backend\App\Action implements HttpPostActionIn
 
         foreach ($collection as $singlesend) {
             $singlesend->delete();
-            $api_key = $this->_helperData->getSendGridConfig('general', 'api_key');
             $singlesend_id = $singlesend->getSinglesendId();
-            $response = $this->_helperData->deleteSingleSend($api_key, $singlesend_id);
+            $response = $this->_helperData->deleteSingleSend($singlesend_id);
             if (isset(json_decode($response)->errors)) {
                 $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                 return $resultRedirect->setPath('*/*/');

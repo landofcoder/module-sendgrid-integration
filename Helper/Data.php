@@ -1,34 +1,43 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 namespace Lof\SendGrid\Helper;
 
+use Exception;
+use Magento\Customer\Model\ResourceModel\Customer\Collection;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
-use Magento\Framework\App\Helper\AbstractHelper;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Newsletter\Model\SubscriberFactory;
+use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Newsletter\Model\SubscriberFactory;
+use Magento\Store\Model\ScopeInterface;
 
+/**
+ * Class Data
+ * @package Lof\SendGrid\Helper
+ */
 class Data extends AbstractHelper
 {
+    /**
+     *
+     */
     const XML_PATH_SENDGRID = 'sendgrid/';
     /**
      * @var ManagerInterface
@@ -43,6 +52,13 @@ class Data extends AbstractHelper
      */
     private $_subscriberFactory;
 
+    /**
+     * Data constructor.
+     * @param CollectionFactory $customerFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param SubscriberFactory $subscriberFactory
+     * @param ManagerInterface $manager
+     */
     public function __construct(
         CollectionFactory $customerFactory,
         ScopeConfigInterface $scopeConfig,
@@ -55,6 +71,11 @@ class Data extends AbstractHelper
         $this->_messageManager = $manager;
     }
 
+    /**
+     * @param $field
+     * @param null $storeId
+     * @return mixed
+     */
     public function getConfigValue($field, $storeId = null)
     {
         return $this->scopeConfig->getValue(
@@ -63,13 +84,326 @@ class Data extends AbstractHelper
             $storeId
         );
     }
+
+    /**
+     * @param $group
+     * @param $code
+     * @param null $storeId
+     * @return mixed
+     */
     public function getSendGridConfig($group, $code, $storeId = null)
     {
         return $this->getConfigValue(self::XML_PATH_SENDGRID .$group.'/'. $code, $storeId);
     }
 
-    public function getAllSingleSend($token)
+    /**
+     * @return mixed
+     */
+    public function getAllSingleSend()
     {
+        $url = 'https://api.sendgrid.com/v3/marketing/singlesends';
+        return $this->sendApi($url, "GET", []);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCustomerCollection()
+    {
+        return $this->_customerFactory->create();
+    }
+
+    /**
+     * @param $contact
+     * @param $list_id
+     */
+    public function sync($contact, $list_id)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/contacts";
+        $type = "PUT";
+        $data = "{\"list_ids\":[\"$list_id\"],\"contacts\":[".$contact."]}";
+        $response = $this->sendRestApi($url, $type, $data);
+        if (!$list_id) {
+            $this->_messageManager->addNoticeMessage(
+                __("Please select Subscribe, UnSubscribe Group and save, then sync again.")
+            );
+        } else {
+            if (strpos($response, 'job_id')) {
+                $this->_messageManager->addSuccessMessage(__("Contacts have been synced"));
+            } else {
+                $this->_messageManager->addErrorMessage(__("Something went wrong. Can't sync contacts"));
+            }
+        }
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getAllList()
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/lists?page_size=100";
+        $type = "GET";
+        $data = "{}";
+        $response = $this->sendRestApi($url, $type, $data);
+        $res = json_decode($response, false);
+        if (isset($res->result) && count($res->result)) {
+            return $res;
+        } else {
+            $sub = $this->createNewSubscribeGroup("Magento 2 Subscriber Group");
+            $arr['result'][0] = $sub;
+            return $arr;
+        }
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function createNewSubscribeGroup($name)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/lists";
+        $type = "POST";
+        $data = "{\"name\":\"$name\"}";
+        $response = $this->sendRestApi($url, $type, $data);
+        return json_decode($response, false);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContacts()
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/contacts";
+        $type = "GET";
+        $data = "{}";
+        $response = $this->sendRestApi($url, $type, $data);
+        return json_decode($response, false);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUnsubscriberGroup()
+    {
+        $url = "https://api.sendgrid.com/v3/asm/groups";
+        $type = "GET";
+        $data = "{}";
+        $response = $this->sendRestApi($url, $type, $data);
+        $res = json_decode($response, false);
+        if (count($res)) {
+            return $res;
+        } else {
+            $sub = $this->createNewUnsubscribeGroup("Magento 2 UnSubscriber Group", "Magento 2 UnSubscriber Group");
+            $arr[0] = $sub;
+            return $arr;
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $des
+     * @return mixed
+     */
+    public function createNewUnsubscribeGroup($name, $des)
+    {
+        $url = "https://api.sendgrid.com/v3/asm/groups";
+        $type = "POST";
+        $data = "{\"name\":\"$name\",\"description\":\"$des\"}";
+        $response = $this->sendRestApi($url, $type, $data);
+        return json_decode($response, false);
+    }
+
+    /**
+     * @param $list_subscriber_id
+     * @throws Exception
+     */
+    public function syncSubscriberToM2($list_subscriber_id)
+    {
+        $contacts = $this->getContacts();
+        if (isset($contacts->result) && $contacts->result) {
+            $items = $contacts->result;
+            foreach ($items as $item) {
+                if (isset($item->list_ids)) {
+                    if (in_array($list_subscriber_id, $item->list_ids)) {
+                        $subscriber = $this->_subscriberFactory->create();
+                        $existing = $subscriber->getCollection()
+                            ->addFieldToFilter("subscriber_email", $item->email)->getFirstItem();
+                        if ($existing->getData()) {
+                            $subscriber->setSubscriberEmail($item->email)
+                                ->setCustomerFirstname($item->first_name)
+                                ->setCustomerLastname($item->last_name)
+                                ->setStatus('1');
+                            $subscriber->save();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $list_subscriber_id
+     * @param $unsubscriber_list_id
+     */
+    public function syncSubscriber($list_subscriber_id, $unsubscriber_list_id)
+    {
+        $sub = $this->_subscriberFactory->create()->getCollection();
+        $unsub = $this->_subscriberFactory->create()->getCollection();
+        $subscriber = '';
+        if ($this->getSendGridConfig('general', 'add_customer') == 0) {
+            $sub->addFieldToFilter('subscriber_status', '1');
+            $unsub->addFieldToFilter('subscriber_status', '3');
+            if (count($sub)) {
+                foreach ($sub as $item) {
+                    $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
+                    if ($subscriber == '') {
+                        $subscriber .= $arr;
+                    } else {
+                        $subscriber .= ','.$arr;
+                    }
+                }
+                $this->sync($subscriber, $list_subscriber_id);
+            }
+            if (count($unsub)) {
+                $arr2 = '';
+                foreach ($unsub as $item) {
+                    if ($arr2 == '') {
+                        $arr2 .= "\"".$item->getSubscriberEmail()."\"";
+                    } else {
+                        $arr2 .= ",\"".$item->getSubscriberEmail()."\"";
+                    }
+                }
+                $this->syncUnsubscriber($unsubscriber_list_id, $arr2);
+            }
+        } else {
+            if (count($sub)) {
+                foreach ($sub as $item) {
+                    $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
+                    if ($subscriber == '') {
+                        $subscriber .= $arr;
+                    } else {
+                        $subscriber .= ','.$arr;
+                    }
+                }
+                $this->sync($subscriber, $list_subscriber_id);
+            }
+        }
+    }
+
+    /**
+     * @param $list_unsubscriber_id
+     * @param $list_email
+     * @return mixed
+     */
+    public function syncUnsubscriber($list_unsubscriber_id, $list_email)
+    {
+        $url = "https://api.sendgrid.com/v3/asm/groups/$list_unsubscriber_id/suppressions";
+        $type = "POST";
+        $data = "{\"recipient_emails\":[$list_email]}";
+        $response = $this->sendRestApi($url, $type, $data);
+        return json_decode($response);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function getDataSinglesend($id)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/singlesends/$id";
+        return $this->sendApi($url, "GET", []);
+    }
+
+    /**
+     * @param $singlesend_id
+     * @return bool|string
+     */
+    public function deleteSingleSend($singlesend_id)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/singlesends/$singlesend_id";
+        $type = "DELETE";
+        $data = "{}";
+        return $this->sendRestApi($url, $type, $data);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAllSenders()
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/senders";
+        $type = "GET";
+
+        return $this->sendApi($url, $type, []);
+    }
+
+    /**
+     * @param $singlesendId
+     * @param $date
+     */
+    public function schedule($singlesendId, $date)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/singlesends/$singlesendId/schedule";
+        $type = "PUT";
+        $data = "{\"send_at\":\"$date\"}";
+        $this->sendRestApi($url, $type, $data);
+    }
+
+    /**
+     * @return bool
+     */
+    public function testAPI()
+    {
+        $url = "https://api.sendgrid.com/v3/scopes";
+        $type = "GET";
+        $data = "{}";
+        $response = $this->sendRestApi($url, $type, $data);
+        if (isset(json_decode($response)->scopes)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param $url
+     * @param $type
+     * @param $data
+     * @return bool|string
+     */
+    public function sendRestApi($url, $type, $data)
+    {
+        $curl = curl_init();
+        $api_key = $this->getSendGridConfig('general', 'api_key');
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => $type,
+            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_HTTPHEADER => array(
+                "authorization: Bearer $api_key",
+                "content-type: application/json"
+            ),
+        ));
+        $res = curl_exec($curl);
+        curl_close($curl);
+        return $res;
+    }
+
+    /**
+     * @param $url
+     * @param $type
+     * @param $data
+     * @return mixed
+     */
+    public function sendApi($url, $type, $data)
+    {
+        $token = $this->getSendGridConfig('general', 'api_key');
         $httpHeaders = new \Zend\Http\Headers();
         $httpHeaders->addHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -78,10 +412,11 @@ class Data extends AbstractHelper
         ]);
         $request = new \Zend\Http\Request();
         $request->setHeaders($httpHeaders);
-        $request->setUri('https://api.sendgrid.com/v3/marketing/singlesends');
-        $request->setMethod(\Zend\Http\Request::METHOD_GET);
-        $params = new \Zend\Stdlib\Parameters();
+        $request->setUri($url);
+        $request->setMethod($type);
+        $params = new \Zend\Stdlib\Parameters($data);
         $request->setQuery($params);
+
         $client = new \Zend\Http\Client();
         $options = [
             'adapter'   => 'Zend\Http\Client\Adapter\Curl',
@@ -93,334 +428,5 @@ class Data extends AbstractHelper
         $response = $client->send($request);
         $collection = ($response->getBody());
         return json_decode($collection, false);
-    }
-    public function getCustomerCollection()
-    {
-        return $this->_customerFactory->create();
-    }
-    public function sync($curl, $contact, $list_id, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => "{\"list_ids\": [\" $list_id  \"],\"contacts\":[".$contact."]}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        if ($err) {
-            $this->_messageManager->addErrorMessage(__($err));
-        } else {
-            if (strpos($response, 'job_id')) {
-                $this->_messageManager->addSuccessMessage(__("Contacts have been synced"));
-            } else {
-                $this->_messageManager->addErrorMessage(__("Something went wrong. Can't sync contacts"));
-            }
-        }
-    }
-    public function getAllList($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/lists?page_size=100",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        if ($err) {
-            return '';
-        } else {
-            return json_decode($response, false);
-        }
-    }
-    public function getContacts($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/contacts",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $err = curl_error($curl);
-        $response = curl_exec($curl);
-        return json_decode($response, false);
-    }
-    public function getUnsubscriberGroup($curl, $api_key)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        if ($err) {
-            return '';
-        } else {
-            return json_decode($response, false);
-        }
-    }
-    public function syncSubscriberToM2($curl, $api_key, $list_subscriber_id)
-    {
-        $contacts = $this->getContacts($curl, $api_key);
-        $items = get_object_vars($contacts)['result'];
-        foreach ($items as $item) {
-            if (isset($item->list_ids)) {
-                if (in_array($list_subscriber_id, $item->list_ids)) {
-                    $subscriber = $this->_subscriberFactory->create();
-                    $existing = $subscriber->getCollection()->addFieldToFilter("subscriber_email", $item->email)->getData();
-                    if (count($existing) == 0) {
-                        $subscriber->setSubscriberEmail($item->email)->setCustomerFirstname($item->first_name)->setCustomerLastname($item->last_name)->setStatus('1');
-                        $subscriber->save();
-                    }
-                }
-            }
-        }
-    }
-    public function syncSubscriber($curl, $api_key, $list_subscriber_id, $unsubscriber_list_id)
-    {
-        $sub = $this->_subscriberFactory->create()->getCollection();
-        $unsub = $this->_subscriberFactory->create()->getCollection();
-        if ($this->getSendGridConfig('general', 'add_customer') == 0) {
-            $sub->addFieldToFilter('subscriber_status', '1');
-            $unsub->addFieldToFilter('subscriber_status', '3');
-            $subscriber = '';
-            if (count($sub)) {
-                foreach ($sub as $item) {
-                    $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
-                    if ($subscriber == '') {
-                        $subscriber .= $arr;
-                    } else {
-                        $subscriber .= ','.$arr;
-                    }
-                }
-                $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
-            }
-            if (count($unsub)) {
-                $arr2 = '';
-                foreach ($unsub as $item) {
-                    if ($arr2 == '') {
-                        $arr2 .= "\"".$item->getSubscriberEmail()."\"";
-                    } else {
-                        $arr2 .= ",\"".$item->getSubscriberEmail()."\"";
-                    }
-                }
-                $this->syncUnsubscriber($curl, $api_key, $unsubscriber_list_id, $arr2);
-            }
-        } else {
-            $subscriber = '';
-            if (count($sub)) {
-                foreach ($sub as $item) {
-                    $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
-                    if ($subscriber == '') {
-                        $subscriber .= $arr;
-                    } else {
-                        $subscriber .= ','.$arr;
-                    }
-                }
-                $this->sync($curl, $subscriber, $list_subscriber_id, $api_key);
-            }
-        }
-    }
-    public function syncUnsubscriber($curl, $api_key, $list_unsubscriber_id, $list_email)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/asm/groups/$list_unsubscriber_id/suppressions",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\"recipient_emails\":[$list_email]}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        return json_decode($response);
-    }
-    public function getDataSinglesend($curl, $id, $token)
-    {
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $token"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        return json_decode($response, false);
-    }
-
-    public function deleteSingleSend($api_key, $singlesend_id)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$singlesend_id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "DELETE",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        return $response;
-    }
-    public function getAllSenders($api_key)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/senders",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key",
-                "content-type: application/json"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if ($err) {
-            echo "cURL Error #:" . $err;
-        } else {
-            return json_decode($response);
-        }
-    }
-    public function schedule($api_key, $singlesendId, $date)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends/$singlesendId/schedule",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => "{\"send_at\":\"$date\"}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-    }
-    public function testAPI($api_key)
-    {
-        $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.sendgrid.com/v3/scopes",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_POSTFIELDS => "{}",
-            CURLOPT_HTTPHEADER => array(
-                "authorization: Bearer $api_key"
-            ),
-        ));
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-        curl_close($curl);
-        if (isset(json_decode($response)->scopes)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function createSingleSend($sg, $data)
-    {
-        $data = json_decode($data);
-        try {
-            $response = $sg->client->campaigns()->post($data);
-            print $response->statusCode() . "\n";
-            print_r($response->headers());
-            print $response->body() . "\n";
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        }
-    }
-
-    public function updateSingleSend($sg, $singleSendId, $data)
-    {
-
-        $query_params = json_decode('{"limit": 1, "offset": 1}');
-
-        try {
-            $response = $sg->client->campaigns()->get(null, $query_params);
-            print $response->statusCode() . "\n";
-            print_r($response->headers());
-            print $response->body() . "\n";
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        }
-
-        $request_body = json_decode($data);
-        try {
-            $response = $sg->client->campaigns()->_($singleSendId)->patch($request_body);
-            print $response->statusCode() . "\n";
-            print_r($response->headers());
-            print $response->body() . "\n";
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        }
     }
 }

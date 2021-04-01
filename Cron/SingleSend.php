@@ -1,22 +1,22 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Cron;
@@ -63,25 +63,25 @@ class SingleSend
 
     /**
      * @return void
+     * @throws \Exception
      */
     public function execute()
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $curl = curl_init();
-            $token = $this->helper->getSendGridConfig('general', 'api_key');
-
-            $object = $this->helper->getAllSingleSend($token);
-            if (isset($object->errors)) {
+            $singleSends = $this->helper->getAllSingleSend();
+            if (!isset($singleSends->result) || !$singleSends->result) {
                 return;
             }
-            $items = get_object_vars($object)['result'];
+            $items = $singleSends->result;
+            $singleSendIds = [];
             foreach ($items as $item) {
                 if (!isset($item->id)) {
                     continue;
                 }
+                $singleSendIds[] = $item->id;
                 $model = $this->singlesend->create();
-                $data = $this->helper->getDataSinglesend($curl, $item->id, $token);
+                $data = $this->helper->getDataSinglesend($item->id);
                 $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
                 if (count($existing)) {
                     $entity_id = $existing[0]['entity_id'];
@@ -131,7 +131,11 @@ class SingleSend
                 }
                 $model->save();
             }
-            curl_close($curl);
+            $singleSendCollectionDelete = $this->singlesend->create()->getCollection();
+            if ($singleSendIds) {
+                $singleSendCollectionDelete->addFieldToFilter('singlesend_id', ['nin' => $singleSendIds]);
+            }
+            $singleSendCollectionDelete->walk('delete');
         }
     }
 }

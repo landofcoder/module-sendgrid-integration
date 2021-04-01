@@ -1,31 +1,30 @@
 <?php
 /**
- * LandOfCoder
+ * Landofcoder
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Landofcoder.com license that is
  * available through the world-wide-web at this URL:
- * http://www.landofcoder.com/license-agreement.html
+ * https://landofcoder.com/terms
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade this extension to newer
  * version in the future.
  *
- * @category   LandOfCoder
+ * @category   Landofcoder
  * @package    Lof_SendGrid
- * @copyright  Copyright (c) 2020 Landofcoder (http://www.LandOfCoder.com/)
- * @license    http://www.LandOfCoder.com/LICENSE-1.0.html
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
  */
 
 namespace Lof\SendGrid\Cron;
 
 use Lof\SendGrid\Helper\Data;
-use Magento\Framework\Controller\ResultInterface;
-use Magento\Newsletter\Model\SubscriberFactory;
+use Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory;
+use Lof\SendGrid\Model\SubscriberFactory;
 use Lof\SendGrid\Model\UnSubscriberFactory;
-
 
 /**
  * Class SyncContact
@@ -36,7 +35,7 @@ class SyncContact
 {
     protected $helper;
     /**
-     * @var \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory
+     * @var CollectionFactory
      */
     private $addressBookCollection;
     /**
@@ -44,14 +43,14 @@ class SyncContact
      */
     private $_unsubscriber;
     /**
-     * @var \Lof\SendGrid\Model\SubscriberFactory
+     * @var SubscriberFactory
      */
-    private  $_subscriber;
+    private $_subscriber;
 
     public function __construct(
         Data $helper,
-        \Lof\SendGrid\Model\ResourceModel\AddressBook\CollectionFactory $addressBookCollection,
-        \Lof\SendGrid\Model\SubscriberFactory $subscriber,
+        CollectionFactory $addressBookCollection,
+        SubscriberFactory $subscriber,
         UnSubscriberFactory $unsubscriber
     ) {
         $this->helper = $helper;
@@ -63,14 +62,13 @@ class SyncContact
     /**
      * Execute view action
      *
-     * @return ResultInterface
+     * @return void
+     * @throws \Exception
      */
     public function execute()
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $curl = curl_init();
-            $token = $this->helper->getSendGridConfig('general', 'api_key');
             if ($this->helper->getSendGridConfig('general', 'add_customer')) {
                 $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
             } else {
@@ -79,19 +77,24 @@ class SyncContact
             $unsubscriber_list = $this->helper->getSendGridConfig('general', 'unsubscribe_list');
             $other_list = $this->helper->getSendGridConfig('general', 'other_group');
             $list_subscriber_id = '';
-            $list = $this->helper->getAllList($curl, $token);
-            $items = get_object_vars($list)['result'];
+            $list = $this->helper->getAllList();
+            if (!isset($list->result) && !isset($list['result'])) {
+                $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
+                $resultRedirect = $this->resultRedirectFactory->create();
+                return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
+            }
+            $items = isset($list->result) ? $list->result : $list['result'];
             foreach ($items as $item) {
-                if (isset($item->name) && $item->name == $subscriber_list) {
+                if (isset($item->id) && $item->id == $subscriber_list) {
                     $list_subscriber_id = $item->id;
                 }
             }
-            $list_unsubscriber = $this->helper->getUnsubscriberGroup($curl, $token);
+            $list_unsubscriber = $this->helper->getUnsubscriberGroup();
             $unsubscriber_id = '';
             $other_list_id = '';
             foreach ($list_unsubscriber as $item) {
-                if (isset($item->name)) {
-                    if ($item->name == $unsubscriber_list) {
+                if (isset($item->id)) {
+                    if ($item->id == $unsubscriber_list) {
                         $unsubscriber_id = $item->id;
                     }
                     if ($item->name == $other_list) {
@@ -100,34 +103,53 @@ class SyncContact
                 }
             }
 
-            $this->helper->syncSubscriber($curl, $token, $list_subscriber_id, $unsubscriber_id);
-            $this->helper->syncSubscriberToM2($curl, $token, $list_subscriber_id);
-
-            $subscribers_groups = $this->helper->getAllList($curl, $token);
-            $subscribers_groups = get_object_vars($subscribers_groups)['result'];
+            //save subscriber group in sendGrid to m2, delete subscriber group in m2 and not in sendGrid
+            $subscribers_groups = $items;
+            $subIds = [];
             foreach ($subscribers_groups as $subscribers_group) {
+                $subIds[] = $subscribers_group->id;
                 $model = $this->_subscriber->create();
-                $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();
-                if (count($exits)) {
-                    $model->load($exits['0']['id']);
+                $exits = $model->getCollection()
+                    ->addFieldToFilter('subscriber_group_id', $subscribers_group->id)
+                    ->getFirstItem();
+                if ($exits->getId()) {
+                    $model->load($exits->getId());
                 }
                 $model->setSubscriberGroupId($subscribers_group->id)
                     ->setSubscriberGroupName($subscribers_group->name)
                     ->setSubscriberCount($subscribers_group->contact_count);
                 $model->save();
             }
-            $unsubscribers_groups = $this->helper->getUnsubscriberGroup($curl, $token);
-            foreach ($unsubscribers_groups as $unsubscribers_group) {
+            $subCollectionDelete = $this->_subscriber->create()
+                ->getCollection();
+            if ($subIds) {
+                $subCollectionDelete->addFieldToFilter('subscriber_group_id', ['nin' => $subIds]);
+            }
+            $subCollectionDelete->walk('delete');
+
+            //save unsubscriber group in sendGrid to m2, delete unsubscriber group in m2 and not in sendGrid
+            $unsubIds = [];
+            foreach ($list_unsubscriber as $unsubscribers_group) {
+                $unsubIds[] = $unsubscribers_group->id;
                 $model = $this->_unsubscriber->create();
-                $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)->getData();
-                if (count($exits)) {
-                    $model->load($exits['0']['id']);
+                $exits = $model->getCollection()
+                    ->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)
+                    ->getFirstItem();
+                if ($exits->getId()) {
+                    $model->load($exits->getId());
                 }
+                $count = isset($unsubscribers_group->unsubscribes) ? $unsubscribers_group->unsubscribes : 0;
                 $model->setUnsubscriberGroupId($unsubscribers_group->id)
                     ->setUnsubscriberGroupName($unsubscribers_group->name)
-                    ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                    ->setUnsubscriberCount($count);
                 $model->save();
             }
+            $unsubCollectionDelete = $this->_unsubscriber->create()
+                ->getCollection();
+            if ($unsubIds) {
+                $unsubCollectionDelete->addFieldToFilter('unsubscriber_group_id', ['nin' => $unsubIds]);
+            }
+            $unsubCollectionDelete->walk('delete');
 
             //sync address book (contact)
             $addressBookCollection = $this->addressBookCollection->create()
@@ -136,13 +158,13 @@ class SyncContact
             $list_other_email = '';
             foreach ($addressBookCollection as $addressBook) {
                 if ($list_other_email == '') {
-                    $list_other_email .= "\"".$addressBook->getEmailAddress()."\"";
+                    $list_other_email .= "\"" . $addressBook->getEmailAddress() . "\"";
                 } else {
-                    $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
+                    $list_other_email .= ",\"" . $addressBook->getEmailAddress() . "\"";
                 }
             }
             if ($list_other_email != '') {
-                $response = $this->helper->syncUnsubscriber($curl, $token, $other_list_id, $list_other_email);
+                $response = $this->helper->syncUnsubscriber($other_list_id, $list_other_email);
                 if (isset($response->recipient_emails)) {
                     foreach ($addressBookCollection as $addressBook) {
                         $addressBook->setIsSynced('1');
@@ -150,7 +172,9 @@ class SyncContact
                     }
                 }
             }
-            curl_close($curl);
+
+            $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
+            $this->helper->syncSubscriberToM2($list_subscriber_id);
         }
     }
 }

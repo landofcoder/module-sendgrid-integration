@@ -1,4 +1,24 @@
 <?php
+/**
+ * Landofcoder
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Landofcoder.com license that is
+ * available through the world-wide-web at this URL:
+ * https://landofcoder.com/terms
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category   Landofcoder
+ * @package    Lof_SendGrid
+ * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+ * @license    https://landofcoder.com/terms
+ */
+
 namespace Lof\SendGrid\Controller\Adminhtml\SingleSend;
 
 use Lof\SendGrid\Helper\Data;
@@ -61,10 +81,9 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $new_model->setUpdateDate($model->getUpdateDate());
                 $new_model->setSuppressionGroupId($model->getSuppressionGroupId());
                 $new_model->setListId($model->getListId());
-                $new_model->setStatus($model->getStatus());
+                $new_model->setStatus('draft');
                 $new_model->setHtmlContent($model->getHtmlContent());
                 $new_model->setPlainContent($model->getPlainContent());
-                $new_model->setStatus($model->getStatus());
                 $new_model->setSubject($model->getSubject());
                 $new_model->setEditor($model->getEditor());
                 $new_model->setSenderId($model->getSenderId());
@@ -77,26 +96,10 @@ class Duplicate extends \Lof\SendGrid\Controller\Adminhtml\SingleSend
                 $suppression_group_id = $new_model->getSuppressionGroupId();
                 $html = $this->getCmsFilterContent($new_model->getHtmlContent());
                 $senderId = $new_model->getSenderId();
-                $dataUpdate =  '{"name":"'.$name.'","send_to":{"list_ids":'.$listSeller.'},"email_config":{"subject":"'.$subject.'","html_content":"'.$html.'","plain_content":"'.$plainContent.'","generate_plain_content":true,"editor":"'.$editor.'","suppression_group_id":'.$suppression_group_id.',"sender_id":'.$senderId.'}}';
-
-                $api_key = $this->_helperdata->getSendGridConfig('general', 'api_key');
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.sendgrid.com/v3/marketing/singlesends",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => $dataUpdate,
-                    CURLOPT_HTTPHEADER => array(
-                        "authorization: Bearer $api_key"
-                    ),
-                ));
-                $response = curl_exec($curl);
-                $err = curl_error($curl);
-                curl_close($curl);
+                $dataUpdate = '{"name":"' . $name . '","send_to":{"list_ids":' . $listSeller . '},"email_config":{"subject":"' . $subject . '","html_content":"' . $html . '","plain_content":"' . $plainContent . '","generate_plain_content":true,"editor":"' . $editor . '","suppression_group_id":' . $suppression_group_id . ',"sender_id":' . $senderId . '}}';
+                $url = "https://api.sendgrid.com/v3/marketing/singlesends";
+                $type = "POST";
+                $response = $this->_helperdata->sendRestApi($url, $type, $dataUpdate);
                 if (isset(json_decode($response)->errors)) {
                     $this->messageManager->addErrorMessage(__("Somethings went wrong. Maybe wrong Api key"));
                     return $resultRedirect->setPath('*/*/');

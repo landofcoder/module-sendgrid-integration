@@ -1,4 +1,23 @@
 <?xml version="1.0" ?>
+<!--*
+  * Landofcoder
+  *
+  * NOTICE OF LICENSE
+  *
+  * This source file is subject to the Landofcoder.com license that is
+  * available through the world-wide-web at this URL:
+  * https://landofcoder.com/terms
+  *
+  * DISCLAIMER
+  *
+  * Do not edit or add to this file if you wish to upgrade this extension to newer
+  * version in the future.
+  *
+  * @category   Landofcoder
+  * @package    Lof_SendGrid
+  * @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+  * @license    https://landofcoder.com/terms
+  *-->
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
@@ -90,10 +109,10 @@
                 </editor>
             </settings>
         </column>
-        <column name="singlesend_id">
+        <column name="name">
             <settings>
                 <filter>text</filter>
-                <label translate="true">SingleSend Id</label>
+                <label translate="true">Name</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>
@@ -102,17 +121,10 @@
                 </editor>
             </settings>
         </column>
-        <actionsColumn class="Lof\SendGrid\Ui\Component\Listing\Column\SingleSendActions" name="actions">
-            <settings>
-                <indexField>entity_id</indexField>
-                <resizeEnabled>false</resizeEnabled>
-                <resizeDefaultWidth>107</resizeDefaultWidth>
-            </settings>
-        </actionsColumn>
-        <column name="name">
+        <column name="singlesend_id">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Name</label>
+                <label translate="true">SingleSend Id</label>
                 <editor>
                     <editorType>text</editorType>
                     <validation>
@@ -145,17 +157,21 @@
                 </editor>
             </settings>
         </column>
-        <column name="status">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">Status</label>
-                <editor>
-                    <editorType>text</editorType>
-                    <validation>
-                        <rule name="required-entry" xsi:type="boolean">false</rule>
-                    </validation>
-                </editor>
-            </settings>
+        <column name="status" class="Lof\SendGrid\Ui\Component\Listing\Column\Status" sortOrder="125">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">Lof_SendGrid/grid/cells/status</item>
+                    <item name="label" xsi:type="string">Status</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                </item>
+            </argument>
         </column>
+        <actionsColumn class="Lof\SendGrid\Ui\Component\Listing\Column\SingleSendActions" name="actions" sortOrder="150">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
     </columns>
 </listing>
