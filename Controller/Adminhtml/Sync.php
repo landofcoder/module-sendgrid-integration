@@ -21,6 +21,7 @@
 
 namespace Lof\SendGrid\Controller\Adminhtml;
 
+use Exception;
 use Lof\SendGrid\Helper\Data;
 use Lof\SendGrid\Model\AddressBookFactory;
 use Lof\SendGrid\Model\SenderFactory;
@@ -141,10 +142,12 @@ abstract class Sync extends \Magento\Backend\App\Action
             return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
         $items = $singleSends->result;
+        $singleSendIds = [];
         foreach ($items as $item) {
             if (!isset($item->id)) {
                 continue;
             }
+            $singleSendIds[] = $item->id;
             $model = $this->singlesend->create();
             $data = $this->helper->getDataSinglesend($item->id);
             $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
@@ -196,6 +199,12 @@ abstract class Sync extends \Magento\Backend\App\Action
             }
             $model->save();
         }
+
+        $singleSendCollectionDelete = $this->singlesend->create()->getCollection();
+        if ($singleSendIds) {
+            $singleSendCollectionDelete->addFieldToFilter('singlesend_id', ['nin' => $singleSendIds]);
+        }
+        $singleSendCollectionDelete->walk('delete');
     }
 
 
@@ -205,11 +214,13 @@ abstract class Sync extends \Magento\Backend\App\Action
     public function SyncSender()
     {
         $senders = $this->helper->getAllSenders();
+        $senderIds = [];
         foreach ($senders as $sender) {
             $model = $this->_sender->create();
             if (!isset($sender->id)) {
                 continue;
             }
+            $senderIds[] = $sender->id;
             $exits = $model->getCollection()->addFieldToFilter('sender_id', $sender->id)->getData();
             if (count($exits)) {
                 $model->load($exits['0']['id']);
@@ -247,14 +258,19 @@ abstract class Sync extends \Magento\Backend\App\Action
             }
             try {
                 $model->save();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->messageManager->addErrorMessage($e);
             }
         }
+        $senderCollectionDelete = $this->_sender->create()->getCollection();
+        if ($senderIds) {
+            $senderCollectionDelete->addFieldToFilter('sender_id', ['nin' => $senderIds]);
+        }
+        $senderCollectionDelete->walk('delete');
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function SyncContact()
     {
@@ -267,14 +283,14 @@ abstract class Sync extends \Magento\Backend\App\Action
         $other_list = $this->helper->getSendGridConfig('general', 'other_group');
         $list_subscriber_id = '';
         $list = $this->helper->getAllList();
-        if (!isset($list->result)) {
+        if (!isset($list->result) && !isset($list['result'])) {
             $this->_messageManager->addErrorMessage(__("Some thing went wrong. May be wrong Api key"));
             $resultRedirect = $this->resultRedirectFactory->create();
             return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
-        $items = $list->result;
+        $items = isset($list->result) ? $list->result : $list['result'];
         foreach ($items as $item) {
-            if (isset($item->name) && $item->name == $subscriber_list) {
+            if (isset($item->id) && $item->id == $subscriber_list) {
                 $list_subscriber_id = $item->id;
             }
         }
@@ -282,8 +298,8 @@ abstract class Sync extends \Magento\Backend\App\Action
         $unsubscriber_id = '';
         $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
-            if (isset($item->name)) {
-                if ($item->name == $unsubscriber_list) {
+            if (isset($item->id)) {
+                if ($item->id == $unsubscriber_list) {
                     $unsubscriber_id = $item->id;
                 }
                 if ($item->name == $other_list) {
@@ -292,33 +308,53 @@ abstract class Sync extends \Magento\Backend\App\Action
             }
         }
 
-        $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
-        $this->helper->syncSubscriberToM2($list_subscriber_id);
-
+        //save subscriber group in sendGrid to m2, delete subscriber group in m2 and not in sendGrid
         $subscribers_groups = $items;
+        $subIds = [];
         foreach ($subscribers_groups as $subscribers_group) {
+            $subIds[] = $subscribers_group->id;
             $model = $this->_subscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('subscriber_group_id', $subscribers_group->id)->getData();
-            if (count($exits)) {
-                $model->load($exits['0']['id']);
+            $exits = $model->getCollection()
+                ->addFieldToFilter('subscriber_group_id', $subscribers_group->id)
+                ->getFirstItem();
+            if ($exits->getId()) {
+                $model->load($exits->getId());
             }
             $model->setSubscriberGroupId($subscribers_group->id)
                 ->setSubscriberGroupName($subscribers_group->name)
                 ->setSubscriberCount($subscribers_group->contact_count);
             $model->save();
         }
-        $unsubscribers_groups = $this->helper->getUnsubscriberGroup();
-        foreach ($unsubscribers_groups as $unsubscribers_group) {
+        $subCollectionDelete = $this->_subscriber->create()
+            ->getCollection();
+        if ($subIds) {
+            $subCollectionDelete->addFieldToFilter('subscriber_group_id', ['nin' => $subIds]);
+        }
+        $subCollectionDelete->walk('delete');
+
+        //save unsubscriber group in sendGrid to m2, delete unsubscriber group in m2 and not in sendGrid
+        $unsubIds = [];
+        foreach ($list_unsubscriber as $unsubscribers_group) {
+            $unsubIds[] = $unsubscribers_group->id;
             $model = $this->_unsubscriber->create();
-            $exits = $model->getCollection()->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)->getData();
-            if (count($exits)) {
-                $model->load($exits['0']['id']);
+            $exits = $model->getCollection()
+                ->addFieldToFilter('unsubscriber_group_id', $unsubscribers_group->id)
+                ->getFirstItem();
+            if ($exits->getId()) {
+                $model->load($exits->getId());
             }
+            $count = isset($unsubscribers_group->unsubscribes) ? $unsubscribers_group->unsubscribes : 0;
             $model->setUnsubscriberGroupId($unsubscribers_group->id)
                 ->setUnsubscriberGroupName($unsubscribers_group->name)
-                ->setUnsubscriberCount($unsubscribers_group->unsubscribes);
+                ->setUnsubscriberCount($count);
             $model->save();
         }
+        $unsubCollectionDelete = $this->_unsubscriber->create()
+            ->getCollection();
+        if ($unsubIds) {
+            $unsubCollectionDelete->addFieldToFilter('unsubscriber_group_id', ['nin' => $unsubIds]);
+        }
+        $unsubCollectionDelete->walk('delete');
 
         //sync address book (contact)
         $addressBookCollection = $this->addressBookCollection->create()
@@ -341,6 +377,9 @@ abstract class Sync extends \Magento\Backend\App\Action
                 }
             }
         }
+
+        $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
+        $this->helper->syncSubscriberToM2($list_subscriber_id);
     }
 
     /**

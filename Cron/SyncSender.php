@@ -21,6 +21,7 @@
 
 namespace Lof\SendGrid\Cron;
 
+use Exception;
 use Lof\SendGrid\Helper\Data;
 use Lof\SendGrid\Model\SenderFactory;
 
@@ -52,24 +53,27 @@ class SyncSender
      * Execute view action
      *
      * @return void
+     * @throws Exception
      */
     public function execute()
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
             $senders = $this->helper->getAllSenders();
+            $senderIds = [];
             foreach ($senders as $sender) {
                 $model = $this->_sender->create();
                 if (!isset($sender->id)) {
                     continue;
                 }
+                $senderIds[] = $sender->id;
                 $exits = $model->getCollection()->addFieldToFilter('sender_id', $sender->id)->getData();
                 if (count($exits)) {
                     $model->load($exits['0']['id']);
                 }
                 $model->setSenderId($sender->id);
-                if (isset($item->nickname)) {
-                    $model->setNickName($item->nickname);
+                if (isset($sender->nickname)) {
+                    $model->setNickName($sender->nickname);
                 }
                 if (isset($sender->from->email)) {
                     $model->setFrom($sender->from->email);
@@ -100,6 +104,11 @@ class SyncSender
                 }
                 $model->save();
             }
+            $senderCollectionDelete = $this->_sender->create()->getCollection();
+            if ($senderIds) {
+                $senderCollectionDelete->addFieldToFilter('sender_id', ['nin' => $senderIds]);
+            }
+            $senderCollectionDelete->walk('delete');
         }
     }
 }

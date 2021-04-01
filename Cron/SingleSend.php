@@ -63,20 +63,23 @@ class SingleSend
 
     /**
      * @return void
+     * @throws \Exception
      */
     public function execute()
     {
         $cron_enable = $this->helper->getSendGridConfig('sync', 'cron_enable');
         if ($cron_enable) {
-            $object = $this->helper->getAllSingleSend();
-            if (!isset($object->result) || !$object->result) {
+            $singleSends = $this->helper->getAllSingleSend();
+            if (!isset($singleSends->result) || !$singleSends->result) {
                 return;
             }
-            $items = $object->result;
+            $items = $singleSends->result;
+            $singleSendIds = [];
             foreach ($items as $item) {
                 if (!isset($item->id)) {
                     continue;
                 }
+                $singleSendIds[] = $item->id;
                 $model = $this->singlesend->create();
                 $data = $this->helper->getDataSinglesend($item->id);
                 $existing = $model->getCollection()->addFieldToFilter("singlesend_id", $item->id)->getData();
@@ -128,6 +131,11 @@ class SingleSend
                 }
                 $model->save();
             }
+            $singleSendCollectionDelete = $this->singlesend->create()->getCollection();
+            if ($singleSendIds) {
+                $singleSendCollectionDelete->addFieldToFilter('singlesend_id', ['nin' => $singleSendIds]);
+            }
+            $singleSendCollectionDelete->walk('delete');
         }
     }
 }

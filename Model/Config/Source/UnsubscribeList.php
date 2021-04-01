@@ -54,7 +54,7 @@ class UnsubscribeList implements \Magento\Framework\Option\ArrayInterface
         foreach ($list as $item) {
             $options[] = [
                 'label' => __($item->getUnsubscriberGroupName()),
-                'value' => $item->getUnsubscriberGroupName(),
+                'value' => $item->getUnsubscriberGroupId(),
             ];
         }
         return $options;

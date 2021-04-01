@@ -123,10 +123,16 @@ class Data extends AbstractHelper
         $type = "PUT";
         $data = "{\"list_ids\":[\"$list_id\"],\"contacts\":[".$contact."]}";
         $response = $this->sendRestApi($url, $type, $data);
-        if (strpos($response, 'job_id')) {
-            $this->_messageManager->addSuccessMessage(__("Contacts have been synced"));
+        if (!$list_id) {
+            $this->_messageManager->addNoticeMessage(
+                __("Please select Subscribe, UnSubscribe Group and save, then sync again.")
+            );
         } else {
-            $this->_messageManager->addErrorMessage(__("Something went wrong. Can't sync contacts"));
+            if (strpos($response, 'job_id')) {
+                $this->_messageManager->addSuccessMessage(__("Contacts have been synced"));
+            } else {
+                $this->_messageManager->addErrorMessage(__("Something went wrong. Can't sync contacts"));
+            }
         }
     }
 
@@ -139,6 +145,26 @@ class Data extends AbstractHelper
         $url = "https://api.sendgrid.com/v3/marketing/lists?page_size=100";
         $type = "GET";
         $data = "{}";
+        $response = $this->sendRestApi($url, $type, $data);
+        $res = json_decode($response, false);
+        if (isset($res->result) && count($res->result)) {
+            return $res;
+        } else {
+            $sub = $this->createNewSubscribeGroup("Magento 2 Subscriber Group");
+            $arr['result'][0] = $sub;
+            return $arr;
+        }
+    }
+
+    /**
+     * @param $name
+     * @return mixed
+     */
+    public function createNewSubscribeGroup($name)
+    {
+        $url = "https://api.sendgrid.com/v3/marketing/lists";
+        $type = "POST";
+        $data = "{\"name\":\"$name\"}";
         $response = $this->sendRestApi($url, $type, $data);
         return json_decode($response, false);
     }
@@ -164,6 +190,27 @@ class Data extends AbstractHelper
         $type = "GET";
         $data = "{}";
         $response = $this->sendRestApi($url, $type, $data);
+        $res = json_decode($response, false);
+        if (count($res)) {
+            return $res;
+        } else {
+            $sub = $this->createNewUnsubscribeGroup("Magento 2 UnSubscriber Group", "Magento 2 UnSubscriber Group");
+            $arr[0] = $sub;
+            return $arr;
+        }
+    }
+
+    /**
+     * @param $name
+     * @param $des
+     * @return mixed
+     */
+    public function createNewUnsubscribeGroup($name, $des)
+    {
+        $url = "https://api.sendgrid.com/v3/asm/groups";
+        $type = "POST";
+        $data = "{\"name\":\"$name\",\"description\":\"$des\"}";
+        $response = $this->sendRestApi($url, $type, $data);
         return json_decode($response, false);
     }
 
@@ -180,9 +227,13 @@ class Data extends AbstractHelper
                 if (isset($item->list_ids)) {
                     if (in_array($list_subscriber_id, $item->list_ids)) {
                         $subscriber = $this->_subscriberFactory->create();
-                        $existing = $subscriber->getCollection()->addFieldToFilter("subscriber_email", $item->email)->getData();
-                        if (count($existing) == 0) {
-                            $subscriber->setSubscriberEmail($item->email)->setCustomerFirstname($item->first_name)->setCustomerLastname($item->last_name)->setStatus('1');
+                        $existing = $subscriber->getCollection()
+                            ->addFieldToFilter("subscriber_email", $item->email)->getFirstItem();
+                        if ($existing->getData()) {
+                            $subscriber->setSubscriberEmail($item->email)
+                                ->setCustomerFirstname($item->first_name)
+                                ->setCustomerLastname($item->last_name)
+                                ->setStatus('1');
                             $subscriber->save();
                         }
                     }
@@ -199,10 +250,10 @@ class Data extends AbstractHelper
     {
         $sub = $this->_subscriberFactory->create()->getCollection();
         $unsub = $this->_subscriberFactory->create()->getCollection();
+        $subscriber = '';
         if ($this->getSendGridConfig('general', 'add_customer') == 0) {
             $sub->addFieldToFilter('subscriber_status', '1');
             $unsub->addFieldToFilter('subscriber_status', '3');
-            $subscriber = '';
             if (count($sub)) {
                 foreach ($sub as $item) {
                     $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
@@ -226,7 +277,6 @@ class Data extends AbstractHelper
                 $this->syncUnsubscriber($unsubscriber_list_id, $arr2);
             }
         } else {
-            $subscriber = '';
             if (count($sub)) {
                 foreach ($sub as $item) {
                     $arr = '{"email":'."\"".$item->getSubscriberEmail()."\"".',"first_name":'."\"".$item->getCustomerFirstname()."\"".',"last_name":'."\"".$item->getCustomerLastname()."\"".'}';
@@ -282,12 +332,10 @@ class Data extends AbstractHelper
      */
     public function getAllSenders()
     {
-        $url = "https://api.sendgrid.com/v3/senders";
+        $url = "https://api.sendgrid.com/v3/marketing/senders";
         $type = "GET";
-        $data = "{}";
 
-        $response = $this->sendRestApi($url, $type, $data);
-        return json_decode($response);
+        return $this->sendApi($url, $type, []);
     }
 
     /**

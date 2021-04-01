@@ -21,30 +21,63 @@
 namespace Lof\SendGrid\Observer;
 
 use Lof\SendGrid\Helper\Data;
+use Lof\SendGrid\Model\AddressBookFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 
+/**
+ * Class GetContact
+ * @package Lof\SendGrid\Observer
+ */
 class GetContact implements \Magento\Framework\Event\ObserverInterface
 {
+    /**
+     * @var Data
+     */
+    private $helper;
+    /**
+     * @var AddressBookFactory
+     */
+    private $addressBook;
+    /**
+     * @var ManagerInterface
+     */
+    private $_messageManager;
+    /**
+     * @var DateTimeFactory
+     */
+    private $_dateFactory;
+
+    /**
+     * GetContact constructor.
+     * @param ManagerInterface $manager
+     * @param AddressBookFactory $addressBookFactory
+     * @param DateTimeFactory $dateFactory
+     * @param Data $helper
+     */
     public function __construct(
         ManagerInterface $manager,
-        \Lof\SendGrid\Model\AddressBookFactory $addressBookFactory,
+        AddressBookFactory $addressBookFactory,
         DateTimeFactory $dateFactory,
         Data $helper
-
     ) {
         $this->addressBook = $addressBookFactory;
         $this->_messageManager = $manager;
         $this->helper = $helper;
         $this->_dateFactory = $dateFactory;
-
     }
+
+    /**
+     * @param \Magento\Framework\Event\Observer $observer
+     * @return $this|void
+     * @throws \Exception
+     */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $group = $this->helper->getSendGridConfig('general', 'other_group');
         $info = $observer->getRequest()->getParams();
-        $collection = $this->addressBook->create()->getCollection()->addFieldToFilter('email_address',$info['email']);
-        if(count($collection) == 0) {
+        $collection = $this->addressBook->create()->getCollection()->addFieldToFilter('email_address', $info['email']);
+        if (count($collection) == 0) {
             $addressBook = $this->addressBook->create();
             $addressBook->setFirstname($info['name'])->setEmailAddress($info['email'])->setIsSubscribed('0')->setSourceFrom('Contact')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
             $addressBook->save();
