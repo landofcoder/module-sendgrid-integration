@@ -1,16 +1,13 @@
 # Mage2 Module Lof SendGrid
 
-    ``lof/module-sendgrid``
+    ``landofcoder/module-sendgrid-integration``
 
  - [Main Functionalities](#markdown-header-main-functionalities)
  - [Installation](#markdown-header-installation)
  - [Configuration](#markdown-header-configuration)
- - [Specifications](#markdown-header-specifications)
- - [Attributes](#markdown-header-attributes)
-
 
 ## Main Functionalities
-
+Magento 2 Sendgrid Extension supports to take control over your email marketing strategy effectively.
 
 ## Installation
 \* = in production please use the `--keep-generated` option
@@ -29,7 +26,7 @@
     - public repository `packagist.org`
     - public github repository as vcs
  - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require lof/module-sendgrid`
+ - Install the module composer by running `composer require landofcoder/module-sendgrid-integration`
  - enable the module by running `php bin/magento module:enable Lof_SendGrid`
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
@@ -62,13 +59,3 @@
  - Webhook Url	 (sendgrid/general/list_for_new_customer)
 
  - Cron Enabled (sendgrid/sync/cron_enable)
-
-## Specifications
-
-
-
-
-## Attributes
-
-
-
