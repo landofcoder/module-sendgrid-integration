@@ -379,7 +379,7 @@ abstract class Sync extends \Magento\Backend\App\Action
         }
 
         $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
-        $this->helper->syncSubscriberToM2($list_subscriber_id);
+//        $this->helper->syncSubscriberToM2($list_subscriber_id);
     }
 
     /**
@@ -401,7 +401,15 @@ abstract class Sync extends \Magento\Backend\App\Action
                     $entity_id = $existOnThis['0']['id'];
                     $addressbook = $this->addressbook->create()->load($entity_id);
                 }
-                $addressbook->setEmailAddress($customer->getEmail())->setFirstname($customer->getFirstname())->setLastname($customer->getLastname())->setSourceFrom('Customer')->setCustomerId($customer->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
+                $addressbook->setEmailAddress($customer->getEmail())
+                    ->setFirstname($customer->getFirstname())
+                    ->setLastname($customer->getLastname())
+                    ->setSourceFrom('Customer')
+                    ->setCustomerId($customer->getId())
+                    ->setIsSubscribed('0')
+                    ->setCreatedAt($this->_dateFactory->create()->gmtDate())
+                    ->setIsSync('0')
+                    ->setGroupId($group);
                 $addressbook->save();
             }
         }
