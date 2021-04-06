@@ -27,7 +27,7 @@ use Magento\Framework\Stdlib\DateTime\DateTimeFactory;
 
 /**
  * Class GetContact
- * @package Lof\SendGrid\Observer
+ * Lof\SendGrid\Observer
  */
 class GetContact implements \Magento\Framework\Event\ObserverInterface
 {
@@ -79,7 +79,13 @@ class GetContact implements \Magento\Framework\Event\ObserverInterface
         $collection = $this->addressBook->create()->getCollection()->addFieldToFilter('email_address', $info['email']);
         if (count($collection) == 0) {
             $addressBook = $this->addressBook->create();
-            $addressBook->setFirstname($info['name'])->setEmailAddress($info['email'])->setIsSubscribed('0')->setSourceFrom('Contact')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
+            $addressBook->setFirstname($info['name'])
+                ->setEmailAddress($info['email'])
+                ->setIsSubscribed('0')
+                ->setSourceFrom('Contact')
+                ->setCreatedAt($this->_dateFactory->create()->gmtDate())
+                ->setIsSync('0')
+                ->setGroupId($group);
             $addressBook->save();
         }
         return $this;

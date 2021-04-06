@@ -174,7 +174,7 @@ class SyncContact
             }
 
             $this->helper->syncSubscriber($list_subscriber_id, $unsubscriber_id);
-            $this->helper->syncSubscriberToM2($list_subscriber_id);
+//            $this->helper->syncSubscriberToM2($list_subscriber_id);
         }
     }
 }
