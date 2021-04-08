@@ -28,6 +28,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Newsletter\Model\SubscriberFactory;
 use Magento\Store\Model\ScopeInterface;
+use Zend\Http\Client\Adapter\Curl;
 
 /**
  * Class Data
@@ -116,6 +117,7 @@ class Data extends AbstractHelper
     /**
      * @param $contact
      * @param $list_id
+     * @return bool
      */
     public function sync($contact, $list_id)
     {
@@ -127,11 +129,13 @@ class Data extends AbstractHelper
             $this->_messageManager->addNoticeMessage(
                 __("Please select Subscribe, UnSubscribe Group and save, then sync again.")
             );
+            return false;
         } else {
             if (strpos($response, 'job_id')) {
-                $this->_messageManager->addSuccessMessage(__("Contacts have been synced"));
+                return true;
             } else {
                 $this->_messageManager->addErrorMessage(__("Something went wrong. Can't sync contacts"));
+                return false;
             }
         }
     }
@@ -376,7 +380,7 @@ class Data extends AbstractHelper
     {
         $curl = curl_init();
         $api_key = $this->getSendGridConfig('general', 'api_key');
-        curl_setopt_array($curl, array(
+        curl_setopt_array($curl, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
@@ -385,11 +389,11 @@ class Data extends AbstractHelper
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $type,
             CURLOPT_POSTFIELDS => $data,
-            CURLOPT_HTTPHEADER => array(
+            CURLOPT_HTTPHEADER => [
                 "authorization: Bearer $api_key",
                 "content-type: application/json"
-            ),
-        ));
+            ],
+        ]);
         $res = curl_exec($curl);
         curl_close($curl);
         return $res;
@@ -419,7 +423,7 @@ class Data extends AbstractHelper
 
         $client = new \Zend\Http\Client();
         $options = [
-            'adapter'   => 'Zend\Http\Client\Adapter\Curl',
+            'adapter'   => Curl::class,
             'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
             'maxredirects' => 0,
             'timeout' => 30

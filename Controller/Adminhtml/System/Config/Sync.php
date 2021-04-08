@@ -99,12 +99,11 @@ class Sync extends \Lof\SendGrid\Controller\Adminhtml\Sync
         // sync sender
         $this->SyncSender();
 
-        //sync unscriber and unsubscriber groups
-        $this->SyncContact();
-
-
         //sync customer to new database
         $this->moveCustomerToSubscriberGroup();
+
+        //sync unscriber and unsubscriber groups
+        $this->SyncContact();
 
         $resultRedirect = $this->resultRedirectFactory->create();
         $this->_messageManager->addSuccessMessage(__("Sync with Sendgrid successfully."));
