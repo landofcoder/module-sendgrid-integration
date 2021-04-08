@@ -207,7 +207,6 @@ abstract class Sync extends \Magento\Backend\App\Action
         $singleSendCollectionDelete->walk('delete');
     }
 
-
     /**
      *
      */
@@ -274,13 +273,15 @@ abstract class Sync extends \Magento\Backend\App\Action
      */
     public function SyncContact()
     {
-        if ($this->helper->getSendGridConfig('general', 'add_customer')) {
-            $subscriber_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
-        } else {
-            $subscriber_list = $this->helper->getSendGridConfig('general', 'subscribe_list');
-        }
+        $subscriber_list = $this->helper->getSendGridConfig('general', 'subscribe_list');
+
         $unsubscriber_list = $this->helper->getSendGridConfig('general', 'unsubscribe_list');
-        $other_list = $this->helper->getSendGridConfig('general', 'other_group');
+        $addNewCustomerToSubscriberList = $this->helper->getSendGridConfig('general', 'add_customer');
+        if ($addNewCustomerToSubscriberList) {
+            $other_list = $this->helper->getSendGridConfig('general', 'list_for_new_customer');
+        } else {
+            $other_list = $this->helper->getSendGridConfig('general', 'other_group');
+        }
         $list_subscriber_id = '';
         $list = $this->helper->getAllList();
         if (!isset($list->result) && !isset($list['result'])) {
@@ -289,20 +290,23 @@ abstract class Sync extends \Magento\Backend\App\Action
             return $resultRedirect->setPath('adminhtml/system_config/edit/section/sendgrid/');
         }
         $items = isset($list->result) ? $list->result : $list['result'];
+        $other_list_id = '';
         foreach ($items as $item) {
             if (isset($item->id) && $item->id == $subscriber_list) {
                 $list_subscriber_id = $item->id;
             }
+            if ($addNewCustomerToSubscriberList && $item->id == $other_list) {
+                $other_list_id = $item->id;
+            }
         }
         $list_unsubscriber = $this->helper->getUnsubscriberGroup();
         $unsubscriber_id = '';
-        $other_list_id = '';
         foreach ($list_unsubscriber as $item) {
             if (isset($item->id)) {
                 if ($item->id == $unsubscriber_list) {
                     $unsubscriber_id = $item->id;
                 }
-                if ($item->name == $other_list) {
+                if (!$addNewCustomerToSubscriberList && $item->id == $other_list) {
                     $other_list_id = $item->id;
                 }
             }
@@ -361,19 +365,39 @@ abstract class Sync extends \Magento\Backend\App\Action
             ->addFieldToFilter('is_subscribed', '0')
             ->addFieldToFilter('is_synced', '0');
         $list_other_email = '';
-        foreach ($addressBookCollection as $addressBook) {
-            if ($list_other_email == '') {
-                $list_other_email .= "\"".$addressBook->getEmailAddress()."\"";
-            } else {
-                $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
+        if (!$addNewCustomerToSubscriberList) {
+            foreach ($addressBookCollection as $addressBook) {
+                if ($list_other_email == '') {
+                    $list_other_email .= "\"".$addressBook->getEmailAddress()."\"";
+                } else {
+                    $list_other_email .= ",\"".$addressBook->getEmailAddress()."\"";
+                }
             }
-        }
-        if ($list_other_email != '') {
-            $response = $this->helper->syncUnsubscriber($other_list_id, $list_other_email);
-            if (isset($response->recipient_emails)) {
-                foreach ($addressBookCollection as $addressBook) {
-                    $addressBook->setIsSynced('1');
-                    $addressBook->save();
+            if ($list_other_email != '') {
+                $response = $this->helper->syncUnsubscriber($other_list_id, $list_other_email);
+                if (isset($response->recipient_emails)) {
+                    foreach ($addressBookCollection as $addressBook) {
+                        $addressBook->setIsSynced('1');
+                        $addressBook->save();
+                    }
+                }
+            }
+        } else {
+            foreach ($addressBookCollection as $addressBook) {
+                $arr = '{"email":'."\"".$addressBook->getEmailAddress()."\"".',"first_name":'."\"".$addressBook->getFirstname()."\"".',"last_name":'."\"".$addressBook->getLastname()."\"".'}';
+                if ($list_other_email == '') {
+                    $list_other_email .= $arr;
+                } else {
+                    $list_other_email .= ','.$arr;
+                }
+            }
+            if ($list_other_email != '') {
+                $response = $this->helper->sync($list_other_email, $other_list_id);
+                if ($response) {
+                    foreach ($addressBookCollection as $addressBook) {
+                        $addressBook->setIsSynced('1');
+                        $addressBook->save();
+                    }
                 }
             }
         }
@@ -418,7 +442,8 @@ abstract class Sync extends \Magento\Backend\App\Action
             $subscriberCollection = $this->_subcriberCollectionFactory->create();
             $exist = $subscriberCollection->addFieldToFilter('subscriber_email', $order->getCustomerEmail())->getData();
             $addressbookCollection = $this->addressbook->create()->getCollection();
-            $existOnThis = $addressbookCollection->addFieldToFilter('email_address', $order->getCustomerEmail())->getData();
+            $existOnThis = $addressbookCollection->addFieldToFilter('email_address', $order->getCustomerEmail())
+                ->getData();
             if (!count($exist)) {
                 if (!count($existOnThis)) {
                     $addressbook = $this->addressbook->create();
@@ -426,7 +451,16 @@ abstract class Sync extends \Magento\Backend\App\Action
                     $entity_id = $existOnThis['0']['id'];
                     $addressbook = $this->addressbook->create()->load($entity_id);
                 }
-                $addressbook->setEmailAddress($order->getCustomerEmail())->setFirstname($order->getCustomerFirstname())->setLastname($order->getCustomerLastname())->setSourceFrom('Order')->setCustomerId($order->getCustomerId())->setOrderId($order->getId())->setIsSubscribed('0')->setCreatedAt($this->_dateFactory->create()->gmtDate())->setIsSync('0')->setGroupId($group);
+                $addressbook->setEmailAddress($order->getCustomerEmail())
+                    ->setFirstname($order->getCustomerFirstname())
+                    ->setLastname($order->getCustomerLastname())
+                    ->setSourceFrom('Order')
+                    ->setCustomerId($order->getCustomerId())
+                    ->setOrderId($order->getId())
+                    ->setIsSubscribed('0')
+                    ->setCreatedAt($this->_dateFactory->create()->gmtDate())
+                    ->setIsSync('0')
+                    ->setGroupId($group);
                 $addressbook->save();
             }
         }
