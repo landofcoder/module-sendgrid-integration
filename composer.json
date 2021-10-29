@@ -4,10 +4,16 @@
     "description": "Sendgrid Sync Magento 2 with Sendgrid",
     "type": "magento2-module",
     "license": "MIT",
+    "keywords": [
+        "landofcoder",
+        "landofcoder sendgrid",
+        "magento 2 sendgrid integration extension"
+    ],
     "authors": [
         {
             "name": "Landofcoder",
-            "email": "info@landofcoder.com"
+            "email": "info@landofcoder.com",
+            "homepage": "https://landofcoder.com"
         }
     ],
     "version": "1.0.3",
